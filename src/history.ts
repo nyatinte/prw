@@ -1,6 +1,6 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
-import { homedir } from 'os';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 
 export interface HistoryEntry {
   package: string;
@@ -8,7 +8,7 @@ export interface HistoryEntry {
   timestamp: number;
 }
 
-const HISTORY_FILE = join(homedir(), '.prw_history');
+const HISTORY_FILE = join(homedir(), ".prw_history");
 const MAX_HISTORY = 50;
 
 export function loadHistory(): HistoryEntry[] {
@@ -17,7 +17,7 @@ export function loadHistory(): HistoryEntry[] {
   }
 
   try {
-    const content = readFileSync(HISTORY_FILE, 'utf-8');
+    const content = readFileSync(HISTORY_FILE, "utf-8");
     return JSON.parse(content);
   } catch {
     return [];
@@ -28,7 +28,7 @@ export function saveHistory(entry: HistoryEntry): void {
   const history = loadHistory();
 
   const existingIndex = history.findIndex(
-    h => h.package === entry.package && h.script === entry.script
+    (h) => h.package === entry.package && h.script === entry.script
   );
 
   if (existingIndex !== -1) {
@@ -41,7 +41,7 @@ export function saveHistory(entry: HistoryEntry): void {
     history.splice(MAX_HISTORY);
   }
 
-  const dir = join(homedir(), '.prw');
+  const dir = join(homedir(), ".prw");
   mkdirSync(dir, { recursive: true });
 
   writeFileSync(HISTORY_FILE, JSON.stringify(history, null, 2));

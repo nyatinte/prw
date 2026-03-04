@@ -1,23 +1,23 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from "vitest";
 
 // Core logic tests without mocking home directory
-describe('history', () => {
-  it('basic history entry type is valid', () => {
+describe("history", () => {
+  it("basic history entry type is valid", () => {
     const entry = {
-      package: '@myapp/web',
-      script: 'dev',
+      package: "@myapp/web",
+      script: "dev",
       timestamp: Date.now(),
     };
-    expect(entry).toHaveProperty('package');
-    expect(entry).toHaveProperty('script');
-    expect(entry).toHaveProperty('timestamp');
+    expect(entry).toHaveProperty("package");
+    expect(entry).toHaveProperty("script");
+    expect(entry).toHaveProperty("timestamp");
   });
 
-  it('history entry ordering works correctly', () => {
+  it("history entry ordering works correctly", () => {
     const entries = [
-      { package: '@pkg0', script: 'test', timestamp: 0 },
-      { package: '@pkg1', script: 'test', timestamp: 1 },
-      { package: '@pkg2', script: 'test', timestamp: 2 },
+      { package: "@pkg0", script: "test", timestamp: 0 },
+      { package: "@pkg1", script: "test", timestamp: 1 },
+      { package: "@pkg2", script: "test", timestamp: 2 },
     ];
 
     // Simulate LRU: move duplicate to front
@@ -29,10 +29,10 @@ describe('history', () => {
     expect(reordered.length).toBe(3);
   });
 
-  it('history truncation logic works', () => {
+  it("history truncation logic works", () => {
     const entries = Array.from({ length: 51 }, (_, i) => ({
       package: `@pkg${i}`,
-      script: 'test',
+      script: "test",
       timestamp: i,
     }));
 
@@ -41,6 +41,6 @@ describe('history', () => {
     }
 
     expect(entries).toHaveLength(50);
-    expect(entries[0].package).toBe('@pkg0');
+    expect(entries[0].package).toBe("@pkg0");
   });
 });

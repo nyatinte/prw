@@ -4,7 +4,7 @@ export function fuzzyFilter(query: string, items: string[]): string[] {
   }
 
   const lowerQuery = query.toLowerCase();
-  return items.filter(item => {
+  return items.filter((item) => {
     const lowerItem = item.toLowerCase();
     let qIdx = 0;
 
