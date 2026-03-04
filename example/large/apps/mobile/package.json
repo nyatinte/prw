@@ -2,9 +2,9 @@
   "name": "@large/mobile",
   "version": "1.0.0",
   "scripts": {
-    "dev": "echo 'Running mobile in dev mode'",
-    "build": "echo 'Building mobile'",
-    "test": "vitest",
-    "lint": "eslint src"
+    "dev": "echo '🚀 @large/mobile dev starting...'",
+    "build": "echo '📦 @large/mobile building...'",
+    "test": "echo '✓ All tests passed'",
+    "lint": "echo '✓ Linting passed'"
   }
 }

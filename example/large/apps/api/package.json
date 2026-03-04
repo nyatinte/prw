@@ -2,9 +2,9 @@
   "name": "@large/api",
   "version": "1.0.0",
   "scripts": {
-    "dev": "echo 'Running api in dev mode'",
-    "build": "echo 'Building api'",
-    "test": "vitest",
-    "lint": "eslint src"
+    "dev": "echo '🚀 @large/api dev starting...'",
+    "build": "echo '📦 @large/api building...'",
+    "test": "echo '✓ All tests passed'",
+    "lint": "echo '✓ Linting passed'"
   }
 }

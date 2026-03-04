@@ -2,9 +2,9 @@
   "name": "@large/dashboard",
   "version": "1.0.0",
   "scripts": {
-    "dev": "echo 'Running dashboard in dev mode'",
-    "build": "echo 'Building dashboard'",
-    "test": "vitest",
-    "lint": "eslint src"
+    "dev": "echo '🚀 @large/dashboard dev starting...'",
+    "build": "echo '📦 @large/dashboard building...'",
+    "test": "echo '✓ All tests passed'",
+    "lint": "echo '✓ Linting passed'"
   }
 }

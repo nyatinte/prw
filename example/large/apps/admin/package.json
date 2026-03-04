@@ -2,9 +2,9 @@
   "name": "@large/admin",
   "version": "1.0.0",
   "scripts": {
-    "dev": "echo 'Running admin in dev mode'",
-    "build": "echo 'Building admin'",
-    "test": "vitest",
-    "lint": "eslint src"
+    "dev": "echo '🚀 @large/admin dev starting...'",
+    "build": "echo '📦 @large/admin building...'",
+    "test": "echo '✓ All tests passed'",
+    "lint": "echo '✓ Linting passed'"
   }
 }
