@@ -3,6 +3,8 @@ import { join, resolve } from "node:path";
 import glob from "fast-glob";
 import YAML from "js-yaml";
 
+const WORKSPACE_CONFIG_FILE = "pnpm-workspace.yaml";
+
 export class WorkspaceNotFoundError extends Error {
   constructor(message: string) {
     super(message);
@@ -16,27 +18,19 @@ export interface Package {
 }
 
 export function findWorkspaceRoot(cwd: string): string {
-  let current = resolve(cwd);
+  const current = resolve(cwd);
+  const workspacePath = join(current, WORKSPACE_CONFIG_FILE);
 
-  while (true) {
-    const workspacePath = join(current, "pnpm-workspace.yaml");
-    if (existsSync(workspacePath)) {
-      return current;
-    }
-
-    const parent = join(current, "..");
-    if (parent === current) {
-      throw new WorkspaceNotFoundError(
-        "pnpm-workspace.yaml not found. Are you in a pnpm workspace?"
-      );
-    }
-    current = parent;
+  if (existsSync(workspacePath)) {
+    return current;
   }
+
+  throw new WorkspaceNotFoundError("Run prw from workspace root.");
 }
 
 export async function getPackages(root: string): Promise<Package[]> {
   const workspaceConfig = readFileSync(
-    join(root, "pnpm-workspace.yaml"),
+    join(root, WORKSPACE_CONFIG_FILE),
     "utf-8"
   );
   const config = YAML.load(workspaceConfig) as { packages?: string[] };

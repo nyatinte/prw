@@ -30,22 +30,10 @@ describe("workspace", () => {
       expect(result).toBe(root);
     });
 
-    it("returns path with pnpm-workspace.yaml in parent dir", () => {
-      const root = tmpDir;
-      writeFileSync(
-        join(root, "pnpm-workspace.yaml"),
-        "packages:\n  - apps/*\n"
-      );
-
-      const subdir = join(root, "subdir");
-      mkdirSync(subdir, { recursive: true });
-
-      const result = findWorkspaceRoot(subdir);
-      expect(result).toBe(root);
-    });
-
     it("throws WorkspaceNotFoundError when not in workspace", () => {
-      expect(() => findWorkspaceRoot(tmpDir)).toThrow(WorkspaceNotFoundError);
+      expect(() => findWorkspaceRoot(tmpDir)).toThrow(
+        new WorkspaceNotFoundError("Run prw from workspace root.")
+      );
     });
   });
 
