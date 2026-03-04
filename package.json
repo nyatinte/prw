@@ -7,7 +7,8 @@
   "bin": "./dist/index.mjs",
   "scripts": {
     "build": "tsdown",
-    "test": "vitest"
+    "test": "vitest",
+    "prepublishOnly": "pnpm build"
   },
   "keywords": [
     "pnpm",
@@ -16,6 +17,9 @@
   ],
   "author": "nyatinte",
   "license": "MIT",
+  "files": [
+    "dist"
+  ],
   "packageManager": "pnpm@10.30.3",
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
