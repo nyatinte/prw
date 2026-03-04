@@ -26,7 +26,7 @@ async function main() {
         console.log('Cancelled.');
         process.exit(0);
       }
-      pkg = packages.find(p => p.name === selected)!;
+      pkg = selected as typeof packages[0];
     } else if (args.length === 1) {
       // prw <package>: fuzzy match and select
       const query = args[0];
@@ -45,7 +45,7 @@ async function main() {
           console.log('Cancelled.');
           process.exit(0);
         }
-        pkg = matches.find(p => p.name === selected)!;
+        pkg = selected as typeof packages[0];
       }
     } else if (args.length >= 2) {
       // prw <package> <script>: direct execution

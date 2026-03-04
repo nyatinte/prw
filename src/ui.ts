@@ -1,4 +1,4 @@
-import { select } from '@clack/prompts';
+import { select, isCancel } from '@clack/prompts';
 import type { Package } from './workspace';
 import type { HistoryEntry } from './history';
 import { fuzzyFilter } from './fuzzy';
@@ -6,7 +6,7 @@ import { fuzzyFilter } from './fuzzy';
 export async function selectPackage(
   packages: Package[],
   history: HistoryEntry[]
-): Promise<Package> {
+): Promise<Package | symbol> {
   const sorted = sortPackages(packages, history);
 
   const selected = await select({
@@ -18,14 +18,18 @@ export async function selectPackage(
     })),
   });
 
-  return sorted.find(p => p.name === selected)!;
+  if (isCancel(selected)) {
+    return selected;
+  }
+
+  return sorted.find(p => p.name === selected as string)!;
 }
 
 export async function selectScript(
   pkg: Package,
   scripts: string[],
   history: HistoryEntry[]
-): Promise<string> {
+): Promise<string | symbol> {
   if (scripts.length === 0) {
     throw new Error(`No scripts found in ${pkg.name}`);
   }
