@@ -9,13 +9,23 @@
     "build": "tsdown",
     "test": "vitest"
   },
-  "keywords": ["pnpm", "workspace", "cli"],
+  "keywords": [
+    "pnpm",
+    "workspace",
+    "cli"
+  ],
   "author": "nyatinte",
   "license": "MIT",
   "packageManager": "pnpm@10.30.3",
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "tsdown": "^0.20.3",
     "typescript": "^5.9.3",
     "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.1.0",
+    "fast-glob": "^3.3.3",
+    "js-yaml": "^4.1.1"
   }
 }
