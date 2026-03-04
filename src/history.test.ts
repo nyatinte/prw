@@ -1,46 +1,88 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// Core logic tests without mocking home directory
+vi.mock("node:fs");
+
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
+import type { HistoryEntry } from "./history";
+import { loadHistory, saveHistory } from "./history";
+
+function getWrittenHistory(): HistoryEntry[] {
+  return JSON.parse(vi.mocked(writeFileSync).mock.calls[0][1] as string);
+}
+
 describe("history", () => {
-  it("basic history entry type is valid", () => {
-    const entry = {
-      package: "@myapp/web",
-      script: "dev",
-      timestamp: Date.now(),
-    };
-    expect(entry).toHaveProperty("package");
-    expect(entry).toHaveProperty("script");
-    expect(entry).toHaveProperty("timestamp");
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
-  it("history entry ordering works correctly", () => {
-    const entries = [
-      { package: "@pkg0", script: "test", timestamp: 0 },
-      { package: "@pkg1", script: "test", timestamp: 1 },
-      { package: "@pkg2", script: "test", timestamp: 2 },
-    ];
+  describe("loadHistory", () => {
+    it("returns [] when file does not exist", () => {
+      vi.mocked(existsSync).mockReturnValue(false);
+      expect(loadHistory()).toEqual([]);
+    });
 
-    // Simulate LRU: move duplicate to front
-    const dup = entries[0];
-    const rest = entries.slice(1);
-    const reordered = [dup, ...rest];
+    it("returns [] when file contains invalid JSON", () => {
+      vi.mocked(existsSync).mockReturnValue(true);
+      vi.mocked(readFileSync).mockReturnValue("not-valid-json" as any);
+      expect(loadHistory()).toEqual([]);
+    });
 
-    expect(reordered[0]).toEqual(entries[0]);
-    expect(reordered.length).toBe(3);
+    it("returns parsed entries when file is valid", () => {
+      const entries = [{ package: "@myapp/web", script: "dev", timestamp: 1 }];
+      vi.mocked(existsSync).mockReturnValue(true);
+      vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries) as any);
+      expect(loadHistory()).toEqual(entries);
+    });
   });
 
-  it("history truncation logic works", () => {
-    const entries = Array.from({ length: 51 }, (_, i) => ({
-      package: `@pkg${i}`,
-      script: "test",
-      timestamp: i,
-    }));
+  describe("saveHistory", () => {
+    beforeEach(() => {
+      vi.mocked(mkdirSync).mockReturnValue(undefined as any);
+      vi.mocked(writeFileSync).mockReturnValue(undefined);
+    });
 
-    if (entries.length > 50) {
-      entries.splice(50);
-    }
+    it("writes entry to file", () => {
+      vi.mocked(existsSync).mockReturnValue(false);
 
-    expect(entries).toHaveLength(50);
-    expect(entries[0].package).toBe("@pkg0");
+      saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 });
+
+      expect(writeFileSync).toHaveBeenCalled();
+    });
+
+    it("deduplicates and moves existing entry to front", () => {
+      const existing = [
+        { package: "@myapp/api", script: "dev", timestamp: 1 },
+        { package: "@myapp/web", script: "dev", timestamp: 2 },
+      ];
+      vi.mocked(existsSync).mockReturnValue(true);
+      vi.mocked(readFileSync).mockReturnValue(JSON.stringify(existing) as any);
+
+      saveHistory({ package: "@myapp/api", script: "dev", timestamp: 999 });
+
+      const written = getWrittenHistory();
+      expect(written[0]).toEqual({ package: "@myapp/api", script: "dev", timestamp: 999 });
+      expect(written).toHaveLength(2);
+    });
+
+    it("truncates to 50 entries", () => {
+      const existing = Array.from({ length: 50 }, (_, i) => ({
+        package: `@pkg${i}`,
+        script: "test",
+        timestamp: i,
+      }));
+      vi.mocked(existsSync).mockReturnValue(true);
+      vi.mocked(readFileSync).mockReturnValue(JSON.stringify(existing) as any);
+
+      saveHistory({ package: "new-pkg", script: "test", timestamp: 999 });
+
+      const written = getWrittenHistory();
+      expect(written).toHaveLength(50);
+      expect(written[0]).toMatchObject({ package: "new-pkg" });
+    });
   });
 });
