@@ -1,13 +1,21 @@
 {
-  "name": "prw",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@nyatinte/prw",
+  "version": "0.0.1",
+  "description": "Interactive pnpm workspace package & script runner",
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "bin": "./dist/index.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsdown",
+    "test": "vitest"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.30.3"
+  "keywords": ["pnpm", "workspace", "cli"],
+  "author": "nyatinte",
+  "license": "MIT",
+  "packageManager": "pnpm@10.30.3",
+  "devDependencies": {
+    "tsdown": "^0.20.3",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
+  }
 }
