@@ -1,0 +1,10 @@
+{
+  "name": "@large/dashboard",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "echo 'Running dashboard in dev mode'",
+    "build": "echo 'Building dashboard'",
+    "test": "vitest",
+    "lint": "eslint src"
+  }
+}

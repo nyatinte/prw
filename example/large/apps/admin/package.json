@@ -1,0 +1,10 @@
+{
+  "name": "@large/admin",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "echo 'Running admin in dev mode'",
+    "build": "echo 'Building admin'",
+    "test": "vitest",
+    "lint": "eslint src"
+  }
+}

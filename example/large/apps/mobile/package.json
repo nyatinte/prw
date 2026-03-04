@@ -1,0 +1,10 @@
+{
+  "name": "@large/mobile",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "echo 'Running mobile in dev mode'",
+    "build": "echo 'Building mobile'",
+    "test": "vitest",
+    "lint": "eslint src"
+  }
+}

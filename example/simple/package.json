@@ -1,0 +1,8 @@
+{
+  "name": "simple-workspace",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "pnpm -r run dev",
+    "build": "pnpm -r run build"
+  }
+}

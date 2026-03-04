@@ -2,7 +2,7 @@ import { existsSync } from 'fs';
 import { join, resolve } from 'path';
 import { readFileSync } from 'fs';
 import YAML from 'js-yaml';
-import { glob } from 'fast-glob';
+import glob from 'fast-glob';
 
 export class WorkspaceNotFoundError extends Error {
   constructor(message: string) {

@@ -1,0 +1,9 @@
+{
+  "name": "@simple/api",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "test": "vitest"
+  }
+}
