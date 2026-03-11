@@ -1,7 +1,16 @@
 import { autocomplete, isCancel } from "@clack/prompts";
 import type { HistoryEntry } from "./history";
 import { sortPackages, sortScripts } from "./sort";
+import { isRootPackage } from "./workspace";
 import type { Package } from "./workspace";
+
+export function exitOnCancel<T>(selected: T | symbol): T {
+  if (isCancel(selected)) {
+    console.log("Cancelled.");
+    process.exit(0);
+  }
+  return selected as T;
+}
 
 export async function selectPackage(
   packages: Package[],
@@ -14,7 +23,7 @@ export async function selectPackage(
     options: sorted.map((pkg) => ({
       value: pkg.name,
       label: pkg.name,
-      hint: pkg.dir === "." ? "" : pkg.dir,
+      hint: isRootPackage(pkg) ? "" : pkg.dir,
     })),
   });
 
@@ -22,8 +31,7 @@ export async function selectPackage(
     return selected;
   }
 
-  const packageMap = new Map(sorted.map((p) => [p.name, p]));
-  const found = packageMap.get(selected as string);
+  const found = sorted.find((p) => p.name === (selected as string));
   if (!found) {
     throw new Error(`Package "${selected}" not found`);
   }

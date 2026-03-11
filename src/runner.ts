@@ -1,8 +1,9 @@
 import { spawnSync } from "node:child_process";
+import { isRootPackage } from "./workspace";
 import type { Package } from "./workspace";
 
 export function runScript(pkg: Package, script: string): void {
-  const isRoot = pkg.dir === ".";
+  const isRoot = isRootPackage(pkg);
   const args = isRoot ? ["run", script] : ["--filter", pkg.name, "run", script];
 
   const result = spawnSync("pnpm", args, {

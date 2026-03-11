@@ -17,6 +17,12 @@ export interface Package {
   name: string;
 }
 
+export const ROOT_PACKAGE: Package = { name: "(root)", dir: "." };
+
+export function isRootPackage(pkg: Package): boolean {
+  return pkg.dir === ".";
+}
+
 export function findWorkspaceRoot(cwd: string): string {
   const current = resolve(cwd);
   const workspacePath = join(current, WORKSPACE_CONFIG_FILE);
@@ -35,7 +41,7 @@ export async function getPackages(root: string): Promise<Package[]> {
   );
   const config = YAML.load(workspaceConfig) as { packages?: string[] };
 
-  const packages: Package[] = [{ name: "(root)", dir: "." }];
+  const packages: Package[] = [ROOT_PACKAGE];
 
   if (!config.packages) {
     return packages;
