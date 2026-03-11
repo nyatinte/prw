@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("node:fs");
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import type { HistoryEntry } from "./history";
 import { loadHistory, saveHistory } from "./history";
 
@@ -17,19 +17,19 @@ describe("history", () => {
 
   describe("loadHistory", () => {
     it("returns [] when file does not exist", () => {
-      vi.mocked(existsSync).mockReturnValue(false);
+      vi.mocked(readFileSync).mockImplementation(() => {
+        throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
+      });
       expect(loadHistory()).toEqual([]);
     });
 
     it("returns [] when file contains invalid JSON", () => {
-      vi.mocked(existsSync).mockReturnValue(true);
       vi.mocked(readFileSync).mockReturnValue("not-valid-json" as any);
       expect(loadHistory()).toEqual([]);
     });
 
     it("returns parsed entries when file is valid", () => {
       const entries = [{ package: "@myapp/web", script: "dev", timestamp: 1 }];
-      vi.mocked(existsSync).mockReturnValue(true);
       vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries) as any);
       expect(loadHistory()).toEqual(entries);
     });
@@ -42,8 +42,6 @@ describe("history", () => {
     });
 
     it("writes entry to file", () => {
-      vi.mocked(existsSync).mockReturnValue(false);
-
       saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 });
 
       expect(writeFileSync).toHaveBeenCalled();
@@ -54,7 +52,6 @@ describe("history", () => {
         { package: "@myapp/api", script: "dev", timestamp: 1 },
         { package: "@myapp/web", script: "dev", timestamp: 2 },
       ];
-      vi.mocked(existsSync).mockReturnValue(true);
       vi.mocked(readFileSync).mockReturnValue(JSON.stringify(existing) as any);
 
       saveHistory({ package: "@myapp/api", script: "dev", timestamp: 999 });
@@ -74,7 +71,6 @@ describe("history", () => {
         script: "test",
         timestamp: i,
       }));
-      vi.mocked(existsSync).mockReturnValue(true);
       vi.mocked(readFileSync).mockReturnValue(JSON.stringify(existing) as any);
 
       saveHistory({ package: "new-pkg", script: "test", timestamp: 999 });

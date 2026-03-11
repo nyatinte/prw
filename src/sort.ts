@@ -1,6 +1,20 @@
 import type { HistoryEntry } from "./history";
 import type { Package } from "./workspace";
 
+function buildFirstOccurrenceIndex(
+  entries: HistoryEntry[],
+  getKey: (h: HistoryEntry) => string
+): Map<string, number> {
+  const index = new Map<string, number>();
+  entries.forEach((h, i) => {
+    const key = getKey(h);
+    if (!index.has(key)) {
+      index.set(key, i);
+    }
+  });
+  return index;
+}
+
 function partitionByHistory<T>(
   items: T[],
   historyIndex: Map<string, number>,
@@ -22,12 +36,7 @@ export function sortPackages(
   packages: Package[],
   history: HistoryEntry[]
 ): Package[] {
-  const historyIndex = new Map<string, number>();
-  history.forEach((h, i) => {
-    if (!historyIndex.has(h.package)) {
-      historyIndex.set(h.package, i);
-    }
-  });
+  const historyIndex = buildFirstOccurrenceIndex(history, (h) => h.package);
 
   const [withHistory, withoutHistory] = partitionByHistory(
     packages,
@@ -49,7 +58,7 @@ export function sortScripts(
   history: HistoryEntry[]
 ): string[] {
   const pkgHistory = history.filter((h) => h.package === packageName);
-  const historyIndex = new Map(pkgHistory.map((h, i) => [h.script, i]));
+  const historyIndex = buildFirstOccurrenceIndex(pkgHistory, (h) => h.script);
 
   const [withHistory, withoutHistory] = partitionByHistory(
     scripts,

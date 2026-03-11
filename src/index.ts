@@ -28,8 +28,7 @@ export async function selectPackageByArgs(
       process.exit(0);
     }
     pkg = selected as Package;
-  } else if (args.length === 1) {
-    // prw <package>: fuzzy match and select
+  } else {
     const query = args[0];
     const matches = matchPackages(packages, query);
 
@@ -38,30 +37,23 @@ export async function selectPackageByArgs(
       process.exit(1);
     } else if (matches.length === 1) {
       pkg = matches[0];
-    } else {
+    } else if (args.length === 1) {
+      // prw <package>: multiple matches → interactive select
       const selected = await selectPackage(matches, history);
       if (isCancel(selected)) {
         console.log("Cancelled.");
         process.exit(0);
       }
       pkg = selected as Package;
-    }
-  } else {
-    // prw <package> <script>: direct execution
-    const query = args[0];
-    const matches = matchPackages(packages, query);
-
-    if (matches.length === 0) {
-      console.error(`No packages match: ${query}`);
-      process.exit(1);
-    } else if (matches.length === 1) {
-      pkg = matches[0];
     } else {
+      // prw <package> <script>: multiple matches → error
       console.error(`Multiple packages match: ${query}. Be more specific.`);
       process.exit(1);
     }
 
-    script = args[1];
+    if (args.length >= 2) {
+      script = args[1];
+    }
   }
 
   return { pkg, script };

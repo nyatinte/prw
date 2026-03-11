@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
@@ -13,10 +13,6 @@ const HISTORY_FILE = join(HISTORY_DIR, "history.json");
 const MAX_HISTORY = 50;
 
 export function loadHistory(): HistoryEntry[] {
-  if (!existsSync(HISTORY_FILE)) {
-    return [];
-  }
-
   try {
     const content = readFileSync(HISTORY_FILE, "utf-8");
     return JSON.parse(content);
