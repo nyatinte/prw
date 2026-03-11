@@ -28,6 +28,11 @@ describe("history", () => {
       expect(loadHistory()).toEqual([]);
     });
 
+    it("returns [] when file contains non-array JSON", () => {
+      vi.mocked(readFileSync).mockReturnValue(JSON.stringify({ foo: "bar" }) as any);
+      expect(loadHistory()).toEqual([]);
+    });
+
     it("returns parsed entries when file is valid", () => {
       const entries = [{ package: "@myapp/web", script: "dev", timestamp: 1 }];
       vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries) as any);

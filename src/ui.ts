@@ -35,10 +35,6 @@ export async function selectScript(
   scripts: string[],
   history: HistoryEntry[]
 ): Promise<string | symbol> {
-  if (scripts.length === 0) {
-    throw new Error(`No scripts found in ${pkg.name}`);
-  }
-
   const sorted = sortScripts(scripts, pkg.name, history);
 
   const selected = await autocomplete({

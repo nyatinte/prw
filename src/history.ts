@@ -15,7 +15,8 @@ const MAX_HISTORY = 50;
 export function loadHistory(): HistoryEntry[] {
   try {
     const content = readFileSync(HISTORY_FILE, "utf-8");
-    return JSON.parse(content);
+    const parsed = JSON.parse(content);
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
