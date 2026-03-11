@@ -41,23 +41,20 @@ export async function getPackages(root: string): Promise<Package[]> {
     return packages;
   }
 
-  for (const pattern of config.packages) {
-    const dirs = await glob(pattern, {
-      cwd: root,
-      absolute: false,
-      onlyDirectories: true,
-    });
+  const dirs = await glob(config.packages, {
+    cwd: root,
+    absolute: false,
+    onlyDirectories: true,
+  });
 
-    for (const dir of dirs) {
-      const pkgJsonPath = join(root, dir, "package.json");
-      if (!existsSync(pkgJsonPath)) {
-        continue;
-      }
-
+  for (const dir of dirs) {
+    const pkgJsonPath = join(root, dir, "package.json");
+    try {
       const pkgJson = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
       const name = pkgJson.name || dir;
-
       packages.push({ name, dir });
+    } catch {
+      // skip directories without a readable package.json
     }
   }
 

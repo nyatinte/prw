@@ -103,6 +103,30 @@ describe("workspace", () => {
       expect(packages).toEqual([{ name: "(root)", dir: "." }]);
     });
 
+    it("excludes directories matching negation pattern", async () => {
+      const root = tmpDir;
+      writeFileSync(
+        join(root, "pnpm-workspace.yaml"),
+        "packages:\n  - apps/*\n  - '!apps/legacy'\n"
+      );
+
+      mkdirSync(join(root, "apps", "web"), { recursive: true });
+      writeFileSync(
+        join(root, "apps", "web", "package.json"),
+        JSON.stringify({ name: "@myapp/web" })
+      );
+
+      mkdirSync(join(root, "apps", "legacy"), { recursive: true });
+      writeFileSync(
+        join(root, "apps", "legacy", "package.json"),
+        JSON.stringify({ name: "@myapp/legacy" })
+      );
+
+      const packages = await getPackages(root);
+      expect(packages.some((p) => p.name === "@myapp/web")).toBe(true);
+      expect(packages.some((p) => p.name === "@myapp/legacy")).toBe(false);
+    });
+
     it("handles multiple patterns", async () => {
       const root = tmpDir;
       writeFileSync(
