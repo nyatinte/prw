@@ -44,9 +44,7 @@ export function sortPackages(
     (p) => p.name
   );
 
-  withHistory.sort(
-    (a, b) => (historyIndex.get(a.name) ?? 0) - (historyIndex.get(b.name) ?? 0)
-  );
+  withHistory.sort((a, b) => historyIndex.get(a.name)! - historyIndex.get(b.name)!);
   withoutHistory.sort((a, b) => a.name.localeCompare(b.name));
 
   return [...withHistory, ...withoutHistory];
@@ -66,9 +64,7 @@ export function sortScripts(
     (s) => s
   );
 
-  withHistory.sort(
-    (a, b) => (historyIndex.get(a) ?? 0) - (historyIndex.get(b) ?? 0)
-  );
+  withHistory.sort((a, b) => historyIndex.get(a)! - historyIndex.get(b)!);
   withoutHistory.sort();
 
   return [...withHistory, ...withoutHistory];

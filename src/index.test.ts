@@ -36,26 +36,23 @@ describe("selectPackageByArgs", () => {
 
   describe("prw <package> — single arg", () => {
     it("returns the matched package when exactly one matches", async () => {
-      process.argv = ["node", "prw", "api"];
-      const result = await selectPackageByArgs(packages, history);
+      const result = await selectPackageByArgs(packages, history, ["api"]);
       expect(result.pkg.name).toBe("@myapp/api");
       expect(result.script).toBe("");
     });
 
     it("exits with code 1 when no packages match", async () => {
-      process.argv = ["node", "prw", "nonexistent"];
-      await expect(selectPackageByArgs(packages, history)).rejects.toThrow(
-        "process.exit(1)"
-      );
+      await expect(
+        selectPackageByArgs(packages, history, ["nonexistent"])
+      ).rejects.toThrow("process.exit(1)");
     });
 
     it("calls selectPackage UI when multiple packages match", async () => {
-      process.argv = ["node", "prw", "web"];
       vi.mocked(selectPackage).mockResolvedValue({
         name: "@myapp/web",
         dir: "apps/web",
       });
-      const result = await selectPackageByArgs(packages, history);
+      const result = await selectPackageByArgs(packages, history, ["web"]);
       expect(selectPackage).toHaveBeenCalled();
       expect(result.pkg.name).toBe("@myapp/web");
     });
@@ -63,24 +60,21 @@ describe("selectPackageByArgs", () => {
 
   describe("prw <package> <script> — two args", () => {
     it("returns matched package and script for direct execution", async () => {
-      process.argv = ["node", "prw", "api", "dev"];
-      const result = await selectPackageByArgs(packages, history);
+      const result = await selectPackageByArgs(packages, history, ["api", "dev"]);
       expect(result.pkg.name).toBe("@myapp/api");
       expect(result.script).toBe("dev");
     });
 
     it("exits with code 1 when no packages match", async () => {
-      process.argv = ["node", "prw", "nonexistent", "dev"];
-      await expect(selectPackageByArgs(packages, history)).rejects.toThrow(
-        "process.exit(1)"
-      );
+      await expect(
+        selectPackageByArgs(packages, history, ["nonexistent", "dev"])
+      ).rejects.toThrow("process.exit(1)");
     });
 
     it("exits with code 1 when multiple packages match", async () => {
-      process.argv = ["node", "prw", "web", "dev"];
-      await expect(selectPackageByArgs(packages, history)).rejects.toThrow(
-        "process.exit(1)"
-      );
+      await expect(
+        selectPackageByArgs(packages, history, ["web", "dev"])
+      ).rejects.toThrow("process.exit(1)");
     });
   });
 });

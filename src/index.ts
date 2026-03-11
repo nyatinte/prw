@@ -12,22 +12,25 @@ import {
   matchPackages,
 } from "./workspace";
 
+function exitOnCancel<T>(selected: T | symbol): T {
+  if (isCancel(selected)) {
+    console.log("Cancelled.");
+    process.exit(0);
+  }
+  return selected as T;
+}
+
 export async function selectPackageByArgs(
   packages: Package[],
-  history: HistoryEntry[]
+  history: HistoryEntry[],
+  args = process.argv.slice(2)
 ): Promise<{ pkg: Package; script: string }> {
-  const args = process.argv.slice(2);
   let pkg = packages[0];
   let script = "";
 
   if (args.length === 0) {
     // Interactive: select package, then script
-    const selected = await selectPackage(packages, history);
-    if (isCancel(selected)) {
-      console.log("Cancelled.");
-      process.exit(0);
-    }
-    pkg = selected as Package;
+    pkg = exitOnCancel(await selectPackage(packages, history));
   } else {
     const query = args[0];
     const matches = matchPackages(packages, query);
@@ -39,12 +42,7 @@ export async function selectPackageByArgs(
       pkg = matches[0];
     } else if (args.length === 1) {
       // prw <package>: multiple matches → interactive select
-      const selected = await selectPackage(matches, history);
-      if (isCancel(selected)) {
-        console.log("Cancelled.");
-        process.exit(0);
-      }
-      pkg = selected as Package;
+      pkg = exitOnCancel(await selectPackage(matches, history));
     } else {
       // prw <package> <script>: multiple matches → error
       console.error(`Multiple packages match: ${query}. Be more specific.`);
@@ -81,12 +79,7 @@ async function main() {
         process.exit(1);
       }
 
-      const selected = await selectScript(pkg, scripts, history);
-      if (isCancel(selected)) {
-        console.log("Cancelled.");
-        process.exit(0);
-      }
-      script = selected;
+      script = exitOnCancel(await selectScript(pkg, scripts, history));
     }
 
     // Run script and save history
