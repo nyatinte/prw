@@ -14,9 +14,10 @@ vi.mock("./history");
 vi.mock("./runner");
 
 import type { HistoryEntry } from "./history";
-import { selectPackageByArgs } from "./index";
-import { selectPackage } from "./ui";
+import { resolveScript, selectPackageByArgs } from "./index";
+import { selectPackage, selectScript } from "./ui";
 import type { Package } from "./workspace";
+import { getScripts } from "./workspace";
 
 const packages: Package[] = [
   { name: "@myapp/api", dir: "apps/api" },
@@ -76,5 +77,36 @@ describe("selectPackageByArgs", () => {
         selectPackageByArgs(packages, history, ["web", "dev"])
       ).rejects.toThrow("process.exit(1)");
     });
+  });
+});
+
+describe("resolveScript", () => {
+  const pkg: Package = { name: "@myapp/api", dir: "apps/api" };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(process, "exit").mockImplementation((code?: string | number) => {
+      throw new Error(`process.exit(${code})`);
+    });
+  });
+
+  it("returns initialScript directly when provided", async () => {
+    const result = await resolveScript("/root", pkg, "dev", []);
+    expect(result).toBe("dev");
+  });
+
+  it("calls selectScript when no initial script", async () => {
+    vi.mocked(getScripts).mockReturnValue(["dev", "build"]);
+    vi.mocked(selectScript).mockResolvedValue("dev");
+    const result = await resolveScript("/root", pkg, "", []);
+    expect(selectScript).toHaveBeenCalled();
+    expect(result).toBe("dev");
+  });
+
+  it("exits with code 1 when no scripts available", async () => {
+    vi.mocked(getScripts).mockReturnValue([]);
+    await expect(resolveScript("/root", pkg, "", [])).rejects.toThrow(
+      "process.exit(1)"
+    );
   });
 });

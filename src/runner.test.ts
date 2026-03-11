@@ -49,4 +49,20 @@ describe("runner", () => {
     expect(exitSpy).toHaveBeenCalledWith(1);
     exitSpy.mockRestore();
   });
+
+  it("exits with code 1 when pnpm command is not found", () => {
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation(() => undefined as never);
+    vi.mocked(spawnSync).mockReturnValue({
+      error: new Error("ENOENT"),
+      status: null,
+    } as any);
+
+    const pkg: Package = { name: "@myapp/web", dir: "apps/web" };
+    runScript(pkg, "dev");
+
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    exitSpy.mockRestore();
+  });
 });

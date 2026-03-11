@@ -9,6 +9,11 @@ export function runScript(pkg: Package, script: string): void {
     stdio: "inherit",
   });
 
+  if (result.error) {
+    console.error(`Failed to run pnpm: ${result.error.message}`);
+    process.exit(1);
+  }
+
   if (result.status !== null && result.status !== 0) {
     process.exit(result.status);
   }

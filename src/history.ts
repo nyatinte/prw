@@ -22,23 +22,11 @@ export function loadHistory(): HistoryEntry[] {
 }
 
 export function saveHistory(entry: HistoryEntry): void {
-  const history = loadHistory();
-
-  const existingIndex = history.findIndex(
-    (h) => h.package === entry.package && h.script === entry.script
+  const previous = loadHistory().filter(
+    (h) => !(h.package === entry.package && h.script === entry.script)
   );
-
-  if (existingIndex !== -1) {
-    history.splice(existingIndex, 1);
-  }
-
-  history.unshift(entry);
-
-  if (history.length > MAX_HISTORY) {
-    history.splice(MAX_HISTORY);
-  }
+  const updated = [entry, ...previous].slice(0, MAX_HISTORY);
 
   mkdirSync(HISTORY_DIR, { recursive: true });
-
-  writeFileSync(HISTORY_FILE, JSON.stringify(history, null, 2));
+  writeFileSync(HISTORY_FILE, JSON.stringify(updated, null, 2));
 }

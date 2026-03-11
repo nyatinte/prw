@@ -9,8 +9,6 @@ export async function selectPackage(
 ): Promise<Package | symbol> {
   const sorted = sortPackages(packages, history);
 
-  const packageMap = new Map(sorted.map((p) => [p.name, p]));
-
   const selected = await autocomplete({
     message: "Select package",
     options: sorted.map((pkg) => ({
@@ -24,6 +22,7 @@ export async function selectPackage(
     return selected;
   }
 
+  const packageMap = new Map(sorted.map((p) => [p.name, p]));
   const found = packageMap.get(selected as string);
   if (!found) {
     throw new Error(`Package "${selected}" not found`);

@@ -57,6 +57,26 @@ export async function selectPackageByArgs(
   return { pkg, script };
 }
 
+export async function resolveScript(
+  root: string,
+  pkg: Package,
+  initialScript: string,
+  history: HistoryEntry[]
+): Promise<string> {
+  if (initialScript) {
+    return initialScript;
+  }
+
+  const scripts = getScripts(root, pkg);
+
+  if (scripts.length === 0) {
+    console.error(`No scripts in ${pkg.name}`);
+    process.exit(1);
+  }
+
+  return exitOnCancel(await selectScript(pkg, scripts, history));
+}
+
 async function main() {
   try {
     const root = findWorkspaceRoot(process.cwd());
@@ -68,21 +88,8 @@ async function main() {
       history
     );
 
-    let script = initialScript;
+    const script = await resolveScript(root, pkg, initialScript, history);
 
-    // Select script if not provided
-    if (!script) {
-      const scripts = getScripts(root, pkg);
-
-      if (scripts.length === 0) {
-        console.error(`No scripts in ${pkg.name}`);
-        process.exit(1);
-      }
-
-      script = exitOnCancel(await selectScript(pkg, scripts, history));
-    }
-
-    // Run script and save history
     saveHistory({
       package: pkg.name,
       script,
