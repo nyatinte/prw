@@ -9,7 +9,12 @@ import { selectPackage, selectScript } from "./ui";
 import type { Package } from "./workspace";
 import { findWorkspaceRoot, getPackages } from "./workspace";
 
-async function selectPackageByArgs(
+function matchPackages(packages: Package[], query: string): Package[] {
+  const queryLower = query.toLowerCase();
+  return packages.filter((p) => p.name.toLowerCase().includes(queryLower));
+}
+
+export async function selectPackageByArgs(
   packages: Package[],
   history: HistoryEntry[]
 ): Promise<{ pkg: Package; script: string }> {
@@ -28,9 +33,7 @@ async function selectPackageByArgs(
   } else if (args.length === 1) {
     // prw <package>: fuzzy match and select
     const query = args[0];
-    const matches = packages.filter((p) =>
-      p.name.toLowerCase().includes(query.toLowerCase())
-    );
+    const matches = matchPackages(packages, query);
 
     if (matches.length === 0) {
       console.error(`No packages match: ${query}`);
@@ -48,9 +51,7 @@ async function selectPackageByArgs(
   } else {
     // prw <package> <script>: direct execution
     const query = args[0];
-    const matches = packages.filter((p) =>
-      p.name.toLowerCase().includes(query.toLowerCase())
-    );
+    const matches = matchPackages(packages, query);
 
     if (matches.length === 0) {
       console.error(`No packages match: ${query}`);
@@ -116,4 +117,6 @@ async function main() {
   }
 }
 
-main();
+if (!process.env.VITEST) {
+  main();
+}
