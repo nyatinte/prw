@@ -1,7 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./ui");
-vi.mock("./workspace");
+vi.mock("./workspace", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./workspace")>();
+  return {
+    ...actual,
+    findWorkspaceRoot: vi.fn(),
+    getPackages: vi.fn(),
+    getScripts: vi.fn(),
+  };
+});
 vi.mock("./history");
 vi.mock("./runner");
 

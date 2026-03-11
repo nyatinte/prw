@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   findWorkspaceRoot,
   getPackages,
+  getScripts,
+  matchPackages,
   WorkspaceNotFoundError,
 } from "./workspace";
 
@@ -150,6 +152,59 @@ describe("workspace", () => {
       expect(packages.length).toBe(3);
       expect(packages.some((p) => p.name === "@myapp/web")).toBe(true);
       expect(packages.some((p) => p.name === "@myapp/ui")).toBe(true);
+    });
+  });
+
+  describe("getScripts", () => {
+    it("returns script names from package.json", () => {
+      const root = tmpDir;
+      mkdirSync(join(root, "apps", "web"), { recursive: true });
+      writeFileSync(
+        join(root, "apps", "web", "package.json"),
+        JSON.stringify({ name: "@myapp/web", scripts: { dev: "vite", build: "tsc" } })
+      );
+
+      const scripts = getScripts(root, { name: "@myapp/web", dir: "apps/web" });
+      expect(scripts).toEqual(["dev", "build"]);
+    });
+
+    it("returns empty array when scripts field is missing", () => {
+      const root = tmpDir;
+      mkdirSync(join(root, "apps", "api"), { recursive: true });
+      writeFileSync(
+        join(root, "apps", "api", "package.json"),
+        JSON.stringify({ name: "@myapp/api" })
+      );
+
+      const scripts = getScripts(root, { name: "@myapp/api", dir: "apps/api" });
+      expect(scripts).toEqual([]);
+    });
+  });
+
+  describe("matchPackages", () => {
+    const packages = [
+      { name: "@myapp/api", dir: "apps/api" },
+      { name: "@myapp/web", dir: "apps/web" },
+      { name: "@myapp/web-admin", dir: "apps/web-admin" },
+    ];
+
+    it("returns packages whose name includes the query (case-insensitive)", () => {
+      const result = matchPackages(packages, "api");
+      expect(result).toEqual([{ name: "@myapp/api", dir: "apps/api" }]);
+    });
+
+    it("returns multiple matches when query is ambiguous", () => {
+      const result = matchPackages(packages, "web");
+      expect(result.map((p) => p.name)).toEqual(["@myapp/web", "@myapp/web-admin"]);
+    });
+
+    it("returns empty array when no packages match", () => {
+      expect(matchPackages(packages, "nonexistent")).toEqual([]);
+    });
+
+    it("matches case-insensitively", () => {
+      const result = matchPackages(packages, "API");
+      expect(result).toEqual([{ name: "@myapp/api", dir: "apps/api" }]);
     });
   });
 });

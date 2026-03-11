@@ -1,18 +1,16 @@
 #!/usr/bin/env node
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { isCancel } from "@clack/prompts";
 import type { HistoryEntry } from "./history";
 import { loadHistory, saveHistory } from "./history";
 import { runScript } from "./runner";
 import { selectPackage, selectScript } from "./ui";
 import type { Package } from "./workspace";
-import { findWorkspaceRoot, getPackages } from "./workspace";
-
-function matchPackages(packages: Package[], query: string): Package[] {
-  const queryLower = query.toLowerCase();
-  return packages.filter((p) => p.name.toLowerCase().includes(queryLower));
-}
+import {
+  findWorkspaceRoot,
+  getPackages,
+  getScripts,
+  matchPackages,
+} from "./workspace";
 
 export async function selectPackageByArgs(
   packages: Package[],
@@ -84,9 +82,7 @@ async function main() {
 
     // Select script if not provided
     if (!script) {
-      const pkgJsonPath = join(root, pkg.dir, "package.json");
-      const pkgJson = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
-      const scripts = Object.keys(pkgJson.scripts || {});
+      const scripts = getScripts(root, pkg);
 
       if (scripts.length === 0) {
         console.error(`No scripts in ${pkg.name}`);

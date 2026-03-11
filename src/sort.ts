@@ -1,6 +1,23 @@
 import type { HistoryEntry } from "./history";
 import type { Package } from "./workspace";
 
+function partitionByHistory<T>(
+  items: T[],
+  historyIndex: Map<string, number>,
+  getKey: (item: T) => string
+): [withHistory: T[], withoutHistory: T[]] {
+  const withHistory: T[] = [];
+  const withoutHistory: T[] = [];
+  for (const item of items) {
+    if (historyIndex.has(getKey(item))) {
+      withHistory.push(item);
+    } else {
+      withoutHistory.push(item);
+    }
+  }
+  return [withHistory, withoutHistory];
+}
+
 export function sortPackages(
   packages: Package[],
   history: HistoryEntry[]
@@ -12,15 +29,11 @@ export function sortPackages(
     }
   });
 
-  const withHistory: Package[] = [];
-  const withoutHistory: Package[] = [];
-  for (const p of packages) {
-    if (historyIndex.has(p.name)) {
-      withHistory.push(p);
-    } else {
-      withoutHistory.push(p);
-    }
-  }
+  const [withHistory, withoutHistory] = partitionByHistory(
+    packages,
+    historyIndex,
+    (p) => p.name
+  );
 
   withHistory.sort(
     (a, b) => (historyIndex.get(a.name) ?? 0) - (historyIndex.get(b.name) ?? 0)
@@ -38,15 +51,11 @@ export function sortScripts(
   const pkgHistory = history.filter((h) => h.package === packageName);
   const historyIndex = new Map(pkgHistory.map((h, i) => [h.script, i]));
 
-  const withHistory: string[] = [];
-  const withoutHistory: string[] = [];
-  for (const s of scripts) {
-    if (historyIndex.has(s)) {
-      withHistory.push(s);
-    } else {
-      withoutHistory.push(s);
-    }
-  }
+  const [withHistory, withoutHistory] = partitionByHistory(
+    scripts,
+    historyIndex,
+    (s) => s
+  );
 
   withHistory.sort(
     (a, b) => (historyIndex.get(a) ?? 0) - (historyIndex.get(b) ?? 0)

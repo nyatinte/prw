@@ -8,7 +8,8 @@ export interface HistoryEntry {
   timestamp: number;
 }
 
-const HISTORY_FILE = join(homedir(), ".prw_history");
+const HISTORY_DIR = join(homedir(), ".config", "prw");
+const HISTORY_FILE = join(HISTORY_DIR, "history.json");
 const MAX_HISTORY = 50;
 
 export function loadHistory(): HistoryEntry[] {
@@ -41,8 +42,7 @@ export function saveHistory(entry: HistoryEntry): void {
     history.splice(MAX_HISTORY);
   }
 
-  const dir = join(homedir(), ".prw");
-  mkdirSync(dir, { recursive: true });
+  mkdirSync(HISTORY_DIR, { recursive: true });
 
   writeFileSync(HISTORY_FILE, JSON.stringify(history, null, 2));
 }

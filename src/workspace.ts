@@ -60,3 +60,14 @@ export async function getPackages(root: string): Promise<Package[]> {
 
   return packages;
 }
+
+export function getScripts(root: string, pkg: Package): string[] {
+  const pkgJsonPath = join(root, pkg.dir, "package.json");
+  const pkgJson = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
+  return Object.keys(pkgJson.scripts || {});
+}
+
+export function matchPackages(packages: Package[], query: string): Package[] {
+  const queryLower = query.toLowerCase();
+  return packages.filter((p) => p.name.toLowerCase().includes(queryLower));
+}
