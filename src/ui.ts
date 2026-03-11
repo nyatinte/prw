@@ -1,4 +1,4 @@
-import { isCancel, select } from "@clack/prompts";
+import { autocomplete, isCancel } from "@clack/prompts";
 import type { HistoryEntry } from "./history";
 import type { Package } from "./workspace";
 
@@ -8,7 +8,7 @@ export async function selectPackage(
 ): Promise<Package | symbol> {
   const sorted = sortPackages(packages, history);
 
-  const selected = await select({
+  const selected = await autocomplete({
     message: "Select package",
     options: sorted.map((pkg) => ({
       value: pkg.name,
@@ -39,7 +39,7 @@ export async function selectScript(
 
   const sorted = sortScripts(scripts, pkg.name, history);
 
-  const selected = await select({
+  const selected = await autocomplete({
     message: "Select script",
     options: sorted.map((script) => ({
       value: script,
@@ -54,16 +54,19 @@ export function sortPackages(
   packages: Package[],
   history: HistoryEntry[]
 ): Package[] {
-  const historySet = new Set(history.map((h) => h.package));
-  const withHistory = packages.filter((p) => historySet.has(p.name));
-  const withoutHistory = packages.filter((p) => !historySet.has(p.name));
-
-  withHistory.sort((a, b) => {
-    const idxA = history.findIndex((h) => h.package === a.name);
-    const idxB = history.findIndex((h) => h.package === b.name);
-    return idxA - idxB;
+  const historyIndex = new Map<string, number>();
+  history.forEach((h, i) => {
+    if (!historyIndex.has(h.package)) {
+      historyIndex.set(h.package, i);
+    }
   });
 
+  const withHistory = packages.filter((p) => historyIndex.has(p.name));
+  const withoutHistory = packages.filter((p) => !historyIndex.has(p.name));
+
+  withHistory.sort(
+    (a, b) => (historyIndex.get(a.name) ?? 0) - (historyIndex.get(b.name) ?? 0)
+  );
   withoutHistory.sort((a, b) => a.name.localeCompare(b.name));
 
   return [...withHistory, ...withoutHistory];
@@ -75,17 +78,14 @@ export function sortScripts(
   history: HistoryEntry[]
 ): string[] {
   const pkgHistory = history.filter((h) => h.package === packageName);
-  const historySet = new Set(pkgHistory.map((h) => h.script));
+  const historyIndex = new Map(pkgHistory.map((h, i) => [h.script, i]));
 
-  const withHistory = scripts.filter((s) => historySet.has(s));
-  const withoutHistory = scripts.filter((s) => !historySet.has(s));
+  const withHistory = scripts.filter((s) => historyIndex.has(s));
+  const withoutHistory = scripts.filter((s) => !historyIndex.has(s));
 
-  withHistory.sort((a, b) => {
-    const idxA = pkgHistory.findIndex((h) => h.script === a);
-    const idxB = pkgHistory.findIndex((h) => h.script === b);
-    return idxA - idxB;
-  });
-
+  withHistory.sort(
+    (a, b) => (historyIndex.get(a) ?? 0) - (historyIndex.get(b) ?? 0)
+  );
   withoutHistory.sort();
 
   return [...withHistory, ...withoutHistory];

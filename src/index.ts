@@ -5,7 +5,7 @@ import { isCancel } from "@clack/prompts";
 import type { HistoryEntry } from "./history";
 import { loadHistory, saveHistory } from "./history";
 import { runScript } from "./runner";
-import { selectPackage, selectScript, sortScripts } from "./ui";
+import { selectPackage, selectScript } from "./ui";
 import type { Package } from "./workspace";
 import { findWorkspaceRoot, getPackages } from "./workspace";
 
@@ -92,8 +92,7 @@ async function main() {
         process.exit(1);
       }
 
-      const sorted = sortScripts(scripts, pkg.name, history);
-      const selected = await selectScript(pkg, sorted, history);
+      const selected = await selectScript(pkg, scripts, history);
       if (isCancel(selected)) {
         console.log("Cancelled.");
         process.exit(0);

@@ -2,12 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("node:fs");
 
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  writeFileSync,
-} from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import type { HistoryEntry } from "./history";
 import { loadHistory, saveHistory } from "./history";
 
@@ -65,7 +60,11 @@ describe("history", () => {
       saveHistory({ package: "@myapp/api", script: "dev", timestamp: 999 });
 
       const written = getWrittenHistory();
-      expect(written[0]).toEqual({ package: "@myapp/api", script: "dev", timestamp: 999 });
+      expect(written[0]).toEqual({
+        package: "@myapp/api",
+        script: "dev",
+        timestamp: 999,
+      });
       expect(written).toHaveLength(2);
     });
 
