@@ -1,5 +1,5 @@
 import type { SpawnSyncReturns } from "node:child_process";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runScript } from "./runner";
 import type { Package } from "./workspace";
 
@@ -22,13 +22,15 @@ function mockSpawnResult(partial: Partial<SpawnSyncReturns<Buffer>>): SpawnSyncR
 }
 
 describe("runner", () => {
+  beforeEach(() => {
+    vi.mocked(spawnSync).mockReturnValue(mockSpawnResult({ status: 0 }));
+  });
+
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it("runs script with --filter for regular package", () => {
-    vi.mocked(spawnSync).mockReturnValue(mockSpawnResult({ status: 0 }));
-
     const pkg: Package = { name: "@myapp/web", dir: "apps/web" };
     runScript(pkg, "dev");
 
@@ -40,8 +42,6 @@ describe("runner", () => {
   });
 
   it("runs script without --filter for root package", () => {
-    vi.mocked(spawnSync).mockReturnValue(mockSpawnResult({ status: 0 }));
-
     const pkg: Package = { name: "(root)", dir: "." };
     runScript(pkg, "build");
 
