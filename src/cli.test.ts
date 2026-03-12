@@ -12,16 +12,12 @@ vi.mock("./workspace", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./workspace")>();
   return {
     ...actual,
-    findWorkspaceRoot: vi.fn(),
-    getPackages: vi.fn(),
     getScripts: vi.fn(),
   };
 });
-vi.mock("./history");
-vi.mock("./runner");
 
 import type { HistoryEntry } from "./history";
-import { resolveScript, selectPackageByArgs } from "./index";
+import { resolveScript, selectPackageByArgs } from "./cli";
 import { selectPackage, selectScript } from "./ui";
 import type { Package } from "./workspace";
 import { getScripts } from "./workspace";
