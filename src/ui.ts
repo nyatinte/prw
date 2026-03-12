@@ -4,14 +4,6 @@ import { sortPackages, sortScripts } from "./sort";
 import { isRootPackage } from "./workspace";
 import type { Package } from "./workspace";
 
-export function exitOnCancel<T>(selected: T | symbol): T {
-  if (isCancel(selected)) {
-    console.log("Cancelled.");
-    process.exit(0);
-  }
-  return selected as T;
-}
-
 export async function selectPackage(
   packages: Package[],
   history: HistoryEntry[]

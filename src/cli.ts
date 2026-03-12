@@ -1,7 +1,16 @@
+import { isCancel } from "@clack/prompts";
 import type { HistoryEntry } from "./history";
-import { exitOnCancel, selectPackage, selectScript } from "./ui";
+import { selectPackage, selectScript } from "./ui";
 import type { Package } from "./workspace";
 import { getScripts, matchPackages } from "./workspace";
+
+function exitOnCancel<T>(selected: T | symbol): T {
+  if (isCancel(selected)) {
+    console.log("Cancelled.");
+    process.exit(0);
+  }
+  return selected as T;
+}
 
 export async function selectPackageByArgs(
   packages: Package[],
