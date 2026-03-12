@@ -36,10 +36,7 @@ export function findWorkspaceRoot(cwd: string): string {
 }
 
 export async function getPackages(root: string): Promise<Package[]> {
-  const workspaceConfig = readFileSync(
-    join(root, WORKSPACE_CONFIG_FILE),
-    "utf-8"
-  );
+  const workspaceConfig = await readFile(join(root, WORKSPACE_CONFIG_FILE), "utf-8");
   const config = (YAML.load(workspaceConfig) ?? {}) as { packages?: string[] };
 
   const packages: Package[] = [ROOT_PACKAGE];
