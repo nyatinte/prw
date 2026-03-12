@@ -84,5 +84,15 @@ describe("history", () => {
       expect(written).toHaveLength(50);
       expect(written[0]).toMatchObject({ package: "new-pkg" });
     });
+
+    it("does not throw when write fails", () => {
+      vi.mocked(writeFileSync).mockImplementation(() => {
+        throw new Error("ENOSPC: no space left on device");
+      });
+
+      expect(() =>
+        saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 })
+      ).not.toThrow();
+    });
   });
 });

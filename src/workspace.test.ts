@@ -5,7 +5,9 @@ import {
   findWorkspaceRoot,
   getPackages,
   getScripts,
+  isRootPackage,
   matchPackages,
+  ROOT_PACKAGE,
   WorkspaceNotFoundError,
 } from "./workspace";
 
@@ -178,6 +180,24 @@ describe("workspace", () => {
 
       const scripts = getScripts(root, { name: "@myapp/api", dir: "apps/api" });
       expect(scripts).toEqual([]);
+    });
+
+    it("returns empty array when package.json does not exist", () => {
+      const root = tmpDir;
+      mkdirSync(join(root, "apps", "ghost"), { recursive: true });
+
+      const scripts = getScripts(root, { name: "@myapp/ghost", dir: "apps/ghost" });
+      expect(scripts).toEqual([]);
+    });
+  });
+
+  describe("isRootPackage", () => {
+    it("returns true for ROOT_PACKAGE", () => {
+      expect(isRootPackage(ROOT_PACKAGE)).toBe(true);
+    });
+
+    it("returns false for a regular package", () => {
+      expect(isRootPackage({ name: "@myapp/web", dir: "apps/web" })).toBe(false);
     });
   });
 
