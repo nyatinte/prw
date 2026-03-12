@@ -32,6 +32,22 @@ describe("sortPackages", () => {
     expect(result[2].name).toBe("@myapp/web");
   });
 
+  it("preserves history order when multiple packages have history", () => {
+    const packages: Package[] = [
+      { name: "@myapp/api", dir: "apps/api" },
+      { name: "@myapp/web", dir: "apps/web" },
+    ];
+
+    const history: HistoryEntry[] = [
+      { package: "@myapp/api", script: "dev", timestamp: 2 },
+      { package: "@myapp/web", script: "dev", timestamp: 1 },
+    ];
+
+    const result = sortPackages(packages, history);
+    expect(result[0].name).toBe("@myapp/api");
+    expect(result[1].name).toBe("@myapp/web");
+  });
+
   it("uses first occurrence when same package appears multiple times in history", () => {
     const packages: Package[] = [
       { name: "@myapp/api", dir: "apps/api" },
