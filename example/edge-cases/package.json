@@ -1,3 +1,6 @@
 {
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "scripts": {
+    "prw": "node ../../dist/bin.mjs"
+  }
 }

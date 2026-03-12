@@ -2,6 +2,7 @@
   "name": "simple-workspace",
   "version": "1.0.0",
   "scripts": {
+    "prw": "node ../../dist/bin.mjs",
     "dev": "pnpm -r run dev",
     "build": "pnpm -r run build"
   }

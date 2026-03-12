@@ -10,8 +10,8 @@ A simple workspace with 2 packages:
 
 ```bash
 cd simple
-prw          # Interactive selection
-prw web dev  # Select @simple/web and run dev
+pnpm prw          # Interactive selection
+pnpm prw web dev  # Select @simple/web and run dev
 ```
 
 ## 2. `large/` - Full-scale workspace
@@ -34,10 +34,10 @@ A realistic workspace with 5 applications and 5 shared packages:
 
 ```bash
 cd large
-prw            # See all 10 packages
-prw web        # Match @large/web
-prw api build  # Run build on @large/api
-prw ui build   # Shared package build
+pnpm prw            # See all 10 packages
+pnpm prw web        # Match @large/web
+pnpm prw api build  # Run build on @large/api
+pnpm prw ui build   # Shared package build
 ```
 
 ## 3. `edge-cases/` - Edge case handling
@@ -52,8 +52,8 @@ Tests how prw handles unusual configurations:
 
 ```bash
 cd edge-cases
-prw          # Root has no name, packages fallback to dirs
-prw unnamed  # Tests dir fallback
+pnpm prw          # Root has no name, packages fallback to dirs
+pnpm prw unnamed  # Tests dir fallback
 ```
 
 ## Testing prw
@@ -61,18 +61,19 @@ prw unnamed  # Tests dir fallback
 To test `@nyatinte/prw` with these examples:
 
 ```bash
-# From repo root
+# From repo root — build first
 pnpm build
 
 # Test with simple
 cd example/simple
-node ../../dist/index.mjs
+pnpm prw             # interactive
+pnpm prw web dev     # direct
 
 # Test with large
 cd ../large
-node ../../dist/index.mjs web dev
+pnpm prw api build
 
 # Test with edge cases
 cd ../edge-cases
-node ../../dist/index.mjs
+pnpm prw
 ```
