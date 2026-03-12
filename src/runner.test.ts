@@ -37,30 +37,16 @@ describe("runner", () => {
     });
   });
 
-  it("exits with non-zero status when script fails", () => {
+  it.each([
+    ["script fails with non-zero status", { status: 1 }],
+    ["pnpm command is not found", { error: new Error("ENOENT"), status: null }],
+  ])("exits with code 1 when %s", (_, spawnResult) => {
     const exitSpy = vi
       .spyOn(process, "exit")
       .mockImplementation(() => undefined as never);
-    vi.mocked(spawnSync).mockReturnValue({ status: 1 } as any);
+    vi.mocked(spawnSync).mockReturnValue(spawnResult as any);
 
-    const pkg: Package = { name: "@myapp/web", dir: "apps/web" };
-    runScript(pkg, "test");
-
-    expect(exitSpy).toHaveBeenCalledWith(1);
-    exitSpy.mockRestore();
-  });
-
-  it("exits with code 1 when pnpm command is not found", () => {
-    const exitSpy = vi
-      .spyOn(process, "exit")
-      .mockImplementation(() => undefined as never);
-    vi.mocked(spawnSync).mockReturnValue({
-      error: new Error("ENOENT"),
-      status: null,
-    } as any);
-
-    const pkg: Package = { name: "@myapp/web", dir: "apps/web" };
-    runScript(pkg, "dev");
+    runScript({ name: "@myapp/web", dir: "apps/web" }, "dev");
 
     expect(exitSpy).toHaveBeenCalledWith(1);
     exitSpy.mockRestore();
