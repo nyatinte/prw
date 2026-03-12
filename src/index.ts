@@ -78,11 +78,7 @@ async function main() {
 
     const script = await resolveScript(root, pkg, initialScript, history);
 
-    saveHistory({
-      package: pkg.name,
-      script,
-      timestamp: Date.now(),
-    });
+    saveHistory({ package: pkg.name, script, timestamp: Date.now() }, history);
 
     runScript(pkg, script);
   } catch (error) {

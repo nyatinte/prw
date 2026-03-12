@@ -8,64 +8,47 @@ function buildFirstOccurrenceIndex(
   const index = new Map<string, number>();
   entries.forEach((h, i) => {
     const key = getKey(h);
-    if (!index.has(key)) {
-      index.set(key, i);
-    }
+    if (!index.has(key)) index.set(key, i);
   });
   return index;
 }
 
-function partitionByHistory<T>(
+function sortByHistory<T>(
   items: T[],
-  historyIndex: Map<string, number>,
-  getKey: (item: T) => string
-): [withHistory: T[], withoutHistory: T[]] {
+  history: HistoryEntry[],
+  getHistoryKey: (h: HistoryEntry) => string,
+  getItemKey: (item: T) => string,
+  compareFallback: (a: T, b: T) => number
+): T[] {
+  const historyIndex = buildFirstOccurrenceIndex(history, getHistoryKey);
   const withHistory: T[] = [];
   const withoutHistory: T[] = [];
   for (const item of items) {
-    if (historyIndex.has(getKey(item))) {
-      withHistory.push(item);
-    } else {
-      withoutHistory.push(item);
-    }
+    if (historyIndex.has(getItemKey(item))) withHistory.push(item);
+    else withoutHistory.push(item);
   }
-  return [withHistory, withoutHistory];
+  withHistory.sort((a, b) => historyIndex.get(getItemKey(a))! - historyIndex.get(getItemKey(b))!);
+  withoutHistory.sort(compareFallback);
+  return [...withHistory, ...withoutHistory];
 }
 
-export function sortPackages(
-  packages: Package[],
-  history: HistoryEntry[]
-): Package[] {
-  const historyIndex = buildFirstOccurrenceIndex(history, (h) => h.package);
-
-  const [withHistory, withoutHistory] = partitionByHistory(
+export function sortPackages(packages: Package[], history: HistoryEntry[]): Package[] {
+  return sortByHistory(
     packages,
-    historyIndex,
-    (p) => p.name
+    history,
+    (h) => h.package,
+    (p) => p.name,
+    (a, b) => a.name.localeCompare(b.name)
   );
-
-  withHistory.sort((a, b) => historyIndex.get(a.name)! - historyIndex.get(b.name)!);
-  withoutHistory.sort((a, b) => a.name.localeCompare(b.name));
-
-  return [...withHistory, ...withoutHistory];
 }
 
-export function sortScripts(
-  scripts: string[],
-  packageName: string,
-  history: HistoryEntry[]
-): string[] {
+export function sortScripts(scripts: string[], packageName: string, history: HistoryEntry[]): string[] {
   const pkgHistory = history.filter((h) => h.package === packageName);
-  const historyIndex = buildFirstOccurrenceIndex(pkgHistory, (h) => h.script);
-
-  const [withHistory, withoutHistory] = partitionByHistory(
+  return sortByHistory(
     scripts,
-    historyIndex,
-    (s) => s
+    pkgHistory,
+    (h) => h.script,
+    (s) => s,
+    (a, b) => a.localeCompare(b)
   );
-
-  withHistory.sort((a, b) => historyIndex.get(a)! - historyIndex.get(b)!);
-  withoutHistory.sort();
-
-  return [...withHistory, ...withoutHistory];
 }

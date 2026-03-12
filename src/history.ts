@@ -22,12 +22,12 @@ export function loadHistory(): HistoryEntry[] {
   }
 }
 
-export function saveHistory(entry: HistoryEntry): void {
+export function saveHistory(entry: HistoryEntry, previous = loadHistory()): void {
   try {
-    const previous = loadHistory().filter(
+    const filtered = previous.filter(
       (h) => !(h.package === entry.package && h.script === entry.script)
     );
-    const updated = [entry, ...previous].slice(0, MAX_HISTORY);
+    const updated = [entry, ...filtered].slice(0, MAX_HISTORY);
     mkdirSync(HISTORY_DIR, { recursive: true });
     writeFileSync(HISTORY_FILE, JSON.stringify(updated, null, 2));
   } catch {

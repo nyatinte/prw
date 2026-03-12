@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import glob from "fast-glob";
 import YAML from "js-yaml";
@@ -53,16 +54,17 @@ export async function getPackages(root: string): Promise<Package[]> {
     onlyDirectories: true,
   });
 
-  for (const dir of dirs) {
-    const pkgJsonPath = join(root, dir, "package.json");
-    try {
-      const pkgJson = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
-      const name = pkgJson.name || dir;
-      packages.push({ name, dir });
-    } catch {
-      // skip directories without a readable package.json
-    }
-  }
+  const results = await Promise.all(
+    dirs.map(async (dir) => {
+      try {
+        const pkgJson = JSON.parse(await readFile(join(root, dir, "package.json"), "utf-8"));
+        return { name: pkgJson.name || dir, dir } as Package;
+      } catch {
+        return null;
+      }
+    })
+  );
+  packages.push(...results.filter((p): p is Package => p !== null));
 
   return packages;
 }
