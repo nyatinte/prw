@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import type { HistoryEntry } from "./history";
 import { loadHistory, saveHistory } from "./history";
 import { runScript } from "./runner";
@@ -65,7 +64,7 @@ export async function resolveScript(
   return exitOnCancel(await selectScript(pkg, scripts, history));
 }
 
-async function main() {
+export async function main() {
   try {
     const root = findWorkspaceRoot(process.cwd());
     const packages = await getPackages(root);
@@ -87,6 +86,3 @@ async function main() {
   }
 }
 
-if (!process.env.VITEST) {
-  main();
-}
