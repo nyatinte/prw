@@ -16,36 +16,33 @@ export async function selectPackageByArgs(
   history: HistoryEntry[],
   args = process.argv.slice(2)
 ): Promise<{ pkg: Package; script: string }> {
-  let pkg = packages[0];
-  let script = "";
-
   if (args.length === 0) {
-    // Interactive: select package, then script
-    pkg = exitOnCancel(await selectPackage(packages, history));
-  } else {
-    const query = args[0];
-    const matches = matchPackages(packages, query);
+    const pkg = exitOnCancel(await selectPackage(packages, history));
+    return { pkg, script: "" };
+  }
 
-    if (matches.length === 0) {
-      console.error(`No packages match: ${query}`);
-      process.exit(1);
-    } else if (matches.length === 1) {
-      pkg = matches[0];
-    } else if (args.length === 1) {
-      // prw <package>: multiple matches → interactive select
-      pkg = exitOnCancel(await selectPackage(matches, history));
-    } else {
-      // prw <package> <script>: multiple matches → error
+  const query = args[0];
+  const matches = matchPackages(packages, query);
+
+  if (matches.length === 0) {
+    console.error(`No packages match: ${query}`);
+    process.exit(1);
+  }
+
+  if (args.length >= 2) {
+    if (matches.length !== 1) {
       console.error(`Multiple packages match: ${query}. Be more specific.`);
       process.exit(1);
     }
-
-    if (args.length >= 2) {
-      script = args[1];
-    }
+    return { pkg: matches[0], script: args[1] };
   }
 
-  return { pkg, script };
+  const pkg =
+    matches.length === 1
+      ? matches[0]
+      : exitOnCancel(await selectPackage(matches, history));
+
+  return { pkg, script: "" };
 }
 
 export async function resolveScript(

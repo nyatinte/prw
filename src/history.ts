@@ -23,11 +23,14 @@ export function loadHistory(): HistoryEntry[] {
 }
 
 export function saveHistory(entry: HistoryEntry): void {
-  const previous = loadHistory().filter(
-    (h) => !(h.package === entry.package && h.script === entry.script)
-  );
-  const updated = [entry, ...previous].slice(0, MAX_HISTORY);
-
-  mkdirSync(HISTORY_DIR, { recursive: true });
-  writeFileSync(HISTORY_FILE, JSON.stringify(updated, null, 2));
+  try {
+    const previous = loadHistory().filter(
+      (h) => !(h.package === entry.package && h.script === entry.script)
+    );
+    const updated = [entry, ...previous].slice(0, MAX_HISTORY);
+    mkdirSync(HISTORY_DIR, { recursive: true });
+    writeFileSync(HISTORY_FILE, JSON.stringify(updated, null, 2));
+  } catch {
+    // History save failure should not interrupt script execution
+  }
 }
