@@ -14,10 +14,10 @@ export async function selectPackageByArgs(
   packages: Package[],
   history: HistoryEntry[],
   args = process.argv.slice(2)
-): Promise<{ pkg: Package; script: string }> {
+): Promise<{ pkg: Package; script?: string }> {
   if (args.length === 0) {
     const pkg = exitOnCancel(await selectPackage(packages, history));
-    return { pkg, script: "" };
+    return { pkg };
   }
 
   const query = args[0];
@@ -41,13 +41,13 @@ export async function selectPackageByArgs(
       ? matches[0]
       : exitOnCancel(await selectPackage(matches, history));
 
-  return { pkg, script: "" };
+  return { pkg };
 }
 
 export async function resolveScript(
   root: string,
   pkg: Package,
-  initialScript: string,
+  initialScript: string | undefined,
   history: HistoryEntry[]
 ): Promise<string> {
   if (initialScript) {
@@ -67,8 +67,9 @@ export async function resolveScript(
 export async function main() {
   try {
     const root = findWorkspaceRoot(process.cwd());
-    const packages = await getPackages(root);
+    const packagesPromise = getPackages(root);
     const history = loadHistory();
+    const packages = await packagesPromise;
 
     const { pkg, script: initialScript } = await selectPackageByArgs(
       packages,

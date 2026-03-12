@@ -46,7 +46,7 @@ describe("selectPackageByArgs", () => {
     it("returns the matched package when exactly one matches", async () => {
       const result = await selectPackageByArgs(packages, history, ["api"]);
       expect(result.pkg.name).toBe("@myapp/api");
-      expect(result.script).toBe("");
+      expect(result.script).toBeUndefined();
     });
 
     it("exits with code 1 when no packages match", async () => {
@@ -105,14 +105,14 @@ describe("resolveScript", () => {
   it("calls selectScript when no initial script", async () => {
     vi.mocked(getScripts).mockReturnValue(["dev", "build"]);
     vi.mocked(selectScript).mockResolvedValue("dev");
-    const result = await resolveScript("/root", pkg, "", []);
+    const result = await resolveScript("/root", pkg, undefined, []);
     expect(selectScript).toHaveBeenCalled();
     expect(result).toBe("dev");
   });
 
   it("exits with code 1 when no scripts available", async () => {
     vi.mocked(getScripts).mockReturnValue([]);
-    await expect(resolveScript("/root", pkg, "", [])).rejects.toThrow(
+    await expect(resolveScript("/root", pkg, undefined, [])).rejects.toThrow(
       "process.exit(1)"
     );
   });
