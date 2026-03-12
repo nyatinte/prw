@@ -17,24 +17,24 @@ describe("history", () => {
 
   describe("loadHistory", () => {
     it.each([
-      ["file does not exist", () => { throw Object.assign(new Error("ENOENT"), { code: "ENOENT" }); }],
-      ["file contains invalid JSON", () => "not-valid-json"],
-      ["file contains non-array JSON", () => JSON.stringify({ foo: "bar" })],
+      ["file does not exist", (): string => { throw Object.assign(new Error("ENOENT"), { code: "ENOENT" }); }],
+      ["file contains invalid JSON", (): string => "not-valid-json"],
+      ["file contains non-array JSON", (): string => JSON.stringify({ foo: "bar" })],
     ])("returns [] when %s", (_, readImpl) => {
-      vi.mocked(readFileSync).mockImplementation(readImpl as any);
+      vi.mocked(readFileSync).mockImplementation(readImpl);
       expect(loadHistory()).toEqual([]);
     });
 
     it("returns parsed entries when file is valid", () => {
       const entries = [{ package: "@myapp/web", script: "dev", timestamp: 1 }];
-      vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries) as any);
+      vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries));
       expect(loadHistory()).toEqual(entries);
     });
   });
 
   describe("saveHistory", () => {
     beforeEach(() => {
-      vi.mocked(mkdirSync).mockReturnValue(undefined as any);
+      vi.mocked(mkdirSync).mockReturnValue(undefined);
       vi.mocked(writeFileSync).mockReturnValue(undefined);
     });
 
