@@ -13,8 +13,8 @@ export class WorkspaceNotFoundError extends Error {
 }
 
 export interface Package {
-  dir: string;
-  name: string;
+  readonly dir: string;
+  readonly name: string;
 }
 
 export const ROOT_PACKAGE: Package = { name: "(root)", dir: "." };
@@ -68,9 +68,12 @@ export async function getPackages(root: string): Promise<Package[]> {
 }
 
 export function getScripts(root: string, pkg: Package): string[] {
-  const pkgJsonPath = join(root, pkg.dir, "package.json");
-  const pkgJson = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
-  return Object.keys(pkgJson.scripts || {});
+  try {
+    const pkgJson = JSON.parse(readFileSync(join(root, pkg.dir, "package.json"), "utf-8"));
+    return Object.keys(pkgJson.scripts || {});
+  } catch {
+    return [];
+  }
 }
 
 export function matchPackages(packages: Package[], query: string): Package[] {
