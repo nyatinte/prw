@@ -39,7 +39,7 @@ export async function getPackages(root: string): Promise<Package[]> {
     join(root, WORKSPACE_CONFIG_FILE),
     "utf-8"
   );
-  const config = YAML.load(workspaceConfig) as { packages?: string[] };
+  const config = (YAML.load(workspaceConfig) ?? {}) as { packages?: string[] };
 
   const packages: Package[] = [ROOT_PACKAGE];
 

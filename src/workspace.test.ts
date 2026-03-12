@@ -107,6 +107,14 @@ describe("workspace", () => {
       expect(packages).toEqual([{ name: "(root)", dir: "." }]);
     });
 
+    it("returns only root when workspace yaml is empty", async () => {
+      const root = tmpDir;
+      writeFileSync(join(root, "pnpm-workspace.yaml"), "");
+
+      const packages = await getPackages(root);
+      expect(packages).toEqual([{ name: "(root)", dir: "." }]);
+    });
+
     it("excludes directories matching negation pattern", async () => {
       const root = tmpDir;
       writeFileSync(
