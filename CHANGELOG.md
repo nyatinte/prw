@@ -1,5 +1,17 @@
 # @nyatinte/prw
 
+## 0.3.0
+
+### Minor Changes
+
+- f28b13f: Allow `prw` to discover the nearest pnpm workspace root from nested directories and always run `pnpm` from that root.
+
+### Patch Changes
+
+- 223f2f6: Support running `prw` from workspace subdirectories by resolving the nearest pnpm workspace root before listing packages or running scripts.
+
+  Improve the error shown when `prw` is started completely outside a pnpm workspace.
+
 ## 0.2.0
 
 ### Minor Changes
