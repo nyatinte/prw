@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import glob from "fast-glob";
 import YAML from "js-yaml";
+import { m } from "./i18n";
 
 const WORKSPACE_CONFIG_FILE = "pnpm-workspace.yaml";
 
@@ -32,7 +33,7 @@ export function findWorkspaceRoot(cwd: string): string {
     return current;
   }
 
-  throw new WorkspaceNotFoundError("Run prw from workspace root.");
+  throw new WorkspaceNotFoundError(m.workspace_root_required());
 }
 
 export async function getPackages(root: string): Promise<Package[]> {

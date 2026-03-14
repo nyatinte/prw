@@ -1,10 +1,12 @@
 import { resolveScript, selectPackageByArgs } from "./cli";
 import { loadHistory, saveHistory } from "./history";
+import { initializeLocale } from "./i18n";
 import { runScript } from "./runner";
 import { findWorkspaceRoot, getPackages } from "./workspace";
 
 export async function main() {
   try {
+    await initializeLocale();
     const root = findWorkspaceRoot(process.cwd());
     const packagesPromise = getPackages(root);
     const history = loadHistory();

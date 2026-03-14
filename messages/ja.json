@@ -1,0 +1,10 @@
+{
+  "select_package": "パッケージを選択",
+  "select_script": "スクリプトを選択",
+  "cancelled": "キャンセルしました。",
+  "no_packages_match": "一致するパッケージがありません: {query}",
+  "multiple_packages_match": "一致するパッケージが複数あります: {query}。より具体的に指定してください。",
+  "no_scripts_in_package": "{packageName} にスクリプトがありません",
+  "workspace_root_required": "ワークスペースのルートで prw を実行してください。",
+  "package_not_found": "パッケージ \"{selected}\" が見つかりません"
+}
