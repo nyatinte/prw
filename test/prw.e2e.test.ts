@@ -62,30 +62,6 @@ function launchPrwSession({
   });
 }
 
-async function withPrwSession(
-  {
-    cwd,
-    args = [],
-  }: {
-    cwd: string;
-    args?: string[];
-  },
-  run: (session: Session) => Promise<void>
-): Promise<void> {
-  await using fixture = await createFixture();
-  const session = await launchPrwSession({
-    cwd,
-    args,
-    homeDir: fixture.path,
-  });
-
-  try {
-    await run(session);
-  } finally {
-    await closeSessionSafely(session);
-  }
-}
-
 function readTerminal(session: Session): Promise<string> {
   return session.text({ trimEnd: true });
 }
@@ -130,17 +106,20 @@ function closeSessionSafely(session: Session | undefined): Promise<void> {
 
 describe.sequential("prw e2e", () => {
   it("shows the script picker for simple workspace package selection", async () => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/simple"),
-        args: ["web"],
-      },
-      async (session) => {
-        await session.waitForText("Select script");
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/simple"),
+      args: ["web"],
+      homeDir: fixture.path,
+    });
 
-        expect(await readTerminal(session)).toMatchSnapshot();
-      }
-    );
+    try {
+      await session.waitForText("Select script");
+
+      expect(await readTerminal(session)).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it.each([
@@ -150,246 +129,293 @@ describe.sequential("prw e2e", () => {
     "type-check",
     "zzz",
   ])('shows the simple workspace script picker while searching for "%s"', async (query) => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/simple"),
-        args: ["web"],
-      },
-      async (session) => {
-        await session.waitForText("Select script");
-        expect(
-          await getScriptSearchTerminalText(session, query)
-        ).toMatchSnapshot();
-      }
-    );
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/simple"),
+      args: ["web"],
+      homeDir: fixture.path,
+    });
+
+    try {
+      await session.waitForText("Select script");
+      expect(
+        await getScriptSearchTerminalText(session, query)
+      ).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it("runs a script directly in the simple workspace", async () => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/simple"),
-        args: ["web", "dev"],
-      },
-      async (session) => {
-        await session.waitForText("🚀 @simple/web dev starting...");
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/simple"),
+      args: ["web", "dev"],
+      homeDir: fixture.path,
+    });
 
-        expect(await readTerminal(session)).toContain(
-          "🚀 @simple/web dev starting..."
-        );
-      }
-    );
+    try {
+      await session.waitForText("🚀 @simple/web dev starting...");
+
+      expect(await readTerminal(session)).toContain(
+        "🚀 @simple/web dev starting..."
+      );
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it("shows the package picker for the large workspace", async () => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/large"),
-      },
-      async (session) => {
-        await session.waitForText("Select package");
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/large"),
+      homeDir: fixture.path,
+    });
 
-        expect(await readTerminal(session)).toMatchSnapshot();
-      }
-    );
+    try {
+      await session.waitForText("Select package");
+
+      expect(await readTerminal(session)).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it.each([
     "web",
     "zzz",
   ])('shows the package picker while searching for "%s"', async (query) => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/large"),
-      },
-      async (session) => {
-        await session.waitForText("Select package");
-        expect(
-          await getPackageSearchTerminalText(session, query)
-        ).toMatchSnapshot();
-      }
-    );
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/large"),
+      homeDir: fixture.path,
+    });
+
+    try {
+      await session.waitForText("Select package");
+      expect(
+        await getPackageSearchTerminalText(session, query)
+      ).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it('shows the filtered package picker for the query "a"', async () => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/large"),
-        args: ["a"],
-      },
-      async (session) => {
-        await session.waitForText("Select package");
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/large"),
+      args: ["a"],
+      homeDir: fixture.path,
+    });
 
-        expect(await readTerminal(session)).toMatchSnapshot();
-      }
-    );
+    try {
+      await session.waitForText("Select package");
+
+      expect(await readTerminal(session)).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it("shows the package picker cancellation state", async () => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/large"),
-      },
-      async (session) => {
-        await session.waitForText("Select package");
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/large"),
+      homeDir: fixture.path,
+    });
 
-        expect(await cancelAndReadTerminal(session)).toMatchSnapshot();
-      }
-    );
+    try {
+      await session.waitForText("Select package");
+
+      expect(await cancelAndReadTerminal(session)).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it("runs a script directly in the large workspace", async () => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/large"),
-        args: ["api", "build"],
-      },
-      async (session) => {
-        await session.waitForText("📦 @large/api building...");
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/large"),
+      args: ["api", "build"],
+      homeDir: fixture.path,
+    });
 
-        expect(await readTerminal(session)).toContain(
-          "📦 @large/api building..."
-        );
-      }
-    );
+    try {
+      await session.waitForText("📦 @large/api building...");
+
+      expect(await readTerminal(session)).toContain(
+        "📦 @large/api building..."
+      );
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it("shows the minimal script picker in edge-cases workspace", async () => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/edge-cases"),
-        args: ["minimal"],
-      },
-      async (session) => {
-        await session.waitForText("Select script");
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/edge-cases"),
+      args: ["minimal"],
+      homeDir: fixture.path,
+    });
 
-        expect(await readTerminal(session)).toMatchSnapshot();
-      }
-    );
+    try {
+      await session.waitForText("Select script");
+
+      expect(await readTerminal(session)).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it.each([
     "build",
     "zzz",
   ])('shows the minimal script picker while searching for "%s"', async (query) => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/edge-cases"),
-        args: ["minimal"],
-      },
-      async (session) => {
-        await session.waitForText("Select script");
-        expect(
-          await getScriptSearchTerminalText(session, query)
-        ).toMatchSnapshot();
-      }
-    );
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/edge-cases"),
+      args: ["minimal"],
+      homeDir: fixture.path,
+    });
+
+    try {
+      await session.waitForText("Select script");
+      expect(
+        await getScriptSearchTerminalText(session, query)
+      ).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it("shows the root script picker", async () => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/simple"),
-        args: ["root"],
-      },
-      async (session) => {
-        await session.waitForText("Select script");
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/simple"),
+      args: ["root"],
+      homeDir: fixture.path,
+    });
 
-        expect(await readTerminal(session)).toMatchSnapshot();
-      }
-    );
+    try {
+      await session.waitForText("Select script");
+
+      expect(await readTerminal(session)).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it("shows the script picker cancellation state", async () => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/simple"),
-        args: ["web"],
-      },
-      async (session) => {
-        await session.waitForText("Select script");
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/simple"),
+      args: ["web"],
+      homeDir: fixture.path,
+    });
 
-        expect(await cancelAndReadTerminal(session)).toMatchSnapshot();
-      }
-    );
+    try {
+      await session.waitForText("Select script");
+
+      expect(await cancelAndReadTerminal(session)).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it("reports a missing script list for unnamed packages", async () => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/edge-cases"),
-        args: ["unnamed"],
-      },
-      async (session) => {
-        await session.waitForText("No scripts in apps/unnamed");
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/edge-cases"),
+      args: ["unnamed"],
+      homeDir: fixture.path,
+    });
 
-        expect(await readTerminal(session)).toMatchSnapshot();
-        expect(await readTerminal(session)).toContain(
-          "No scripts in apps/unnamed"
-        );
-      }
-    );
+    try {
+      await session.waitForText("No scripts in apps/unnamed");
+
+      expect(await readTerminal(session)).toMatchSnapshot();
+      expect(await readTerminal(session)).toContain(
+        "No scripts in apps/unnamed"
+      );
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it("reports a missing script list for named packages with no scripts", async () => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/edge-cases"),
-        args: ["no-scripts"],
-      },
-      async (session) => {
-        await session.waitForText("No scripts in @edge/no-scripts");
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/edge-cases"),
+      args: ["no-scripts"],
+      homeDir: fixture.path,
+    });
 
-        expect(await readTerminal(session)).toMatchSnapshot();
-        expect(await readTerminal(session)).toContain(
-          "No scripts in @edge/no-scripts"
-        );
-      }
-    );
+    try {
+      await session.waitForText("No scripts in @edge/no-scripts");
+
+      expect(await readTerminal(session)).toMatchSnapshot();
+      expect(await readTerminal(session)).toContain(
+        "No scripts in @edge/no-scripts"
+      );
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it("shows the package picker when launched from inside a workspace subdirectory", async () => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/simple/apps/web"),
-      },
-      async (session) => {
-        await session.waitForText("Select package");
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/simple/apps/web"),
+      homeDir: fixture.path,
+    });
 
-        expect(await readTerminal(session)).toMatchSnapshot();
-      }
-    );
+    try {
+      await session.waitForText("Select package");
+
+      expect(await readTerminal(session)).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it("runs root workspace scripts when launched from inside a workspace subdirectory", async () => {
-    await withPrwSession(
-      {
-        cwd: resolve(repoRoot, "example/simple/apps/web"),
-        args: ["root", "build"],
-      },
-      async (session) => {
-        await session.waitForText("@simple/web building");
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/simple/apps/web"),
+      args: ["root", "build"],
+      homeDir: fixture.path,
+    });
 
-        const output = await readTerminal(session);
+    try {
+      await session.waitForText("@simple/web building");
 
-        expect(output).toContain("simple-workspace@1.0.0 build");
-        expect(output).toContain("/example/simple");
-        expect(output).toContain("@simple/web building");
-      }
-    );
+      const output = await readTerminal(session);
+
+      expect(output).toContain("simple-workspace@1.0.0 build");
+      expect(output).toContain("/example/simple");
+      expect(output).toContain("@simple/web building");
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 
   it("reports an error when launched completely outside a workspace", async () => {
     await using fixture = await createFixture();
+    await using homeFixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: fixture.path,
+      homeDir: homeFixture.path,
+    });
 
-    await withPrwSession(
-      {
-        cwd: fixture.path,
-      },
-      async (session) => {
-        await session.waitForText("Run prw inside a pnpm workspace.");
+    try {
+      await session.waitForText("Run prw inside a pnpm workspace.");
 
-        expect(await readTerminal(session)).toMatchSnapshot();
-      }
-    );
+      expect(await readTerminal(session)).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
   });
 });
