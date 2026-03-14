@@ -2,7 +2,28 @@
 
 English | [日本語](./README.ja.md)
 
+[![CI](https://github.com/nyatinte/prw/actions/workflows/ci.yml/badge.svg)](https://github.com/nyatinte/prw/actions/workflows/ci.yml)
+[![npm downloads](https://img.shields.io/npm/dm/%40nyatinte%2Fprw)](https://npmx.dev/package/@nyatinte/prw#downloads)
+[![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
+
 `prw` is a CLI for selecting a package and running one of its scripts from the root of a pnpm workspace.
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw@main/.github/assets/readme-package-picker.webp" alt="Package picker filtered by package name" width="100%" />
+    </td>
+    <td width="50%">
+      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw@main/.github/assets/readme-script-picker.webp" alt="Script picker after selecting a package" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><small>Filter packages with a short query.</small></td>
+    <td align="center"><small>Pick a script and run it immediately.</small></td>
+  </tr>
+</table>
+
+At a glance: run `prw`, narrow down the target package, choose a script, and execute an existing workspace task without leaving the workspace root.
 
 > [!IMPORTANT]
 > `prw` is intentionally small.

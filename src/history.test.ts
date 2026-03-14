@@ -3,15 +3,22 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("node:fs");
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import type { HistoryEntry } from "./history";
-import { loadHistory, saveHistory } from "./history";
+import { homedir } from "node:os";
+import { join } from "node:path";
+import type { HistoryEntry } from "./history.js";
+import { loadHistory, saveHistory } from "./history.js";
 
 function getWrittenHistory(): HistoryEntry[] {
   return JSON.parse(vi.mocked(writeFileSync).mock.calls[0][1] as string);
 }
 
+function getDefaultHistoryFile(): string {
+  return join(homedir(), ".local", "state", "prw", "history.json");
+}
+
 describe("history", () => {
   afterEach(() => {
+    vi.unstubAllEnvs();
     vi.clearAllMocks();
   });
 
@@ -37,6 +44,33 @@ describe("history", () => {
       const entries = [{ package: "@myapp/web", script: "dev", timestamp: 1 }];
       vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries));
       expect(loadHistory()).toEqual(entries);
+      expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
+        getDefaultHistoryFile(),
+        "utf-8"
+      );
+    });
+
+    it("prefers XDG_STATE_HOME when reading history", () => {
+      vi.stubEnv("XDG_STATE_HOME", "/tmp/state");
+      vi.mocked(readFileSync).mockReturnValue("[]");
+
+      loadHistory();
+
+      expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
+        "/tmp/state/prw/history.json",
+        "utf-8"
+      );
+    });
+
+    it("falls back to the XDG state default when XDG_STATE_HOME is unset", () => {
+      vi.mocked(readFileSync).mockReturnValue("[]");
+
+      loadHistory();
+
+      expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
+        getDefaultHistoryFile(),
+        "utf-8"
+      );
     });
   });
 
@@ -91,6 +125,35 @@ describe("history", () => {
       expect(() =>
         saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, [])
       ).not.toThrow();
+    });
+
+    it("writes to XDG_STATE_HOME when set", () => {
+      vi.stubEnv("XDG_STATE_HOME", "/tmp/state");
+
+      saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
+
+      expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith("/tmp/state/prw", {
+        recursive: true,
+      });
+      expect(vi.mocked(writeFileSync)).toHaveBeenCalledWith(
+        "/tmp/state/prw/history.json",
+        expect.any(String)
+      );
+    });
+
+    it("falls back to the XDG state default when XDG_STATE_HOME is unset", () => {
+      saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
+
+      expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith(
+        join(homedir(), ".local", "state", "prw"),
+        {
+          recursive: true,
+        }
+      );
+      expect(vi.mocked(writeFileSync)).toHaveBeenCalledWith(
+        getDefaultHistoryFile(),
+        expect.any(String)
+      );
     });
   });
 });

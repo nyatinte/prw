@@ -17,7 +17,7 @@ exports[`prw e2e > shows the minimal script picker in edge-cases workspace 1`] =
 ◆  Select script
 │
 │  Search: _
-│  ● build
+│  ● build (echo '📦 Building @edge/minimal...')
 │  ↑/↓ to select • Enter: confirm • Type: to search
 └"
 `;
@@ -52,7 +52,7 @@ exports[`prw e2e > shows the script picker for simple workspace package selectio
 ◆  Select script
 │
 │  Search: _
-│  ● build
+│  ● build (echo '📦 @simple/web building...')
 │  ○ dev
 │  ○ test
 │  ○ type-check

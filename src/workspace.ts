@@ -1,10 +1,11 @@
 import { existsSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import glob from "fast-glob";
-import YAML from "js-yaml";
+import { glob } from "tinyglobby";
+import { parse } from "yaml";
 
 const WORKSPACE_CONFIG_FILE = "pnpm-workspace.yaml";
+const TRAILING_PATH_SEPARATOR_PATTERN = /[\\/]+$/;
 
 export class WorkspaceNotFoundError extends Error {
   constructor(message: string) {
@@ -13,10 +14,10 @@ export class WorkspaceNotFoundError extends Error {
   }
 }
 
-export interface Package {
+export type Package = {
   readonly dir: string;
   readonly name: string;
-}
+};
 
 export const ROOT_PACKAGE: Package = { name: "(root)", dir: "." };
 
@@ -40,7 +41,7 @@ export async function getPackages(root: string): Promise<Package[]> {
     join(root, WORKSPACE_CONFIG_FILE),
     "utf-8"
   );
-  const config = (YAML.load(workspaceConfig) ?? {}) as { packages?: string[] };
+  const config = (parse(workspaceConfig) ?? {}) as { packages?: string[] };
 
   const packages: Package[] = [ROOT_PACKAGE];
 
@@ -55,7 +56,8 @@ export async function getPackages(root: string): Promise<Package[]> {
   });
 
   const results = await Promise.all(
-    dirs.map(async (dir) => {
+    dirs.map(async (rawDir) => {
+      const dir = rawDir.replace(TRAILING_PATH_SEPARATOR_PATTERN, "");
       try {
         const pkgJson = JSON.parse(
           await readFile(join(root, dir, "package.json"), "utf-8")
@@ -71,12 +73,24 @@ export async function getPackages(root: string): Promise<Package[]> {
   return packages;
 }
 
-export function getScripts(root: string, pkg: Package): string[] {
+export type Script = {
+  readonly command: string;
+  readonly name: string;
+};
+
+export function getScripts(root: string, pkg: Package): Script[] {
   try {
     const pkgJson = JSON.parse(
       readFileSync(join(root, pkg.dir, "package.json"), "utf-8")
     );
-    return Object.keys(pkgJson.scripts || {});
+    const scripts = pkgJson.scripts;
+    if (!scripts || typeof scripts !== "object") {
+      return [];
+    }
+    return Object.entries(scripts).map(([name, command]) => ({
+      name,
+      command: typeof command === "string" ? command : "",
+    }));
   } catch {
     return [];
   }

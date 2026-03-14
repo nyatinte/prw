@@ -2,7 +2,28 @@
 
 [English](./README.md) | 日本語
 
+[![CI](https://github.com/nyatinte/prw/actions/workflows/ci.yml/badge.svg)](https://github.com/nyatinte/prw/actions/workflows/ci.yml)
+[![npm downloads](https://img.shields.io/npm/dm/%40nyatinte%2Fprw)](https://npmx.dev/package/@nyatinte/prw#downloads)
+[![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
+
 `prw` は、pnpm workspace のルートからパッケージとスクリプトを選んで実行するための CLI ツールです。
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw@main/.github/assets/readme-package-picker.webp" alt="package 名で絞り込んでいる画面" width="100%" />
+    </td>
+    <td width="50%">
+      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw@main/.github/assets/readme-script-picker.webp" alt="package 選択後に script を選んでいる画面" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><small>短い入力で package を絞り込めます。</small></td>
+    <td align="center"><small>script を選んだらそのまま実行できます。</small></td>
+  </tr>
+</table>
+
+一目で分かるように言うと、`prw` は workspace root から package を絞り込み、その package に定義済みの script を選んで実行するためのツールです。
 
 > [!IMPORTANT]
 > `prw` は意図的に機能を絞っています。
