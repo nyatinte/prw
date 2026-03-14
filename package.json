@@ -59,6 +59,7 @@
     "@types/node": "24.12.0",
     "@typescript/native-preview": "7.0.0-dev.20260314.1",
     "@vitest/coverage-v8": "4.1.0",
+    "fs-fixture": "2.11.0",
     "knip": "5.86.0",
     "lefthook": "2.1.4",
     "tsdown": "0.21.2",

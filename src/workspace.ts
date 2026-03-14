@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { glob } from "tinyglobby";
 import { parse } from "yaml";
 
@@ -26,14 +26,23 @@ export function isRootPackage(pkg: Package): boolean {
 }
 
 export function findWorkspaceRoot(cwd: string): string {
-  const current = resolve(cwd);
-  const workspacePath = join(current, WORKSPACE_CONFIG_FILE);
+  let current = resolve(cwd);
 
-  if (existsSync(workspacePath)) {
-    return current;
+  while (true) {
+    const workspacePath = join(current, WORKSPACE_CONFIG_FILE);
+    if (existsSync(workspacePath)) {
+      return current;
+    }
+
+    const parent = dirname(current);
+    if (parent === current) {
+      break;
+    }
+
+    current = parent;
   }
 
-  throw new WorkspaceNotFoundError("Run prw from workspace root.");
+  throw new WorkspaceNotFoundError("Run prw inside a pnpm workspace.");
 }
 
 export async function getPackages(root: string): Promise<Package[]> {

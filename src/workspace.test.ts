@@ -1,6 +1,5 @@
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { createFixture } from "fs-fixture";
+import { describe, expect, it } from "vitest";
 import {
   findWorkspaceRoot,
   getPackages,
@@ -12,51 +11,72 @@ import {
 } from "./workspace.js";
 
 describe("workspace", () => {
-  const tmpDir = join("/tmp", `prw-test-${Date.now()}`);
-
-  beforeEach(() => {
-    mkdirSync(tmpDir, { recursive: true });
-  });
-
-  afterEach(() => {
-    rmSync(tmpDir, { recursive: true, force: true });
-  });
-
   describe("findWorkspaceRoot", () => {
-    it("returns path with pnpm-workspace.yaml in current dir", () => {
-      writeFileSync(
-        join(tmpDir, "pnpm-workspace.yaml"),
-        "packages:\n  - apps/*\n"
-      );
+    it("returns path with pnpm-workspace.yaml in current dir", async () => {
+      await using fixture = await createFixture({
+        "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
+      });
 
-      expect(findWorkspaceRoot(tmpDir)).toBe(tmpDir);
+      expect(findWorkspaceRoot(fixture.path)).toBe(fixture.path);
     });
 
-    it("throws WorkspaceNotFoundError when not in workspace", () => {
-      expect(() => findWorkspaceRoot(tmpDir)).toThrow(
-        new WorkspaceNotFoundError("Run prw from workspace root.")
+    it("returns nearest workspace root from nested workspace dir", async () => {
+      await using fixture = await createFixture({
+        "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
+        "apps/web/src": {},
+      });
+
+      expect(findWorkspaceRoot(fixture.getPath("apps", "web", "src"))).toBe(
+        fixture.path
+      );
+    });
+
+    it("returns nearest workspace root when nested workspaces exist", async () => {
+      await using fixture = await createFixture({
+        "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
+        apps: {
+          web: {
+            "pnpm-workspace.yaml": "packages:\n  - packages/*\n",
+            packages: {
+              ui: {
+                src: {},
+              },
+            },
+          },
+        },
+      });
+
+      expect(
+        findWorkspaceRoot(
+          fixture.getPath("apps", "web", "packages", "ui", "src")
+        )
+      ).toBe(fixture.getPath("apps", "web"));
+    });
+
+    it("throws WorkspaceNotFoundError when not in a workspace", async () => {
+      await using fixture = await createFixture();
+
+      expect(() => findWorkspaceRoot(fixture.path)).toThrow(
+        new WorkspaceNotFoundError("Run prw inside a pnpm workspace.")
       );
     });
   });
 
   describe("getPackages", () => {
     it("returns packages from glob pattern", async () => {
-      writeFileSync(
-        join(tmpDir, "pnpm-workspace.yaml"),
-        "packages:\n  - apps/*\n"
-      );
-      mkdirSync(join(tmpDir, "apps", "web"), { recursive: true });
-      writeFileSync(
-        join(tmpDir, "apps", "web", "package.json"),
-        JSON.stringify({ name: "@myapp/web" })
-      );
-      mkdirSync(join(tmpDir, "apps", "api"), { recursive: true });
-      writeFileSync(
-        join(tmpDir, "apps", "api", "package.json"),
-        JSON.stringify({ name: "@myapp/api" })
-      );
+      await using fixture = await createFixture({
+        "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
+        apps: {
+          web: {
+            "package.json": JSON.stringify({ name: "@myapp/web" }),
+          },
+          api: {
+            "package.json": JSON.stringify({ name: "@myapp/api" }),
+          },
+        },
+      });
 
-      const packages = await getPackages(tmpDir);
+      const packages = await getPackages(fixture.path);
       expect(packages.length).toBe(3);
       expect(packages[0]).toEqual({ name: "(root)", dir: "." });
       expect(packages.some((p) => p.name === "@myapp/web")).toBe(true);
@@ -64,17 +84,16 @@ describe("workspace", () => {
     });
 
     it("uses dir as fallback when package.json has no name", async () => {
-      writeFileSync(
-        join(tmpDir, "pnpm-workspace.yaml"),
-        "packages:\n  - apps/*\n"
-      );
-      mkdirSync(join(tmpDir, "apps", "unnamed"), { recursive: true });
-      writeFileSync(
-        join(tmpDir, "apps", "unnamed", "package.json"),
-        JSON.stringify({})
-      );
+      await using fixture = await createFixture({
+        "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
+        apps: {
+          unnamed: {
+            "package.json": JSON.stringify({}),
+          },
+        },
+      });
 
-      const packages = await getPackages(tmpDir);
+      const packages = await getPackages(fixture.path);
       expect(packages.some((p) => p.name === "apps/unnamed")).toBe(true);
     });
 
@@ -82,50 +101,48 @@ describe("workspace", () => {
       ["no packages match the glob", "packages:\n  - apps/*\n"],
       ["workspace yaml is empty", ""],
     ])("returns only root when %s", async (_, yaml) => {
-      writeFileSync(join(tmpDir, "pnpm-workspace.yaml"), yaml);
+      await using fixture = await createFixture({
+        "pnpm-workspace.yaml": yaml,
+      });
 
-      const packages = await getPackages(tmpDir);
+      const packages = await getPackages(fixture.path);
       expect(packages).toEqual([{ name: "(root)", dir: "." }]);
     });
 
     it("excludes directories matching negation pattern", async () => {
-      writeFileSync(
-        join(tmpDir, "pnpm-workspace.yaml"),
-        "packages:\n  - apps/*\n  - '!apps/legacy'\n"
-      );
-      mkdirSync(join(tmpDir, "apps", "web"), { recursive: true });
-      writeFileSync(
-        join(tmpDir, "apps", "web", "package.json"),
-        JSON.stringify({ name: "@myapp/web" })
-      );
-      mkdirSync(join(tmpDir, "apps", "legacy"), { recursive: true });
-      writeFileSync(
-        join(tmpDir, "apps", "legacy", "package.json"),
-        JSON.stringify({ name: "@myapp/legacy" })
-      );
+      await using fixture = await createFixture({
+        "pnpm-workspace.yaml": "packages:\n  - apps/*\n  - '!apps/legacy'\n",
+        apps: {
+          web: {
+            "package.json": JSON.stringify({ name: "@myapp/web" }),
+          },
+          legacy: {
+            "package.json": JSON.stringify({ name: "@myapp/legacy" }),
+          },
+        },
+      });
 
-      const packages = await getPackages(tmpDir);
+      const packages = await getPackages(fixture.path);
       expect(packages.some((p) => p.name === "@myapp/web")).toBe(true);
       expect(packages.some((p) => p.name === "@myapp/legacy")).toBe(false);
     });
 
     it("handles multiple patterns", async () => {
-      writeFileSync(
-        join(tmpDir, "pnpm-workspace.yaml"),
-        "packages:\n  - apps/*\n  - packages/*\n"
-      );
-      mkdirSync(join(tmpDir, "apps", "web"), { recursive: true });
-      writeFileSync(
-        join(tmpDir, "apps", "web", "package.json"),
-        JSON.stringify({ name: "@myapp/web" })
-      );
-      mkdirSync(join(tmpDir, "packages", "ui"), { recursive: true });
-      writeFileSync(
-        join(tmpDir, "packages", "ui", "package.json"),
-        JSON.stringify({ name: "@myapp/ui" })
-      );
+      await using fixture = await createFixture({
+        "pnpm-workspace.yaml": "packages:\n  - apps/*\n  - packages/*\n",
+        apps: {
+          web: {
+            "package.json": JSON.stringify({ name: "@myapp/web" }),
+          },
+        },
+        packages: {
+          ui: {
+            "package.json": JSON.stringify({ name: "@myapp/ui" }),
+          },
+        },
+      });
 
-      const packages = await getPackages(tmpDir);
+      const packages = await getPackages(fixture.path);
       expect(packages.length).toBe(3);
       expect(packages.some((p) => p.name === "@myapp/web")).toBe(true);
       expect(packages.some((p) => p.name === "@myapp/ui")).toBe(true);
@@ -133,41 +150,47 @@ describe("workspace", () => {
   });
 
   describe("getScripts", () => {
-    it("returns script names and commands from package.json", () => {
-      mkdirSync(join(tmpDir, "apps", "web"), { recursive: true });
-      writeFileSync(
-        join(tmpDir, "apps", "web", "package.json"),
-        JSON.stringify({
-          name: "@myapp/web",
-          scripts: { dev: "vite", build: "tsc" },
-        })
-      );
+    it("returns script names and commands from package.json", async () => {
+      await using fixture = await createFixture({
+        apps: {
+          web: {
+            "package.json": JSON.stringify({
+              name: "@myapp/web",
+              scripts: { dev: "vite", build: "tsc" },
+            }),
+          },
+        },
+      });
 
       expect(
-        getScripts(tmpDir, { name: "@myapp/web", dir: "apps/web" })
+        getScripts(fixture.path, { name: "@myapp/web", dir: "apps/web" })
       ).toEqual([
         { name: "dev", command: "vite" },
         { name: "build", command: "tsc" },
       ]);
     });
 
-    it("returns empty array when scripts field is missing", () => {
-      mkdirSync(join(tmpDir, "apps", "api"), { recursive: true });
-      writeFileSync(
-        join(tmpDir, "apps", "api", "package.json"),
-        JSON.stringify({ name: "@myapp/api" })
-      );
+    it("returns empty array when scripts field is missing", async () => {
+      await using fixture = await createFixture({
+        apps: {
+          api: {
+            "package.json": JSON.stringify({ name: "@myapp/api" }),
+          },
+        },
+      });
 
       expect(
-        getScripts(tmpDir, { name: "@myapp/api", dir: "apps/api" })
+        getScripts(fixture.path, { name: "@myapp/api", dir: "apps/api" })
       ).toEqual([]);
     });
 
-    it("returns empty array when package.json does not exist", () => {
-      mkdirSync(join(tmpDir, "apps", "ghost"), { recursive: true });
+    it("returns empty array when package.json does not exist", async () => {
+      await using fixture = await createFixture({
+        "apps/ghost": {},
+      });
 
       expect(
-        getScripts(tmpDir, { name: "@myapp/ghost", dir: "apps/ghost" })
+        getScripts(fixture.path, { name: "@myapp/ghost", dir: "apps/ghost" })
       ).toEqual([]);
     });
   });

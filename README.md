@@ -6,7 +6,7 @@ English | [日本語](./README.ja.md)
 [![npm downloads](https://img.shields.io/npm/dm/%40nyatinte%2Fprw)](https://npmx.dev/package/@nyatinte/prw#downloads)
 [![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
 
-`prw` is a CLI for selecting a package and running one of its scripts from the root of a pnpm workspace.
+`prw` is a CLI for selecting a package and running one of its scripts from a pnpm workspace.
 
 <table>
   <tr>
@@ -23,7 +23,7 @@ English | [日本語](./README.ja.md)
   </tr>
 </table>
 
-At a glance: run `prw`, narrow down the target package, choose a script, and execute an existing workspace task without leaving the workspace root.
+At a glance: run `prw`, narrow down the target package, choose a script, and execute an existing workspace task from anywhere inside the workspace.
 
 > [!IMPORTANT]
 > `prw` is intentionally small.
@@ -32,7 +32,7 @@ At a glance: run `prw`, narrow down the target package, choose a script, and exe
 
 ## What It Does
 
-`prw` lets you pick a package and a script from your pnpm workspace root, then runs it.
+`prw` lets you pick a package and a script from your pnpm workspace, then runs it.
 It only uses scripts already defined in `package.json`.
 
 ## Installation
@@ -110,13 +110,13 @@ $ prw
       └─ package.json
 ```
 
-From the workspace root, `prw` can run scripts from `apps/*` and `packages/*`.
+From anywhere in the workspace, `prw` can run scripts from `apps/*` and `packages/*`.
 
 ## Notes
 
 > [!IMPORTANT]
-> Run `prw` from the workspace root.
-> It expects `pnpm-workspace.yaml` in the current directory.
+> Run `prw` anywhere inside the workspace.
+> It finds the nearest `pnpm-workspace.yaml` by walking up parent directories.
 
 ## License
 

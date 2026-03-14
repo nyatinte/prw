@@ -6,7 +6,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/%40nyatinte%2Fprw)](https://npmx.dev/package/@nyatinte/prw#downloads)
 [![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
 
-`prw` は、pnpm workspace のルートからパッケージとスクリプトを選んで実行するための CLI ツールです。
+`prw` は、pnpm workspace 内でパッケージとスクリプトを選んで実行するための CLI ツールです。
 
 <table>
   <tr>
@@ -23,7 +23,7 @@
   </tr>
 </table>
 
-一目で分かるように言うと、`prw` は workspace root から package を絞り込み、その package に定義済みの script を選んで実行するためのツールです。
+一目で分かるように言うと、`prw` は workspace 内のどこからでも package を絞り込み、その package に定義済みの script を選んで実行するためのツールです。
 
 > [!IMPORTANT]
 > `prw` は意図的に機能を絞っています。
@@ -32,7 +32,7 @@
 
 ## これは何をするツールか
 
-pnpm workspace で、実行したい package と script をルートから選んで実行します。
+pnpm workspace で、実行したい package と script を workspace 内から選んで実行します。
 使うのは既存の `package.json` scripts だけです。
 
 ## インストール
@@ -111,13 +111,13 @@ $ prw
       └─ package.json
 ```
 
-このような monorepo で、ルートから `apps/*` や `packages/*` の scripts を選んで実行できます。
+このような monorepo で、workspace 内のどこからでも `apps/*` や `packages/*` の scripts を選んで実行できます。
 
 ## 注意事項
 
 > [!IMPORTANT]
-> `prw` は workspace root で実行してください。
-> カレントディレクトリに `pnpm-workspace.yaml` がない場合は動作しません。
+> `prw` は workspace 内であればどこからでも実行できます。
+> 親ディレクトリをたどって最も近い `pnpm-workspace.yaml` を見つけます。
 
 ## License
 
