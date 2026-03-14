@@ -3,16 +3,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("node:fs");
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 import type { HistoryEntry } from "./history";
-import {
-  loadHistory,
-  resolveHistoryDir,
-  resolveHistoryFile,
-  saveHistory,
-} from "./history";
+import { loadHistory, saveHistory } from "./history";
 
 function getWrittenHistory(): HistoryEntry[] {
   return JSON.parse(vi.mocked(writeFileSync).mock.calls[0][1] as string);
+}
+
+function getDefaultHistoryFile(): string {
+  return join(homedir(), ".local", "state", "prw", "history.json");
 }
 
 describe("history", () => {
@@ -44,7 +45,7 @@ describe("history", () => {
       vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries));
       expect(loadHistory()).toEqual(entries);
       expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
-        resolveHistoryFile(),
+        getDefaultHistoryFile(),
         "utf-8"
       );
     });
@@ -67,7 +68,7 @@ describe("history", () => {
       loadHistory();
 
       expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
-        resolveHistoryFile(),
+        getDefaultHistoryFile(),
         "utf-8"
       );
     });
@@ -143,11 +144,14 @@ describe("history", () => {
     it("falls back to the XDG state default when XDG_STATE_HOME is unset", () => {
       saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
 
-      expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith(resolveHistoryDir(), {
-        recursive: true,
-      });
+      expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith(
+        join(homedir(), ".local", "state", "prw"),
+        {
+          recursive: true,
+        }
+      );
       expect(vi.mocked(writeFileSync)).toHaveBeenCalledWith(
-        resolveHistoryFile(),
+        getDefaultHistoryFile(),
         expect.any(String)
       );
     });

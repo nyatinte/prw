@@ -1,6 +1,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 export type HistoryEntry = {
   package: string;
@@ -11,15 +11,11 @@ export type HistoryEntry = {
 const HISTORY_FILE_NAME = "history.json";
 const MAX_HISTORY = 50;
 
-export function resolveHistoryDir(): string {
-  return join(
-    process.env.XDG_STATE_HOME ?? homedir(),
-    ...(process.env.XDG_STATE_HOME ? ["prw"] : [".local", "state", "prw"])
-  );
-}
-
-export function resolveHistoryFile(): string {
-  return join(resolveHistoryDir(), HISTORY_FILE_NAME);
+function resolveHistoryFile(): string {
+  const stateHome = process.env.XDG_STATE_HOME;
+  return stateHome
+    ? join(stateHome, "prw", HISTORY_FILE_NAME)
+    : join(homedir(), ".local", "state", "prw", HISTORY_FILE_NAME);
 }
 
 export function loadHistory(): HistoryEntry[] {
@@ -41,9 +37,8 @@ export function saveHistory(
       (h) => !(h.package === entry.package && h.script === entry.script)
     );
     const updated = [entry, ...filtered].slice(0, MAX_HISTORY);
-    const historyDir = resolveHistoryDir();
     const historyFile = resolveHistoryFile();
-    mkdirSync(historyDir, { recursive: true });
+    mkdirSync(dirname(historyFile), { recursive: true });
     writeFileSync(historyFile, JSON.stringify(updated, null, 2));
   } catch {
     // History save failure should not interrupt script execution
