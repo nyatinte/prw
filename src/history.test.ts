@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("node:fs");
+vi.mock("node:os", () => ({
+  homedir: vi.fn(() => "/home/test"),
+}));
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import type { HistoryEntry } from "./history";
@@ -12,6 +15,7 @@ function getWrittenHistory(): HistoryEntry[] {
 
 describe("history", () => {
   afterEach(() => {
+    vi.unstubAllEnvs();
     vi.clearAllMocks();
   });
 
@@ -37,6 +41,34 @@ describe("history", () => {
       const entries = [{ package: "@myapp/web", script: "dev", timestamp: 1 }];
       vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries));
       expect(loadHistory()).toEqual(entries);
+      expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
+        "/home/test/.config/prw/history.json",
+        "utf-8"
+      );
+    });
+
+    it("prefers XDG_STATE_HOME when reading history", () => {
+      vi.stubEnv("XDG_STATE_HOME", "/tmp/state");
+      vi.mocked(readFileSync).mockReturnValue("[]");
+
+      loadHistory();
+
+      expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
+        "/tmp/state/prw/history.json",
+        "utf-8"
+      );
+    });
+
+    it("falls back to XDG_CONFIG_HOME when XDG_STATE_HOME is unset", () => {
+      vi.stubEnv("XDG_CONFIG_HOME", "/tmp/config");
+      vi.mocked(readFileSync).mockReturnValue("[]");
+
+      loadHistory();
+
+      expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
+        "/tmp/config/prw/history.json",
+        "utf-8"
+      );
     });
   });
 
@@ -91,6 +123,33 @@ describe("history", () => {
       expect(() =>
         saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, [])
       ).not.toThrow();
+    });
+
+    it("writes to XDG_STATE_HOME when set", () => {
+      vi.stubEnv("XDG_STATE_HOME", "/tmp/state");
+
+      saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
+
+      expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith("/tmp/state/prw", {
+        recursive: true,
+      });
+      expect(vi.mocked(writeFileSync)).toHaveBeenCalledWith(
+        "/tmp/state/prw/history.json",
+        expect.any(String)
+      );
+    });
+
+    it("falls back to the legacy config path when XDG env vars are unset", () => {
+      saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
+
+      expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith(
+        "/home/test/.config/prw",
+        { recursive: true }
+      );
+      expect(vi.mocked(writeFileSync)).toHaveBeenCalledWith(
+        "/home/test/.config/prw/history.json",
+        expect.any(String)
+      );
     });
   });
 });

@@ -8,13 +8,29 @@ export type HistoryEntry = {
   timestamp: number;
 };
 
-const HISTORY_DIR = join(homedir(), ".config", "prw");
-const HISTORY_FILE = join(HISTORY_DIR, "history.json");
 const MAX_HISTORY = 50;
+
+function resolveHistoryDir(): string {
+  const stateHome = process.env.XDG_STATE_HOME;
+  if (stateHome) {
+    return join(stateHome, "prw");
+  }
+
+  const configHome = process.env.XDG_CONFIG_HOME;
+  if (configHome) {
+    return join(configHome, "prw");
+  }
+
+  return join(homedir(), ".config", "prw");
+}
+
+function resolveHistoryFile(): string {
+  return join(resolveHistoryDir(), "history.json");
+}
 
 export function loadHistory(): HistoryEntry[] {
   try {
-    const content = readFileSync(HISTORY_FILE, "utf-8");
+    const content = readFileSync(resolveHistoryFile(), "utf-8");
     const parsed = JSON.parse(content);
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -31,8 +47,10 @@ export function saveHistory(
       (h) => !(h.package === entry.package && h.script === entry.script)
     );
     const updated = [entry, ...filtered].slice(0, MAX_HISTORY);
-    mkdirSync(HISTORY_DIR, { recursive: true });
-    writeFileSync(HISTORY_FILE, JSON.stringify(updated, null, 2));
+    const historyDir = resolveHistoryDir();
+    const historyFile = resolveHistoryFile();
+    mkdirSync(historyDir, { recursive: true });
+    writeFileSync(historyFile, JSON.stringify(updated, null, 2));
   } catch {
     // History save failure should not interrupt script execution
   }
