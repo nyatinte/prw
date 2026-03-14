@@ -81,7 +81,11 @@ export function getScripts(root: string, pkg: Package): Script[] {
     const pkgJson = JSON.parse(
       readFileSync(join(root, pkg.dir, "package.json"), "utf-8")
     );
-    return Object.entries(pkgJson.scripts || {}).map(([name, command]) => ({
+    const scripts = pkgJson.scripts;
+    if (!scripts || typeof scripts !== "object") {
+      return [];
+    }
+    return Object.entries(scripts).map(([name, command]) => ({
       name,
       command: typeof command === "string" ? command : "",
     }));
