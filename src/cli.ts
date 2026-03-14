@@ -39,24 +39,16 @@ export async function selectPackageByArgs(
   }
 
   if (initialScript) {
-    const matchedPackage = matches[0];
     if (matches.length !== 1) {
       console.error(`Multiple packages match: ${query}. Be more specific.`);
       process.exit(1);
     }
-    if (!matchedPackage) {
-      console.error(`No packages match: ${query}`);
-      process.exit(1);
-    }
+    const [matchedPackage] = matches as [Package];
     return { pkg: matchedPackage, script: initialScript };
   }
 
   if (matches.length === 1) {
-    const matchedPackage = matches[0];
-    if (!matchedPackage) {
-      console.error(`No packages match: ${query}`);
-      process.exit(1);
-    }
+    const [matchedPackage] = matches as [Package];
     logSelectedPackage(matchedPackage);
     return { pkg: matchedPackage };
   }
