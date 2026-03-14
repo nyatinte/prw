@@ -13,6 +13,9 @@
 
 pnpm workspace で、実行したい package と script をルートから選んで実行します。
 使うのは既存の `package.json` scripts だけです。
+prompt や error message はシステム locale に合わせて表示されます。
+現在サポートしている locale は英語 (`en`) と日本語 (`ja`) です。
+未対応の locale は英語にフォールバックします。
 
 ## インストール
 
@@ -63,12 +66,12 @@ package と script が特定できれば、そのまま実行します。
 
 ```text
 $ prw
-? Select package
+? パッケージを選択
 ❯ (root)
   @myapp/web      apps/web
   @myapp/api      apps/api
 
-? Select script
+? スクリプトを選択
 ❯ dev
   build
   test

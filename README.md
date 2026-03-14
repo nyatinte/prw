@@ -13,6 +13,9 @@ English | [日本語](./README.ja.md)
 
 `prw` lets you pick a package and a script from your pnpm workspace root, then runs it.
 It only uses scripts already defined in `package.json`.
+Prompt and error messages follow your system locale.
+Currently supported locales are English (`en`) and Japanese (`ja`).
+Unsupported locales fall back to English.
 
 ## Installation
 
@@ -72,6 +75,8 @@ $ prw
   build
   test
 ```
+
+With a Japanese locale, the prompts and errors are shown in Japanese.
 
 ## Workspace Layout
 
