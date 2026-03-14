@@ -1,0 +1,61 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`prw e2e > reports a missing script list for unnamed packages 1`] = `
+"
+│
+◇  Select package
+│  apps/unnamed
+No scripts in apps/unnamed"
+`;
+
+exports[`prw e2e > shows the minimal script picker in edge-cases workspace 1`] = `
+"
+│
+◇  Select package
+│  @edge/minimal
+│
+◆  Select script
+│
+│  Search: _
+│  ● build
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
+
+exports[`prw e2e > shows the package picker for the large workspace 1`] = `
+"
+│
+◆  Select package
+│
+│  Search: _
+│  ● (root)
+│  ○ @large/admin
+│  ○ @large/api
+│  ○ @large/config
+│  ○ @large/dashboard
+│  ○ @large/logger
+│  ○ @large/mobile
+│  ○ @large/types
+│  ○ @large/ui
+│  ○ @large/utils
+│  ○ @large/web
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
+
+exports[`prw e2e > shows the script picker for simple workspace package selection 1`] = `
+"
+│
+◇  Select package
+│  @simple/web
+│
+◆  Select script
+│
+│  Search: _
+│  ● build
+│  ○ dev
+│  ○ test
+│  ○ type-check
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
