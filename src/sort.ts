@@ -1,5 +1,5 @@
 import type { HistoryEntry } from "./history";
-import type { Package } from "./workspace";
+import type { Package, Script } from "./workspace";
 
 function buildFirstOccurrenceIndex(
   entries: HistoryEntry[],
@@ -55,16 +55,16 @@ export function sortPackages(
 }
 
 export function sortScripts(
-  scripts: string[],
+  scripts: Script[],
   packageName: string,
   history: HistoryEntry[]
-): string[] {
+): Script[] {
   const pkgHistory = history.filter((h) => h.package === packageName);
   return sortByHistory(
     scripts,
     pkgHistory,
     (h) => h.script,
-    (s) => s,
-    (a, b) => a.localeCompare(b)
+    (s) => s.name,
+    (a, b) => a.name.localeCompare(b.name)
   );
 }

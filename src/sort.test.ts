@@ -68,18 +68,26 @@ describe("sortPackages", () => {
 
 describe("sortScripts", () => {
   it("prioritizes scripts with history", () => {
-    const scripts = ["build", "dev", "test"];
+    const scripts = [
+      { name: "build", command: "tsc" },
+      { name: "dev", command: "vite" },
+      { name: "test", command: "vitest" },
+    ];
     const history: HistoryEntry[] = [
       { package: "@myapp/web", script: "test", timestamp: 1 },
     ];
 
     const result = sortScripts(scripts, "@myapp/web", history);
-    expect(result[0]).toBe("test");
+    expect(result[0].name).toBe("test");
   });
 
   it("sorts non-history scripts alphabetically", () => {
-    const scripts = ["test", "build", "dev"];
+    const scripts = [
+      { name: "test", command: "vitest" },
+      { name: "build", command: "tsc" },
+      { name: "dev", command: "vite" },
+    ];
     const result = sortScripts(scripts, "@myapp/web", []);
-    expect(result).toEqual(["build", "dev", "test"]);
+    expect(result.map((s) => s.name)).toEqual(["build", "dev", "test"]);
   });
 });

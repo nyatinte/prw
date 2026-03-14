@@ -71,12 +71,24 @@ export async function getPackages(root: string): Promise<Package[]> {
   return packages;
 }
 
-export function getScripts(root: string, pkg: Package): string[] {
+export type Script = {
+  readonly command: string;
+  readonly name: string;
+};
+
+export function getScripts(root: string, pkg: Package): Script[] {
   try {
     const pkgJson = JSON.parse(
       readFileSync(join(root, pkg.dir, "package.json"), "utf-8")
     );
-    return Object.keys(pkgJson.scripts || {});
+    const scripts = pkgJson.scripts;
+    if (!scripts || typeof scripts !== "object") {
+      return [];
+    }
+    return Object.entries(scripts).map(([name, command]) => ({
+      name,
+      command: typeof command === "string" ? command : "",
+    }));
   } catch {
     return [];
   }

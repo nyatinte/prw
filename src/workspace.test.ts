@@ -133,7 +133,7 @@ describe("workspace", () => {
   });
 
   describe("getScripts", () => {
-    it("returns script names from package.json", () => {
+    it("returns script names and commands from package.json", () => {
       mkdirSync(join(tmpDir, "apps", "web"), { recursive: true });
       writeFileSync(
         join(tmpDir, "apps", "web", "package.json"),
@@ -145,7 +145,10 @@ describe("workspace", () => {
 
       expect(
         getScripts(tmpDir, { name: "@myapp/web", dir: "apps/web" })
-      ).toEqual(["dev", "build"]);
+      ).toEqual([
+        { name: "dev", command: "vite" },
+        { name: "build", command: "tsc" },
+      ]);
     });
 
     it("returns empty array when scripts field is missing", () => {

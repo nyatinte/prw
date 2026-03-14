@@ -102,7 +102,10 @@ describe("resolveScript", () => {
   });
 
   it("calls selectScript when no initial script", async () => {
-    vi.mocked(getScripts).mockReturnValue(["dev", "build"]);
+    vi.mocked(getScripts).mockReturnValue([
+      { name: "dev", command: "vite" },
+      { name: "build", command: "tsc" },
+    ]);
     vi.mocked(selectScript).mockResolvedValue("dev");
     const result = await resolveScript("/root", pkg, undefined, []);
     expect(selectScript).toHaveBeenCalled();
