@@ -1,5 +1,17 @@
 # @nyatinte/prw
 
+## 0.2.0
+
+### Minor Changes
+
+- 3f38be5: Support XDG base directories for history storage.
+
+  This is a breaking change.
+
+  `prw` now stores history in `$XDG_STATE_HOME/prw/history.json` and falls back to
+  `~/.local/state/prw/history.json` when `XDG_STATE_HOME` is unset. It no longer
+  uses `~/.config/prw/history.json`.
+
 ## 0.1.1
 
 ### Patch Changes
