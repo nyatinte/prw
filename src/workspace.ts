@@ -71,10 +71,10 @@ export async function getPackages(root: string): Promise<Package[]> {
   return packages;
 }
 
-export interface Script {
+export type Script = {
   readonly command: string;
   readonly name: string;
-}
+};
 
 export function getScripts(root: string, pkg: Package): Script[] {
   try {
