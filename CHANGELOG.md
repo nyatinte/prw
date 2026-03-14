@@ -1,11 +1,25 @@
 # @nyatinte/prw
 
-## 0.0.2
+## 0.1.0
 
-### Patch Changes
+### Features
 
-- c229e48: Initial public release of `@nyatinte/prw`, an interactive CLI for running scripts
-  across pnpm workspace packages from the workspace root.
+- Interactive CLI for running scripts across pnpm workspaces — select package and script with keyboard navigation
+- Package selection with history-based sorting: recently used packages appear at the top (LRU cache, max 50 entries)
+- Script selection UI shows the actual command next to each script name for quick identification
+- Fuzzy package matching: `prw <package>` narrows candidates and launches interactive script selection
+- Direct execution mode: `prw <package> <script>` runs without any prompts
+- Show selected package name in log output when fuzzy match resolves to a single result
+- Workspace exclusion pattern support in `pnpm-workspace.yaml`
+- Graceful error handling for cancelled prompts and missing workspace root
 
-  This release also sets up Changesets-based release management and GitHub Actions
-  publishing with trusted publishing and provenance.
+### Infrastructure
+
+- TypeScript build pipeline with tsdown (ESM output)
+- GitHub Actions CI workflow with test and lint checks
+- Changesets-based release management with npm trusted publishing and provenance
+- Biome for linting and formatting; Lefthook for git hooks
+- Vitest with coverage reporting
+- tsgo for fast type checking
+- Knip for dead code detection
+- Node version pinned via `.node-versions`
