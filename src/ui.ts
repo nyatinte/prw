@@ -1,8 +1,8 @@
 import { autocomplete, isCancel } from "@clack/prompts";
 import type { HistoryEntry } from "./history";
 import { sortPackages, sortScripts } from "./sort";
-import { isRootPackage } from "./workspace";
 import type { Package } from "./workspace";
+import { isRootPackage } from "./workspace";
 
 export async function selectPackage(
   packages: Package[],

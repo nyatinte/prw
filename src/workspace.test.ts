@@ -24,7 +24,10 @@ describe("workspace", () => {
 
   describe("findWorkspaceRoot", () => {
     it("returns path with pnpm-workspace.yaml in current dir", () => {
-      writeFileSync(join(tmpDir, "pnpm-workspace.yaml"), "packages:\n  - apps/*\n");
+      writeFileSync(
+        join(tmpDir, "pnpm-workspace.yaml"),
+        "packages:\n  - apps/*\n"
+      );
 
       expect(findWorkspaceRoot(tmpDir)).toBe(tmpDir);
     });
@@ -38,11 +41,20 @@ describe("workspace", () => {
 
   describe("getPackages", () => {
     it("returns packages from glob pattern", async () => {
-      writeFileSync(join(tmpDir, "pnpm-workspace.yaml"), "packages:\n  - apps/*\n");
+      writeFileSync(
+        join(tmpDir, "pnpm-workspace.yaml"),
+        "packages:\n  - apps/*\n"
+      );
       mkdirSync(join(tmpDir, "apps", "web"), { recursive: true });
-      writeFileSync(join(tmpDir, "apps", "web", "package.json"), JSON.stringify({ name: "@myapp/web" }));
+      writeFileSync(
+        join(tmpDir, "apps", "web", "package.json"),
+        JSON.stringify({ name: "@myapp/web" })
+      );
       mkdirSync(join(tmpDir, "apps", "api"), { recursive: true });
-      writeFileSync(join(tmpDir, "apps", "api", "package.json"), JSON.stringify({ name: "@myapp/api" }));
+      writeFileSync(
+        join(tmpDir, "apps", "api", "package.json"),
+        JSON.stringify({ name: "@myapp/api" })
+      );
 
       const packages = await getPackages(tmpDir);
       expect(packages.length).toBe(3);
@@ -52,9 +64,15 @@ describe("workspace", () => {
     });
 
     it("uses dir as fallback when package.json has no name", async () => {
-      writeFileSync(join(tmpDir, "pnpm-workspace.yaml"), "packages:\n  - apps/*\n");
+      writeFileSync(
+        join(tmpDir, "pnpm-workspace.yaml"),
+        "packages:\n  - apps/*\n"
+      );
       mkdirSync(join(tmpDir, "apps", "unnamed"), { recursive: true });
-      writeFileSync(join(tmpDir, "apps", "unnamed", "package.json"), JSON.stringify({}));
+      writeFileSync(
+        join(tmpDir, "apps", "unnamed", "package.json"),
+        JSON.stringify({})
+      );
 
       const packages = await getPackages(tmpDir);
       expect(packages.some((p) => p.name === "apps/unnamed")).toBe(true);
@@ -76,9 +94,15 @@ describe("workspace", () => {
         "packages:\n  - apps/*\n  - '!apps/legacy'\n"
       );
       mkdirSync(join(tmpDir, "apps", "web"), { recursive: true });
-      writeFileSync(join(tmpDir, "apps", "web", "package.json"), JSON.stringify({ name: "@myapp/web" }));
+      writeFileSync(
+        join(tmpDir, "apps", "web", "package.json"),
+        JSON.stringify({ name: "@myapp/web" })
+      );
       mkdirSync(join(tmpDir, "apps", "legacy"), { recursive: true });
-      writeFileSync(join(tmpDir, "apps", "legacy", "package.json"), JSON.stringify({ name: "@myapp/legacy" }));
+      writeFileSync(
+        join(tmpDir, "apps", "legacy", "package.json"),
+        JSON.stringify({ name: "@myapp/legacy" })
+      );
 
       const packages = await getPackages(tmpDir);
       expect(packages.some((p) => p.name === "@myapp/web")).toBe(true);
@@ -86,11 +110,20 @@ describe("workspace", () => {
     });
 
     it("handles multiple patterns", async () => {
-      writeFileSync(join(tmpDir, "pnpm-workspace.yaml"), "packages:\n  - apps/*\n  - packages/*\n");
+      writeFileSync(
+        join(tmpDir, "pnpm-workspace.yaml"),
+        "packages:\n  - apps/*\n  - packages/*\n"
+      );
       mkdirSync(join(tmpDir, "apps", "web"), { recursive: true });
-      writeFileSync(join(tmpDir, "apps", "web", "package.json"), JSON.stringify({ name: "@myapp/web" }));
+      writeFileSync(
+        join(tmpDir, "apps", "web", "package.json"),
+        JSON.stringify({ name: "@myapp/web" })
+      );
       mkdirSync(join(tmpDir, "packages", "ui"), { recursive: true });
-      writeFileSync(join(tmpDir, "packages", "ui", "package.json"), JSON.stringify({ name: "@myapp/ui" }));
+      writeFileSync(
+        join(tmpDir, "packages", "ui", "package.json"),
+        JSON.stringify({ name: "@myapp/ui" })
+      );
 
       const packages = await getPackages(tmpDir);
       expect(packages.length).toBe(3);
@@ -104,23 +137,35 @@ describe("workspace", () => {
       mkdirSync(join(tmpDir, "apps", "web"), { recursive: true });
       writeFileSync(
         join(tmpDir, "apps", "web", "package.json"),
-        JSON.stringify({ name: "@myapp/web", scripts: { dev: "vite", build: "tsc" } })
+        JSON.stringify({
+          name: "@myapp/web",
+          scripts: { dev: "vite", build: "tsc" },
+        })
       );
 
-      expect(getScripts(tmpDir, { name: "@myapp/web", dir: "apps/web" })).toEqual(["dev", "build"]);
+      expect(
+        getScripts(tmpDir, { name: "@myapp/web", dir: "apps/web" })
+      ).toEqual(["dev", "build"]);
     });
 
     it("returns empty array when scripts field is missing", () => {
       mkdirSync(join(tmpDir, "apps", "api"), { recursive: true });
-      writeFileSync(join(tmpDir, "apps", "api", "package.json"), JSON.stringify({ name: "@myapp/api" }));
+      writeFileSync(
+        join(tmpDir, "apps", "api", "package.json"),
+        JSON.stringify({ name: "@myapp/api" })
+      );
 
-      expect(getScripts(tmpDir, { name: "@myapp/api", dir: "apps/api" })).toEqual([]);
+      expect(
+        getScripts(tmpDir, { name: "@myapp/api", dir: "apps/api" })
+      ).toEqual([]);
     });
 
     it("returns empty array when package.json does not exist", () => {
       mkdirSync(join(tmpDir, "apps", "ghost"), { recursive: true });
 
-      expect(getScripts(tmpDir, { name: "@myapp/ghost", dir: "apps/ghost" })).toEqual([]);
+      expect(
+        getScripts(tmpDir, { name: "@myapp/ghost", dir: "apps/ghost" })
+      ).toEqual([]);
     });
   });
 

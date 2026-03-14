@@ -36,7 +36,10 @@ export function findWorkspaceRoot(cwd: string): string {
 }
 
 export async function getPackages(root: string): Promise<Package[]> {
-  const workspaceConfig = await readFile(join(root, WORKSPACE_CONFIG_FILE), "utf-8");
+  const workspaceConfig = await readFile(
+    join(root, WORKSPACE_CONFIG_FILE),
+    "utf-8"
+  );
   const config = (YAML.load(workspaceConfig) ?? {}) as { packages?: string[] };
 
   const packages: Package[] = [ROOT_PACKAGE];
@@ -54,7 +57,9 @@ export async function getPackages(root: string): Promise<Package[]> {
   const results = await Promise.all(
     dirs.map(async (dir) => {
       try {
-        const pkgJson = JSON.parse(await readFile(join(root, dir, "package.json"), "utf-8"));
+        const pkgJson = JSON.parse(
+          await readFile(join(root, dir, "package.json"), "utf-8")
+        );
         return { name: pkgJson.name || dir, dir } as Package;
       } catch {
         return null;
@@ -68,7 +73,9 @@ export async function getPackages(root: string): Promise<Package[]> {
 
 export function getScripts(root: string, pkg: Package): string[] {
   try {
-    const pkgJson = JSON.parse(readFileSync(join(root, pkg.dir, "package.json"), "utf-8"));
+    const pkgJson = JSON.parse(
+      readFileSync(join(root, pkg.dir, "package.json"), "utf-8")
+    );
     return Object.keys(pkgJson.scripts || {});
   } catch {
     return [];
