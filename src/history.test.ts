@@ -44,7 +44,7 @@ describe("history", () => {
 
     it("returns parsed entries when file is valid", async () => {
       const entries: HistoryEntry[] = [
-        { package: "@myapp/web", script: "dev", timestamp: 1 },
+        { package: "@myapp/web", script: "dev" },
       ];
       await using fixture = await createFixture({
         state: {
@@ -60,10 +60,10 @@ describe("history", () => {
 
     it("prefers XDG_STATE_HOME when reading history", async () => {
       const xdgEntries: HistoryEntry[] = [
-        { package: "@myapp/web", script: "dev", timestamp: 1 },
+        { package: "@myapp/web", script: "dev" },
       ];
       const homeEntries: HistoryEntry[] = [
-        { package: "@myapp/api", script: "build", timestamp: 2 },
+        { package: "@myapp/api", script: "build" },
       ];
 
       await using xdgFixture = await createFixture({
@@ -91,7 +91,7 @@ describe("history", () => {
 
     it("falls back to the XDG state default when XDG_STATE_HOME is unset", async () => {
       const entries: HistoryEntry[] = [
-        { package: "@myapp/web", script: "dev", timestamp: 1 },
+        { package: "@myapp/web", script: "dev" },
       ];
       await using fixture = await createFixture({
         ".local": {
@@ -115,14 +115,11 @@ describe("history", () => {
       vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
 
       const existing: HistoryEntry[] = [
-        { package: "@myapp/api", script: "dev", timestamp: 1 },
-        { package: "@myapp/web", script: "dev", timestamp: 2 },
+        { package: "@myapp/api", script: "dev" },
+        { package: "@myapp/web", script: "dev" },
       ];
 
-      saveHistory(
-        { package: "@myapp/api", script: "dev", timestamp: 999 },
-        existing
-      );
+      saveHistory({ package: "@myapp/api", script: "dev" }, existing);
 
       const written = await fixture.readJson<HistoryEntry[]>(
         "state/prw/history.json"
@@ -130,7 +127,6 @@ describe("history", () => {
       expect(written[0]).toEqual({
         package: "@myapp/api",
         script: "dev",
-        timestamp: 999,
       });
       expect(written).toHaveLength(2);
     });
@@ -142,13 +138,9 @@ describe("history", () => {
       const existing: HistoryEntry[] = Array.from({ length: 50 }, (_, i) => ({
         package: `@pkg${i}`,
         script: "test",
-        timestamp: i,
       }));
 
-      saveHistory(
-        { package: "new-pkg", script: "test", timestamp: 999 },
-        existing
-      );
+      saveHistory({ package: "new-pkg", script: "test" }, existing);
 
       const written = await fixture.readJson<HistoryEntry[]>(
         "state/prw/history.json"
@@ -166,7 +158,7 @@ describe("history", () => {
       vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
 
       expect(() =>
-        saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, [])
+        saveHistory({ package: "@myapp/web", script: "dev" }, [])
       ).not.toThrow();
     });
 
@@ -174,12 +166,12 @@ describe("history", () => {
       await using fixture = await createFixture();
       vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
 
-      saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
+      saveHistory({ package: "@myapp/web", script: "dev" }, []);
 
       expect(await fixture.exists("state/prw/history.json")).toBe(true);
       expect(
         await fixture.readJson<HistoryEntry[]>("state/prw/history.json")
-      ).toEqual([{ package: "@myapp/web", script: "dev", timestamp: 1 }]);
+      ).toEqual([{ package: "@myapp/web", script: "dev" }]);
     });
 
     it("falls back to the XDG state default when XDG_STATE_HOME is unset", async () => {
@@ -187,12 +179,12 @@ describe("history", () => {
       vi.stubEnv("XDG_STATE_HOME", "");
       vi.stubEnv("HOME", fixture.path);
 
-      saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
+      saveHistory({ package: "@myapp/web", script: "dev" }, []);
 
       expect(await fixture.exists(".local/state/prw/history.json")).toBe(true);
       expect(
         await fixture.readJson<HistoryEntry[]>(".local/state/prw/history.json")
-      ).toEqual([{ package: "@myapp/web", script: "dev", timestamp: 1 }]);
+      ).toEqual([{ package: "@myapp/web", script: "dev" }]);
     });
   });
 });

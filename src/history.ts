@@ -5,7 +5,6 @@ import { dirname, join } from "node:path";
 export type HistoryEntry = {
   package: string;
   script: string;
-  timestamp: number;
 };
 
 const HISTORY_FILE_NAME = "history.json";
