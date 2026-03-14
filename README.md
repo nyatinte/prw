@@ -1,92 +1,102 @@
 # @nyatinte/prw
 
-pnpm workspace で、rootからインタラクティブにパッケージとスクリプトを選んで実行するCLIツール。
+English | [日本語](./README.ja.md)
 
-## インストール
+`prw` is a CLI for selecting a package and running one of its scripts from the root of a pnpm workspace.
+
+> [!IMPORTANT]
+> `prw` is intentionally small.
+> It only runs scripts that already exist in your workspace.
+> It does not add its own task system.
+
+## What It Does
+
+`prw` lets you pick a package and a script from your pnpm workspace root, then runs it.
+It only uses scripts already defined in `package.json`.
+
+## Installation
 
 ```bash
 npm install -g @nyatinte/prw
-# または
+# or
 pnpm add -g @nyatinte/prw
 ```
 
-## 使い方
+## Usage
 
-### モード 1: インタラクティブ選択（引数なし）
+### 1. Start without arguments
 
 ```bash
 prw
-# ↓ パッケージ一覧を表示
-# ❯ (root)          .
-#   @myapp/web      apps/web
-#   @myapp/api      apps/api
-# ↓ スクリプト一覧を表示
-# ❯ dev
-#   build
-#   test
 ```
 
-### モード 2: パッケージ指定（パッケージ名のfuzzy match）
+Pick a package, pick a script, and run it.
+You can also select the workspace root package.
+
+### 2. Pass a package first
 
 ```bash
 prw web
-# @myapp/web が自動選択 → スクリプト選択画面へ
 ```
 
-複数にマッチした場合はパッケージ選択画面が表示されます。
+Package names can be matched loosely.
+You do not need to type the full name every time.
+If only one package matches, `prw` goes straight to script selection.
+If multiple packages match, it shows the package picker.
+Frequently used packages are shown first.
 
-### モード 3: 直接実行（パッケージ + スクリプト指定）
+### 3. Pass both package and script
 
 ```bash
 prw @myapp/web dev
-# 直接実行、UIなし
 ```
 
-## 特徴
+If the package and script are clear, `prw` runs them directly.
+Only scripts defined in `package.json` are runnable.
+Frequently used scripts are shown first.
 
-- 🎯 **インタラクティブ**: fuzzy search で素早くパッケージ・スクリプトを検索
-- 📝 **履歴機能**: よく使うパッケージ・スクリプトは常に上に表示
-- ⚡ **高速**: 軽量なCLI、起動時間最小化
-- 📦 **pnpm対応**: pnpm workspace に完全対応
+> [!NOTE]
+> Short input like `prw web` is enough in many cases.
 
-## デモ
+## Example
 
-```
+```text
 $ prw
-? Select package ›
-❯ @myapp/web      apps/web
+? Select package
+❯ (root)
+  @myapp/web      apps/web
   @myapp/api      apps/api
-  (root)          .
 
-? Select script ›
+? Select script
 ❯ dev
   build
-  type-check
   test
 ```
 
-## ライセンス
+## Workspace Layout
 
-MIT
-
-## リリース運用
-
-このリポジトリは Changesets でリリース管理します。
-
-```bash
-# 変更内容に対する release intent を追加
-pnpm changeset
-
-# pending changeset を package.json / changelog に反映
-pnpm version-packages
+```text
+.
+├─ package.json
+├─ pnpm-workspace.yaml
+├─ apps/
+│  └─ web/
+│     └─ package.json
+└─ packages/
+   ├─ ui/
+   │  └─ package.json
+   └─ config/
+      └─ package.json
 ```
 
-`.github/workflows/release.yml` は `main` への push ごとに pending changeset を
-集約した release PR を作成または更新します。release PR が merge されると、
-同じ workflow から `pnpm release` を実行して npm publish し、GitHub Release も
-自動作成します。
+From the workspace root, `prw` can run scripts from `apps/*` and `packages/*`.
 
-npm への publish は GitHub Actions の Trusted Publishing を前提にしており、
-この workflow には `id-token: write` を付与しています。初回 publish 前に npm 側で
-`nyatinte/prw` と `.github/workflows/release.yml` を trusted publisher として
-関連付けてください。
+## Notes
+
+> [!IMPORTANT]
+> Run `prw` from the workspace root.
+> It expects `pnpm-workspace.yaml` in the current directory.
+
+## License
+
+MIT
