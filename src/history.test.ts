@@ -1,16 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("node:fs");
-vi.mock("node:os", () => ({
-  homedir: vi.fn(() => "/home/test"),
-}));
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 import type { HistoryEntry } from "./history";
 import { loadHistory, saveHistory } from "./history";
 
 function getWrittenHistory(): HistoryEntry[] {
   return JSON.parse(vi.mocked(writeFileSync).mock.calls[0][1] as string);
+}
+
+function getLegacyHistoryDir(): string {
+  return join(homedir(), ".config", "prw");
 }
 
 describe("history", () => {
@@ -42,7 +45,7 @@ describe("history", () => {
       vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries));
       expect(loadHistory()).toEqual(entries);
       expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
-        "/home/test/.config/prw/history.json",
+        join(getLegacyHistoryDir(), "history.json"),
         "utf-8"
       );
     });
@@ -142,12 +145,11 @@ describe("history", () => {
     it("falls back to the legacy config path when XDG env vars are unset", () => {
       saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
 
-      expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith(
-        "/home/test/.config/prw",
-        { recursive: true }
-      );
+      expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith(getLegacyHistoryDir(), {
+        recursive: true,
+      });
       expect(vi.mocked(writeFileSync)).toHaveBeenCalledWith(
-        "/home/test/.config/prw/history.json",
+        join(getLegacyHistoryDir(), "history.json"),
         expect.any(String)
       );
     });
