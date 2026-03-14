@@ -1,8 +1,15 @@
-import { isCancel } from "@clack/prompts";
+import { isCancel, log, S_STEP_SUBMIT } from "@clack/prompts";
+import color from "picocolors";
 import type { HistoryEntry } from "./history";
-import { selectPackage, selectScript } from "./ui";
+import { SELECT_PACKAGE_MESSAGE, selectPackage, selectScript } from "./ui";
 import type { Package } from "./workspace";
 import { getScripts, matchPackages } from "./workspace";
+
+function logSelectedPackage(pkg: Package): void {
+  log.message([SELECT_PACKAGE_MESSAGE, color.dim(pkg.name)], {
+    symbol: color.green(S_STEP_SUBMIT),
+  });
+}
 
 function exitOnCancel<T>(selected: T | symbol): T {
   if (isCancel(selected)) {
@@ -38,11 +45,12 @@ export async function selectPackageByArgs(
     return { pkg: matches[0], script: args[1] };
   }
 
-  const pkg =
-    matches.length === 1
-      ? matches[0]
-      : exitOnCancel(await selectPackage(matches, history));
+  if (matches.length === 1) {
+    logSelectedPackage(matches[0]);
+    return { pkg: matches[0] };
+  }
 
+  const pkg = exitOnCancel(await selectPackage(matches, history));
   return { pkg };
 }
 
