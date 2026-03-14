@@ -4,7 +4,7 @@
   "description": "Interactive pnpm workspace package & script runner",
   "type": "module",
   "main": "./dist/index.mjs",
-  "bin": "./dist/index.mjs",
+  "bin": "./dist/bin.mjs",
   "scripts": {
     "build": "tsdown",
     "test": "vitest",
@@ -27,6 +27,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.0",
     "@types/js-yaml": "^4.0.9",
+    "@types/node": "^25.4.0",
     "lefthook": "^2.1.2",
     "tsdown": "^0.20.3",
     "typescript": "^5.9.3",

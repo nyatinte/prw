@@ -1,13 +1,19 @@
 import { spawnSync } from "node:child_process";
+import { isRootPackage } from "./workspace";
 import type { Package } from "./workspace";
 
 export function runScript(pkg: Package, script: string): void {
-  const isRoot = pkg.dir === ".";
+  const isRoot = isRootPackage(pkg);
   const args = isRoot ? ["run", script] : ["--filter", pkg.name, "run", script];
 
   const result = spawnSync("pnpm", args, {
     stdio: "inherit",
   });
+
+  if (result.error) {
+    console.error(`Failed to run pnpm: ${result.error.message}`);
+    process.exit(1);
+  }
 
   if (result.status !== null && result.status !== 0) {
     process.exit(result.status);

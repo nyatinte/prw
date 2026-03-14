@@ -1,6 +1,7 @@
 import { autocomplete, isCancel } from "@clack/prompts";
 import type { HistoryEntry } from "./history";
 import { sortPackages, sortScripts } from "./sort";
+import { isRootPackage } from "./workspace";
 import type { Package } from "./workspace";
 
 export async function selectPackage(
@@ -14,7 +15,7 @@ export async function selectPackage(
     options: sorted.map((pkg) => ({
       value: pkg.name,
       label: pkg.name,
-      hint: pkg.dir === "." ? "" : pkg.dir,
+      hint: isRootPackage(pkg) ? "" : pkg.dir,
     })),
   });
 
@@ -34,10 +35,6 @@ export async function selectScript(
   scripts: string[],
   history: HistoryEntry[]
 ): Promise<string | symbol> {
-  if (scripts.length === 0) {
-    throw new Error(`No scripts found in ${pkg.name}`);
-  }
-
   const sorted = sortScripts(scripts, pkg.name, history);
 
   const selected = await autocomplete({

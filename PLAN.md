@@ -67,13 +67,13 @@ AIへの作業指示用。**1チェックポイント = 1コミット**を目安
 
 - [x] テストを先に書く
 - [x] `src/workspace.ts` 実装（`findWorkspaceRoot(cwd: string): string`）
-  - 現在地から上方向に `pnpm-workspace.yaml` を探す
-  - 見つからなければ `WorkspaceNotFoundError` をthrow
+  - **カレントディレクトリのみ** `pnpm-workspace.yaml` を探す（親ディレクトリへの遡りなし）
+  - 見つからなければ `WorkspaceNotFoundError` をthrow（エラーメッセージ: "Run prw from workspace root."）
+  - 遡り機能は初期リリースではサポートしない（曖昧性・複雑性のため）
 
 ```
 テストケース:
 - pnpm-workspace.yaml がカレントにある → そのパスを返す
-- pnpm-workspace.yaml が親ディレクトリにある → 親のパスを返す
 - pnpm-workspace.yaml が存在しない → WorkspaceNotFoundError をthrow
 ```
 
@@ -239,6 +239,102 @@ AIへの作業指示用。**1チェックポイント = 1コミット**を目安
 
 -----
 
+## Phase 6: 品質改善（レビューで発覚した課題）
+
+### CP-17: history.ts のフォールバックテスト追加
+
+現在のロジックテストはファイルシステムをモックしていないため、PLAN.md で定義したテストが未実装のままになっている。
+
+```
+追加テストケース（fs モック使用）:
+- 履歴ファイルが存在しない → [] を返す（クラッシュしない）
+- 履歴ファイルが存在するが不正 JSON → [] を返す（クラッシュしない）
+- saveHistory → loadHistory で同じデータが返る（実際の読み書き）
+```
+
+### CP-18: findWorkspaceRoot を「カレントのみ」に変更
+
+**決定**: 遡り機能は初期リリースから除外する。
+
+理由:
+- `pnpm` コマンドはワークスペースルートから実行するのが前提のため、`prw` も同様でよい
+- 遡った先が意図したワークスペースかの判断が困難
+- シンプルな実装・明確なエラーメッセージで十分
+
+```
+実装変更:
+- while ループを削除し、カレントディレクトリのみチェック
+- エラーメッセージを "Run prw from workspace root." に変更
+
+テストケース変更:
+- 追加: pnpm-workspace.yaml がカレントにある → そのパスを返す ✅ 既存
+- 削除: 親ディレクトリにある → 親のパスを返す（機能削除）
+- 変更: 存在しない → WorkspaceNotFoundError ✅ 既存（メッセージ更新）
+```
+
+### CP-19: `select` → `autocomplete` 移行
+
+`@clack/prompts` v1.1.0 に `autocomplete` 関数が存在する（type-ahead filtering 内蔵）。
+現在の `select` を `autocomplete` に差し替えることで UI での fuzzy filtering が実現できる。
+
+```typescript
+// 現状
+import { select } from "@clack/prompts";
+await select({ message, options });
+
+// 変更後
+import { autocomplete } from "@clack/prompts";
+await autocomplete({ message, options }); // 入力しながら絞り込み可能
+```
+
+**影響範囲**:
+- `src/ui.ts`: `select` → `autocomplete` に変更
+- `src/fuzzy.ts`: CLI 引数モード（`prw <pkg>`）のフィルタリング用としては残す or 削除
+  - CLI 引数モードは既に `includes()` のみで動いているため `fuzzy.ts` 自体を削除も検討
+
+```
+テストケース:
+- autocomplete に options を渡すと正常に動作する（手動確認）
+- fuzzy.ts を削除した場合は fuzzy.test.ts も削除
+```
+
+### CP-20: ソートロジックを `sort.ts` に分離
+
+`src/ui.ts` にある `sortPackages`, `sortScripts` は UI と独立したロジック。分離してテストしやすくする。
+
+```
+変更内容:
+- src/sort.ts を新規作成（sortPackages, sortScripts を移動）
+- src/sort.test.ts として独立したテストファイル
+- src/ui.ts は @clack/prompts を使うコードのみに特化
+- src/ui.test.ts は削除（テストは sort.test.ts に移行）
+```
+
+### CP-21: pnpm workspace 除外パターンのテスト追加
+
+`fast-glob` は `!` prefix の除外パターンに対応しているため実装は動くが、テストが欠けている。
+
+```
+追加テストケース:
+- packages: ['apps/*', '!apps/legacy'] → legacy 以外が返る
+```
+
+### CP-22: index.ts の CLI モードテスト追加
+
+CP-12, CP-13 でテストケースが PLAN.md に定義されているが、`src/index.ts` のテストファイルが存在しない。
+
+```
+新規: src/index.test.ts
+- prw <package> で 1件のみマッチ → selectScript に進む
+- prw <package> で 0件マッチ → process.exit(1)
+- prw <package> で 複数マッチ → selectPackage UI を表示
+- prw <package> <script> で 1件マッチ → 直接 runScript 呼び出し
+- prw <package> <script> で 0件マッチ → process.exit(1)
+- prw <package> <script> で 複数マッチ → "Be more specific" エラーで process.exit(1)
+```
+
+-----
+
 ## チェックポイント一覧
 
 |CP   |タイトル                    |フェーズ  |テストあり     |
@@ -259,3 +355,9 @@ AIへの作業指示用。**1チェックポイント = 1コミット**を目安
 |CP-14|エラーハンドリング全般             |仕上げ   |✅         |
 |CP-15|README整備                |仕上げ   |—         |
 |CP-16|npm publish準備           |仕上げ   |—         |
+|CP-17|history.ts フォールバックテスト    |品質改善  |⬜ 未実装     |
+|CP-18|findWorkspaceRoot 遡り削除  |品質改善  |⬜ 未実装     |
+|CP-19|`autocomplete` 移行        |品質改善  |⬜ 未実装     |
+|CP-20|ソートロジック `sort.ts` 分離    |品質改善  |⬜ 未実装     |
+|CP-21|除外パターンテスト追加             |品質改善  |⬜ 未実装     |
+|CP-22|index.ts CLI モードテスト追加    |品質改善  |⬜ 未実装     |

@@ -1,57 +1,54 @@
 import type { HistoryEntry } from "./history";
 import type { Package } from "./workspace";
 
-export function sortPackages(
-  packages: Package[],
-  history: HistoryEntry[]
-): Package[] {
-  const historyIndex = new Map<string, number>();
-  history.forEach((h, i) => {
-    if (!historyIndex.has(h.package)) {
-      historyIndex.set(h.package, i);
-    }
+function buildFirstOccurrenceIndex(
+  entries: HistoryEntry[],
+  getKey: (h: HistoryEntry) => string
+): Map<string, number> {
+  const index = new Map<string, number>();
+  entries.forEach((h, i) => {
+    const key = getKey(h);
+    if (!index.has(key)) index.set(key, i);
   });
+  return index;
+}
 
-  const withHistory: Package[] = [];
-  const withoutHistory: Package[] = [];
-  for (const p of packages) {
-    if (historyIndex.has(p.name)) {
-      withHistory.push(p);
-    } else {
-      withoutHistory.push(p);
-    }
+function sortByHistory<T>(
+  items: T[],
+  history: HistoryEntry[],
+  getHistoryKey: (h: HistoryEntry) => string,
+  getItemKey: (item: T) => string,
+  compareFallback: (a: T, b: T) => number
+): T[] {
+  const historyIndex = buildFirstOccurrenceIndex(history, getHistoryKey);
+  const withHistory: T[] = [];
+  const withoutHistory: T[] = [];
+  for (const item of items) {
+    if (historyIndex.has(getItemKey(item))) withHistory.push(item);
+    else withoutHistory.push(item);
   }
-
-  withHistory.sort(
-    (a, b) => (historyIndex.get(a.name) ?? 0) - (historyIndex.get(b.name) ?? 0)
-  );
-  withoutHistory.sort((a, b) => a.name.localeCompare(b.name));
-
+  withHistory.sort((a, b) => historyIndex.get(getItemKey(a))! - historyIndex.get(getItemKey(b))!);
+  withoutHistory.sort(compareFallback);
   return [...withHistory, ...withoutHistory];
 }
 
-export function sortScripts(
-  scripts: string[],
-  packageName: string,
-  history: HistoryEntry[]
-): string[] {
-  const pkgHistory = history.filter((h) => h.package === packageName);
-  const historyIndex = new Map(pkgHistory.map((h, i) => [h.script, i]));
-
-  const withHistory: string[] = [];
-  const withoutHistory: string[] = [];
-  for (const s of scripts) {
-    if (historyIndex.has(s)) {
-      withHistory.push(s);
-    } else {
-      withoutHistory.push(s);
-    }
-  }
-
-  withHistory.sort(
-    (a, b) => (historyIndex.get(a) ?? 0) - (historyIndex.get(b) ?? 0)
+export function sortPackages(packages: Package[], history: HistoryEntry[]): Package[] {
+  return sortByHistory(
+    packages,
+    history,
+    (h) => h.package,
+    (p) => p.name,
+    (a, b) => a.name.localeCompare(b.name)
   );
-  withoutHistory.sort();
+}
 
-  return [...withHistory, ...withoutHistory];
+export function sortScripts(scripts: string[], packageName: string, history: HistoryEntry[]): string[] {
+  const pkgHistory = history.filter((h) => h.package === packageName);
+  return sortByHistory(
+    scripts,
+    pkgHistory,
+    (h) => h.script,
+    (s) => s,
+    (a, b) => a.localeCompare(b)
+  );
 }

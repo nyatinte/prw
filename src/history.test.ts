@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("node:fs");
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import type { HistoryEntry } from "./history";
 import { loadHistory, saveHistory } from "./history";
 
@@ -16,37 +16,26 @@ describe("history", () => {
   });
 
   describe("loadHistory", () => {
-    it("returns [] when file does not exist", () => {
-      vi.mocked(existsSync).mockReturnValue(false);
-      expect(loadHistory()).toEqual([]);
-    });
-
-    it("returns [] when file contains invalid JSON", () => {
-      vi.mocked(existsSync).mockReturnValue(true);
-      vi.mocked(readFileSync).mockReturnValue("not-valid-json" as any);
+    it.each([
+      ["file does not exist", (): string => { throw Object.assign(new Error("ENOENT"), { code: "ENOENT" }); }],
+      ["file contains invalid JSON", (): string => "not-valid-json"],
+      ["file contains non-array JSON", (): string => JSON.stringify({ foo: "bar" })],
+    ])("returns [] when %s", (_, readImpl) => {
+      vi.mocked(readFileSync).mockImplementation(readImpl);
       expect(loadHistory()).toEqual([]);
     });
 
     it("returns parsed entries when file is valid", () => {
       const entries = [{ package: "@myapp/web", script: "dev", timestamp: 1 }];
-      vi.mocked(existsSync).mockReturnValue(true);
-      vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries) as any);
+      vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries));
       expect(loadHistory()).toEqual(entries);
     });
   });
 
   describe("saveHistory", () => {
     beforeEach(() => {
-      vi.mocked(mkdirSync).mockReturnValue(undefined as any);
+      vi.mocked(mkdirSync).mockReturnValue(undefined);
       vi.mocked(writeFileSync).mockReturnValue(undefined);
-    });
-
-    it("writes entry to file", () => {
-      vi.mocked(existsSync).mockReturnValue(false);
-
-      saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 });
-
-      expect(writeFileSync).toHaveBeenCalled();
     });
 
     it("deduplicates and moves existing entry to front", () => {
@@ -54,17 +43,11 @@ describe("history", () => {
         { package: "@myapp/api", script: "dev", timestamp: 1 },
         { package: "@myapp/web", script: "dev", timestamp: 2 },
       ];
-      vi.mocked(existsSync).mockReturnValue(true);
-      vi.mocked(readFileSync).mockReturnValue(JSON.stringify(existing) as any);
 
-      saveHistory({ package: "@myapp/api", script: "dev", timestamp: 999 });
+      saveHistory({ package: "@myapp/api", script: "dev", timestamp: 999 }, existing);
 
       const written = getWrittenHistory();
-      expect(written[0]).toEqual({
-        package: "@myapp/api",
-        script: "dev",
-        timestamp: 999,
-      });
+      expect(written[0]).toEqual({ package: "@myapp/api", script: "dev", timestamp: 999 });
       expect(written).toHaveLength(2);
     });
 
@@ -74,14 +57,22 @@ describe("history", () => {
         script: "test",
         timestamp: i,
       }));
-      vi.mocked(existsSync).mockReturnValue(true);
-      vi.mocked(readFileSync).mockReturnValue(JSON.stringify(existing) as any);
 
-      saveHistory({ package: "new-pkg", script: "test", timestamp: 999 });
+      saveHistory({ package: "new-pkg", script: "test", timestamp: 999 }, existing);
 
       const written = getWrittenHistory();
       expect(written).toHaveLength(50);
       expect(written[0]).toMatchObject({ package: "new-pkg" });
+    });
+
+    it("does not throw when write fails", () => {
+      vi.mocked(writeFileSync).mockImplementation(() => {
+        throw new Error("ENOSPC: no space left on device");
+      });
+
+      expect(() =>
+        saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, [])
+      ).not.toThrow();
     });
   });
 });
