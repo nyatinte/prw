@@ -1,3 +1,4 @@
+---
 "@nyatinte/prw": minor
 ---
 
