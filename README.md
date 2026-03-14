@@ -11,15 +11,15 @@ English | [日本語](./README.ja.md)
 <table>
   <tr>
     <td width="50%">
-      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw/.github/assets/readme-package-picker.webp" alt="Package picker filtered by package name" width="100%" />
+      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw@main/.github/assets/readme-package-picker.webp" alt="Package picker filtered by package name" width="100%" />
     </td>
     <td width="50%">
-      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw/.github/assets/readme-script-picker.webp" alt="Script picker after selecting a package" width="100%" />
+      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw@main/.github/assets/readme-script-picker.webp" alt="Script picker after selecting a package" width="100%" />
     </td>
   </tr>
   <tr>
-    <td align="center"><sub>Filter packages with a short query.</sub></td>
-    <td align="center"><sub>Pick a script and run it immediately.</sub></td>
+    <td align="center"><small>Filter packages with a short query.</small></td>
+    <td align="center"><small>Pick a script and run it immediately.</small></td>
   </tr>
 </table>
 
