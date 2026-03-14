@@ -2,6 +2,10 @@
 
 English | [日本語](./README.ja.md)
 
+[![CI](https://github.com/nyatinte/prw/actions/workflows/ci.yml/badge.svg)](https://github.com/nyatinte/prw/actions/workflows/ci.yml)
+[![npm downloads](https://img.shields.io/npm/dm/%40nyatinte%2Fprw)](https://npmx.dev/package/@nyatinte/prw#downloads)
+[![pnpm](https://img.shields.io/badge/pnpm-10.30.3-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
+
 `prw` is a CLI for selecting a package and running one of its scripts from the root of a pnpm workspace.
 
 > [!IMPORTANT]
