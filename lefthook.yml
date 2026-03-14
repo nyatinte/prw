@@ -1,6 +1,6 @@
 pre-commit:
   jobs:
-    - run: pnpm dlx ultracite fix
+    - run: pnpm exec ultracite fix {staged_files}
       glob:
         - "**/*.js"
         - "**/*.jsx"
@@ -10,4 +10,4 @@ pre-commit:
         - "**/*.jsonc"
         - "**/*.css"
       stage_fixed: true
-    - run: pnpm knip
+    - run: pnpm exec knip
