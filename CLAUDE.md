@@ -16,7 +16,7 @@ pnpm knip           # detect unused exports/dependencies
 
 Run a single test file:
 ```bash
-pnpm vitest run src/sort.test.ts
+pnpm vitest run src/path/to/file.test.ts
 ```
 
 ## Conventions
