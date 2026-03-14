@@ -43,7 +43,9 @@ describe("history", () => {
     });
 
     it("returns parsed entries when file is valid", async () => {
-      const entries = [{ package: "@myapp/web", script: "dev", timestamp: 1 }];
+      const entries: HistoryEntry[] = [
+        { package: "@myapp/web", script: "dev", timestamp: 1 },
+      ];
       await using fixture = await createFixture({
         state: {
           prw: {
@@ -57,10 +59,10 @@ describe("history", () => {
     });
 
     it("prefers XDG_STATE_HOME when reading history", async () => {
-      const xdgEntries = [
+      const xdgEntries: HistoryEntry[] = [
         { package: "@myapp/web", script: "dev", timestamp: 1 },
       ];
-      const homeEntries = [
+      const homeEntries: HistoryEntry[] = [
         { package: "@myapp/api", script: "build", timestamp: 2 },
       ];
 
@@ -88,7 +90,9 @@ describe("history", () => {
     });
 
     it("falls back to the XDG state default when XDG_STATE_HOME is unset", async () => {
-      const entries = [{ package: "@myapp/web", script: "dev", timestamp: 1 }];
+      const entries: HistoryEntry[] = [
+        { package: "@myapp/web", script: "dev", timestamp: 1 },
+      ];
       await using fixture = await createFixture({
         ".local": {
           state: {
@@ -110,7 +114,7 @@ describe("history", () => {
       await using fixture = await createFixture();
       vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
 
-      const existing = [
+      const existing: HistoryEntry[] = [
         { package: "@myapp/api", script: "dev", timestamp: 1 },
         { package: "@myapp/web", script: "dev", timestamp: 2 },
       ];
@@ -135,7 +139,7 @@ describe("history", () => {
       await using fixture = await createFixture();
       vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
 
-      const existing = Array.from({ length: 50 }, (_, i) => ({
+      const existing: HistoryEntry[] = Array.from({ length: 50 }, (_, i) => ({
         package: `@pkg${i}`,
         script: "test",
         timestamp: i,
