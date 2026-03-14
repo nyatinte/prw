@@ -98,6 +98,7 @@ describe("history", () => {
           },
         },
       });
+      vi.stubEnv("XDG_STATE_HOME", "");
       vi.stubEnv("HOME", fixture.path);
 
       expect(loadHistory()).toEqual(entries);
@@ -179,6 +180,7 @@ describe("history", () => {
 
     it("falls back to the XDG state default when XDG_STATE_HOME is unset", async () => {
       await using fixture = await createFixture();
+      vi.stubEnv("XDG_STATE_HOME", "");
       vi.stubEnv("HOME", fixture.path);
 
       saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
