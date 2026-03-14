@@ -8,6 +8,23 @@
 
 `prw` は、pnpm workspace のルートからパッケージとスクリプトを選んで実行するための CLI ツールです。
 
+<table>
+  <tr>
+    <td width="50%">
+      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw/.github/assets/readme-package-picker.webp" alt="package 名で絞り込んでいる画面" width="100%" />
+    </td>
+    <td width="50%">
+      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw/.github/assets/readme-script-picker.webp" alt="package 選択後に script を選んでいる画面" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><sub>短い入力で package を絞り込めます。</sub></td>
+    <td align="center"><sub>script を選んだらそのまま実行できます。</sub></td>
+  </tr>
+</table>
+
+一目で分かるように言うと、`prw` は workspace root から package を絞り込み、その package に定義済みの script を選んで実行するためのツールです。
+
 > [!IMPORTANT]
 > `prw` は意図的に機能を絞っています。
 > workspace 内にすでに定義されている script を選んで実行することだけを扱います。
