@@ -250,9 +250,10 @@ describe("history", () => {
     it("falls back to the XDG state default when XDG_STATE_HOME is unset", async () => {
       await using fixture = await createFixture({
         workspace: {},
+        home: {},
       });
       vi.stubEnv("XDG_STATE_HOME", "");
-      vi.stubEnv("HOME", fixture.path);
+      vi.stubEnv("HOME", fixture.getPath("home"));
 
       saveHistory(
         fixture.getPath("workspace"),
@@ -260,7 +261,7 @@ describe("history", () => {
         []
       );
 
-      const historyFile = `.local/state/prw/histories/${getWorkspaceId(fixture.getPath("workspace"))}.json`;
+      const historyFile = `home/.local/state/prw/histories/${getWorkspaceId(fixture.getPath("workspace"))}.json`;
       expect(await fixture.exists(historyFile)).toBe(true);
       expect(await fixture.readJson<HistoryEntry[]>(historyFile)).toEqual([
         { package: "@myapp/web", script: "dev" },
