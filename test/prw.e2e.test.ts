@@ -7,7 +7,6 @@ import { afterEach, describe, expect, it } from "vitest";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const binPath = resolve(repoRoot, "dist/bin.mjs");
-const E2E_WAIT_TIMEOUT = 1500;
 
 /*
 Use this file for end-to-end tests that validate the real interactive terminal
@@ -74,27 +73,12 @@ function readTerminal(session: Session): Promise<string> {
   return session.text({ trimEnd: true });
 }
 
-async function waitForTerminalText(
-  session: Session,
-  text: string
-): Promise<void> {
-  await session.waitForText(text, { timeout: E2E_WAIT_TIMEOUT });
-}
-
-async function waitForPackagePicker(session: Session): Promise<void> {
-  await waitForTerminalText(session, "Select package");
-}
-
-async function waitForScriptPicker(session: Session): Promise<void> {
-  await waitForTerminalText(session, "Select script");
-}
-
 async function getPackageSearchTerminalText(
   session: Session,
   query: string
 ): Promise<string> {
   await session.type(query);
-  await waitForTerminalText(session, `Search: ${query}`);
+  await session.waitForText(`Search: ${query}`);
   return readTerminal(session);
 }
 
@@ -103,7 +87,7 @@ async function getScriptSearchTerminalText(
   query: string
 ): Promise<string> {
   await session.type(query);
-  await waitForTerminalText(session, `Search: ${query}`);
+  await session.waitForText(`Search: ${query}`);
   return readTerminal(session);
 }
 
@@ -146,7 +130,7 @@ describe.sequential("prw e2e", () => {
       args: ["web"],
     });
 
-    await waitForScriptPicker(session);
+    await session.waitForText("Select script");
 
     expect(await readTerminal(session)).toMatchSnapshot();
   });
@@ -163,7 +147,7 @@ describe.sequential("prw e2e", () => {
       args: ["web"],
     });
 
-    await waitForScriptPicker(session);
+    await session.waitForText("Select script");
     expect(await getScriptSearchTerminalText(session, query)).toMatchSnapshot();
   });
 
@@ -173,7 +157,7 @@ describe.sequential("prw e2e", () => {
       args: ["web", "dev"],
     });
 
-    await waitForTerminalText(session, "🚀 @simple/web dev starting...");
+    await session.waitForText("🚀 @simple/web dev starting...");
 
     expect(await readTerminal(session)).toContain(
       "🚀 @simple/web dev starting..."
@@ -185,7 +169,7 @@ describe.sequential("prw e2e", () => {
       cwd: resolve(repoRoot, "example/large"),
     });
 
-    await waitForPackagePicker(session);
+    await session.waitForText("Select package");
 
     expect(await readTerminal(session)).toMatchSnapshot();
   });
@@ -198,7 +182,7 @@ describe.sequential("prw e2e", () => {
       cwd: resolve(repoRoot, "example/large"),
     });
 
-    await waitForPackagePicker(session);
+    await session.waitForText("Select package");
     expect(
       await getPackageSearchTerminalText(session, query)
     ).toMatchSnapshot();
@@ -210,7 +194,7 @@ describe.sequential("prw e2e", () => {
       args: ["a"],
     });
 
-    await waitForPackagePicker(session);
+    await session.waitForText("Select package");
 
     expect(await readTerminal(session)).toMatchSnapshot();
   });
@@ -220,7 +204,7 @@ describe.sequential("prw e2e", () => {
       cwd: resolve(repoRoot, "example/large"),
     });
 
-    await waitForPackagePicker(session);
+    await session.waitForText("Select package");
 
     expect(await cancelAndReadTerminal(session)).toMatchSnapshot();
   });
@@ -231,7 +215,7 @@ describe.sequential("prw e2e", () => {
       args: ["api", "build"],
     });
 
-    await waitForTerminalText(session, "📦 @large/api building...");
+    await session.waitForText("📦 @large/api building...");
 
     expect(await readTerminal(session)).toContain("📦 @large/api building...");
   });
@@ -242,7 +226,7 @@ describe.sequential("prw e2e", () => {
       args: ["minimal"],
     });
 
-    await waitForScriptPicker(session);
+    await session.waitForText("Select script");
 
     expect(await readTerminal(session)).toMatchSnapshot();
   });
@@ -256,7 +240,7 @@ describe.sequential("prw e2e", () => {
       args: ["minimal"],
     });
 
-    await waitForScriptPicker(session);
+    await session.waitForText("Select script");
     expect(await getScriptSearchTerminalText(session, query)).toMatchSnapshot();
   });
 
@@ -266,7 +250,7 @@ describe.sequential("prw e2e", () => {
       args: ["root"],
     });
 
-    await waitForScriptPicker(session);
+    await session.waitForText("Select script");
 
     expect(await readTerminal(session)).toMatchSnapshot();
   });
@@ -277,7 +261,7 @@ describe.sequential("prw e2e", () => {
       args: ["web"],
     });
 
-    await waitForScriptPicker(session);
+    await session.waitForText("Select script");
 
     expect(await cancelAndReadTerminal(session)).toMatchSnapshot();
   });
@@ -288,7 +272,7 @@ describe.sequential("prw e2e", () => {
       args: ["unnamed"],
     });
 
-    await waitForTerminalText(session, "No scripts in apps/unnamed");
+    await session.waitForText("No scripts in apps/unnamed");
 
     expect(await readTerminal(session)).toMatchSnapshot();
     expect(await readTerminal(session)).toContain("No scripts in apps/unnamed");
@@ -300,7 +284,7 @@ describe.sequential("prw e2e", () => {
       args: ["no-scripts"],
     });
 
-    await waitForTerminalText(session, "No scripts in @edge/no-scripts");
+    await session.waitForText("No scripts in @edge/no-scripts");
 
     expect(await readTerminal(session)).toMatchSnapshot();
     expect(await readTerminal(session)).toContain(
@@ -313,7 +297,7 @@ describe.sequential("prw e2e", () => {
       cwd: resolve(repoRoot, "example/simple/apps/web"),
     });
 
-    await waitForPackagePicker(session);
+    await session.waitForText("Select package");
 
     expect(await readTerminal(session)).toMatchSnapshot();
   });
@@ -324,7 +308,7 @@ describe.sequential("prw e2e", () => {
       args: ["root", "build"],
     });
 
-    await waitForTerminalText(session, "@simple/web building");
+    await session.waitForText("@simple/web building");
 
     const output = await readTerminal(session);
 
@@ -339,7 +323,7 @@ describe.sequential("prw e2e", () => {
       cwd: outsideWorkspaceDir,
     });
 
-    await waitForTerminalText(session, "Run prw inside a pnpm workspace.");
+    await session.waitForText("Run prw inside a pnpm workspace.");
 
     expect(await readTerminal(session)).toMatchSnapshot();
   });
