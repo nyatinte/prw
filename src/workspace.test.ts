@@ -9,7 +9,7 @@ import {
   matchPackages,
   ROOT_PACKAGE,
   WorkspaceNotFoundError,
-} from "./workspace";
+} from "./workspace.js";
 
 describe("workspace", () => {
   const tmpDir = join("/tmp", `prw-test-${Date.now()}`);

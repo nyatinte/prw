@@ -5,8 +5,8 @@ vi.mock("node:fs");
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import type { HistoryEntry } from "./history";
-import { loadHistory, saveHistory } from "./history";
+import type { HistoryEntry } from "./history.js";
+import { loadHistory, saveHistory } from "./history.js";
 
 function getWrittenHistory(): HistoryEntry[] {
   return JSON.parse(vi.mocked(writeFileSync).mock.calls[0][1] as string);

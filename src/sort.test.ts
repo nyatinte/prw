@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { HistoryEntry } from "./history";
-import { sortPackages, sortScripts } from "./sort";
-import type { Package } from "./workspace";
+import type { HistoryEntry } from "./history.js";
+import { sortPackages, sortScripts } from "./sort.js";
+import type { Package } from "./workspace.js";
 
 describe("sortPackages", () => {
   it("prioritizes packages with history", () => {

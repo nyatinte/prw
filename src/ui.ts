@@ -1,8 +1,8 @@
 import { autocomplete, isCancel } from "@clack/prompts";
-import type { HistoryEntry } from "./history";
-import { sortPackages, sortScripts } from "./sort";
-import type { Package, Script } from "./workspace";
-import { isRootPackage } from "./workspace";
+import type { HistoryEntry } from "./history.js";
+import { sortPackages, sortScripts } from "./sort.js";
+import type { Package, Script } from "./workspace.js";
+import { isRootPackage } from "./workspace.js";
 
 export const SELECT_PACKAGE_MESSAGE = "Select package";
 
