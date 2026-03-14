@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "tsdown",
+    "typecheck": "tsgo --noEmit -p tsconfig.json",
     "test": "vitest",
     "knip": "knip",
     "prepublishOnly": "pnpm build",
@@ -60,6 +61,7 @@
     "@changesets/cli": "2.30.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.12.0",
+    "@typescript/native-preview": "7.0.0-dev.20260313.1",
     "knip": "^5.86.0",
     "lefthook": "^2.1.2",
     "tsdown": "^0.20.3",
