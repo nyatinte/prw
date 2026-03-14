@@ -36,6 +36,20 @@ exports[`prw e2e > shows the minimal script picker while searching for "build" 1
 └"
 `;
 
+exports[`prw e2e > shows the minimal script picker while searching for "zzz" 1`] = `
+"
+│
+◇  Select package
+│  @edge/minimal
+│
+◆  Select script
+│
+│  Search: zzz█ (0 matches)
+│  No matches found
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
+
 exports[`prw e2e > shows the package picker for the large workspace 1`] = `
 "
 │
@@ -126,6 +140,20 @@ exports[`prw e2e > shows the simple workspace script picker while searching for 
 │
 │  Search: type-check█ (1 match)
 │  ● type-check (echo '✓ Type check passed')
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
+
+exports[`prw e2e > shows the simple workspace script picker while searching for "zzz" 1`] = `
+"
+│
+◇  Select package
+│  @simple/web
+│
+◆  Select script
+│
+│  Search: zzz█ (0 matches)
+│  No matches found
 │  ↑/↓ to select • Enter: confirm • Type: to search
 └"
 `;

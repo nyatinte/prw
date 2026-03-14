@@ -115,7 +115,7 @@ describe.sequential("prw e2e", () => {
     expect(await readTerminal(session)).toMatchSnapshot();
   });
 
-  for (const query of ["build", "dev", "test", "type-check"]) {
+  for (const query of ["build", "dev", "test", "type-check", "zzz"]) {
     it(`shows the simple workspace script picker while searching for "${query}"`, async () => {
       session = await launchPrwSession({
         cwd: resolve(repoRoot, "example/simple"),
@@ -178,17 +178,19 @@ describe.sequential("prw e2e", () => {
     expect(await readTerminal(session)).toMatchSnapshot();
   });
 
-  it('shows the minimal script picker while searching for "build"', async () => {
-    session = await launchPrwSession({
-      cwd: resolve(repoRoot, "example/edge-cases"),
-      args: ["minimal"],
-    });
+  for (const query of ["build", "zzz"]) {
+    it(`shows the minimal script picker while searching for "${query}"`, async () => {
+      session = await launchPrwSession({
+        cwd: resolve(repoRoot, "example/edge-cases"),
+        args: ["minimal"],
+      });
 
-    await waitForScriptPicker(session);
-    expect(
-      await getScriptSearchTerminalText(session, "build")
-    ).toMatchSnapshot();
-  });
+      await waitForScriptPicker(session);
+      expect(
+        await getScriptSearchTerminalText(session, query)
+      ).toMatchSnapshot();
+    });
+  }
 
   it("reports a missing script list for unnamed packages", async () => {
     session = await launchPrwSession({
