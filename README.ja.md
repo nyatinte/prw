@@ -11,15 +11,15 @@
 <table>
   <tr>
     <td width="50%">
-      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw/.github/assets/readme-package-picker.webp" alt="package 名で絞り込んでいる画面" width="100%" />
+      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw@main/.github/assets/readme-package-picker.webp" alt="package 名で絞り込んでいる画面" width="100%" />
     </td>
     <td width="50%">
-      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw/.github/assets/readme-script-picker.webp" alt="package 選択後に script を選んでいる画面" width="100%" />
+      <img src="https://cdn.jsdelivr.net/gh/nyatinte/prw@main/.github/assets/readme-script-picker.webp" alt="package 選択後に script を選んでいる画面" width="100%" />
     </td>
   </tr>
   <tr>
-    <td align="center"><sub>短い入力で package を絞り込めます。</sub></td>
-    <td align="center"><sub>script を選んだらそのまま実行できます。</sub></td>
+    <td align="center"><small>短い入力で package を絞り込めます。</small></td>
+    <td align="center"><small>script を選んだらそのまま実行できます。</small></td>
   </tr>
 </table>
 
