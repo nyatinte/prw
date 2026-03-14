@@ -1,0 +1,29 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:recommended"],
+  ignorePaths: ["example/**"],
+  prConcurrentLimit: 5,
+  prCreation: "not-pending",
+  internalChecksFilter: "strict",
+  rebaseWhen: "behind-base-branch",
+  dependencyDashboard: true,
+  lockFileMaintenance: {
+    enabled: true,
+    schedule: ["before 3am on monday"],
+  },
+  packageRules: [
+    {
+      description: "Automerge safe updates after packages have aged for 1 day",
+      matchUpdateTypes: ["minor", "patch", "pin", "digest"],
+      automerge: true,
+      automergeType: "pr",
+      platformAutomerge: true,
+      minimumReleaseAge: "1 day",
+    },
+    {
+      description: "Major updates stay manual",
+      matchUpdateTypes: ["major"],
+      automerge: false,
+    },
+  ],
+}
