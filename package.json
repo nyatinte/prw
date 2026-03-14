@@ -4,7 +4,9 @@
   "description": "Interactive pnpm workspace package & script runner",
   "type": "module",
   "main": "./dist/index.mjs",
-  "bin": "./dist/bin.mjs",
+  "bin": {
+    "prw": "./dist/bin.mjs"
+  },
   "scripts": {
     "build": "tsdown",
     "test": "vitest",
