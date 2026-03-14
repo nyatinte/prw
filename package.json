@@ -1,57 +1,58 @@
 {
+  "author": "nyatinte",
   "name": "@nyatinte/prw",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "Interactive pnpm workspace package & script runner",
   "type": "module",
   "bin": {
     "prw": "./dist/bin.mjs"
   },
-  "scripts": {
-    "build": "tsdown",
-    "typecheck": "tsgo --noEmit -p tsconfig.json",
-    "test": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "knip": "knip",
-    "prepublishOnly": "pnpm build",
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "changeset publish",
-    "check": "ultracite check",
-    "fix": "ultracite fix",
-    "prepare": "lefthook install"
-  },
-  "keywords": [
-    "pnpm",
-    "workspace",
-    "cli"
-  ],
-  "author": "nyatinte",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/nyatinte/prw.git"
-  },
-  "homepage": "https://github.com/nyatinte/prw#readme",
   "bugs": {
     "url": "https://github.com/nyatinte/prw/issues"
-  },
-  "files": [
-    "dist"
-  ],
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  },
-  "knip": {
-    "ignoreDependencies": [
-      "@biomejs/biome"
-    ]
   },
   "engines": {
     "node": ">=24.14.0",
     "pnpm": "10.30.3"
   },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/nyatinte/prw#readme",
+  "keywords": [
+    "pnpm",
+    "workspace",
+    "cli"
+  ],
   "packageManager": "pnpm@10.30.3",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nyatinte/prw.git"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "changeset": "changeset",
+    "check": "ultracite check",
+    "fix": "ultracite fix",
+    "knip": "knip",
+    "prepare": "lefthook install",
+    "prepublishOnly": "pnpm build",
+    "release": "changeset publish",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsgo --noEmit -p tsconfig.json",
+    "version-packages": "changeset version"
+  },
+  "dependencies": {
+    "@clack/prompts": "1.1.0",
+    "fast-glob": "3.3.3",
+    "js-yaml": "4.1.1",
+    "picocolors": "1.1.1"
+  },
   "devDependencies": {
     "@biomejs/biome": "2.4.6",
     "@changesets/cli": "2.30.0",
@@ -66,10 +67,9 @@
     "ultracite": "7.3.0",
     "vitest": "4.1.0"
   },
-  "dependencies": {
-    "@clack/prompts": "1.1.0",
-    "fast-glob": "3.3.3",
-    "js-yaml": "4.1.1",
-    "picocolors": "1.1.1"
+  "knip": {
+    "ignoreDependencies": [
+      "@biomejs/biome"
+    ]
   }
 }
