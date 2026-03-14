@@ -41,9 +41,20 @@ history handling, and runner behavior should stay in unit tests unless the real
 terminal rendering is the thing under test.
 */
 
+const isolatedHomes = new Set<string>();
+
 function createIsolatedHome(): string {
-  return mkdtempSync(join(tmpdir(), "prw-tuistory-"));
+  const homeDir = mkdtempSync(join(tmpdir(), "prw-tuistory-"));
+  isolatedHomes.add(homeDir);
+  return homeDir;
 }
+
+afterEach(() => {
+  for (const homeDir of isolatedHomes) {
+    rmSync(homeDir, { recursive: true, force: true });
+  }
+  isolatedHomes.clear();
+});
 
 function createOutsideWorkspaceDir(): string {
   return mkdtempSync(join(tmpdir(), "prw-outside-"));
