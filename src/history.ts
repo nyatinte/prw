@@ -8,19 +8,18 @@ export type HistoryEntry = {
   timestamp: number;
 };
 
+const HISTORY_FILE_NAME = "history.json";
 const MAX_HISTORY = 50;
 
-function resolveHistoryDir(): string {
-  const stateHome = process.env.XDG_STATE_HOME;
-  if (stateHome) {
-    return join(stateHome, "prw");
-  }
-
-  return join(homedir(), ".local", "state", "prw");
+export function resolveHistoryDir(): string {
+  return join(
+    process.env.XDG_STATE_HOME ?? homedir(),
+    ...(process.env.XDG_STATE_HOME ? ["prw"] : [".local", "state", "prw"])
+  );
 }
 
-function resolveHistoryFile(): string {
-  return join(resolveHistoryDir(), "history.json");
+export function resolveHistoryFile(): string {
+  return join(resolveHistoryDir(), HISTORY_FILE_NAME);
 }
 
 export function loadHistory(): HistoryEntry[] {
