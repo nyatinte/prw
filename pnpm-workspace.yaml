@@ -1,0 +1,4 @@
+savePrefix: ''
+minimumReleaseAge: 1440
+allowBuilds:
+  lefthook: true
