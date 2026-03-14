@@ -23,7 +23,7 @@ jobs:
           node-version-file: .node-versions
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec tsc --noEmit
+      - run: pnpm typecheck
 
   knip:
     name: Knip

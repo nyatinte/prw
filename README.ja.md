@@ -22,6 +22,16 @@ npm install -g @nyatinte/prw
 pnpm add -g @nyatinte/prw
 ```
 
+## 開発
+
+このリポジトリでは型チェックに [`tsgo`](https://github.com/microsoft/typescript-go) を使います。
+
+```bash
+pnpm typecheck
+pnpm test run
+pnpm build
+```
+
 ## 使い方
 
 ### 1. 引数なしで起動する

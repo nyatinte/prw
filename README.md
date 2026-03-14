@@ -22,6 +22,16 @@ npm install -g @nyatinte/prw
 pnpm add -g @nyatinte/prw
 ```
 
+## Development
+
+This repo uses [`tsgo`](https://github.com/microsoft/typescript-go) for type checking.
+
+```bash
+pnpm typecheck
+pnpm test run
+pnpm build
+```
+
 ## Usage
 
 ### 1. Start without arguments
