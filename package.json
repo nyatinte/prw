@@ -30,8 +30,9 @@
     "prepare": "lefthook install",
     "prepublishOnly": "pnpm build",
     "release": "changeset publish",
-    "test": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "test": "pnpm build && vitest",
+    "test:coverage": "pnpm build && vitest run --coverage",
+    "test:update": "pnpm build && vitest -u",
     "typecheck": "tsgo --noEmit -p tsconfig.json",
     "version-packages": "changeset version"
   },
@@ -62,6 +63,7 @@
     "knip": "5.86.0",
     "lefthook": "2.1.4",
     "tsdown": "0.21.2",
+    "tuistory": "0.0.16",
     "typescript": "5.9.3",
     "ultracite": "7.3.0",
     "vitest": "4.1.0"

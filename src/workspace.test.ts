@@ -32,9 +32,21 @@ describe("workspace", () => {
       expect(findWorkspaceRoot(tmpDir)).toBe(tmpDir);
     });
 
-    it("throws WorkspaceNotFoundError when not in workspace", () => {
+    it("returns nearest workspace root from nested workspace dir", () => {
+      writeFileSync(
+        join(tmpDir, "pnpm-workspace.yaml"),
+        "packages:\n  - apps/*\n"
+      );
+      mkdirSync(join(tmpDir, "apps", "web", "src"), { recursive: true });
+
+      expect(findWorkspaceRoot(join(tmpDir, "apps", "web", "src"))).toBe(
+        tmpDir
+      );
+    });
+
+    it("throws WorkspaceNotFoundError when not in a workspace", () => {
       expect(() => findWorkspaceRoot(tmpDir)).toThrow(
-        new WorkspaceNotFoundError("Run prw from workspace root.")
+        new WorkspaceNotFoundError("Run prw inside a pnpm workspace.")
       );
     });
   });

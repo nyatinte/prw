@@ -38,7 +38,7 @@ describe("selectPackageByArgs", () => {
     });
   });
 
-  describe("prw <package> — single arg", () => {
+  describe("prw <package> - single arg", () => {
     it("returns the matched package when exactly one matches", async () => {
       const result = await selectPackageByArgs(packages, history, ["api"]);
       expect(result.pkg.name).toBe("@myapp/api");
@@ -62,7 +62,7 @@ describe("selectPackageByArgs", () => {
     });
   });
 
-  describe("prw <package> <script> — two args", () => {
+  describe("prw <package> <script> - two args", () => {
     it("returns matched package and script for direct execution", async () => {
       const result = await selectPackageByArgs(packages, history, [
         "api",
