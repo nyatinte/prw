@@ -1,7 +1,7 @@
 import type { SpawnSyncReturns } from "node:child_process";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { runScript } from "./runner";
-import type { Package } from "./workspace";
+import { runScript } from "./runner.js";
+import type { Package } from "./workspace.js";
 
 vi.mock("node:child_process", () => ({
   spawnSync: vi.fn(),

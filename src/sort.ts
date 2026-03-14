@@ -1,5 +1,5 @@
-import type { HistoryEntry } from "./history";
-import type { Package, Script } from "./workspace";
+import type { HistoryEntry } from "./history.js";
+import type { Package, Script } from "./workspace.js";
 
 function buildFirstOccurrenceIndex(
   entries: HistoryEntry[],

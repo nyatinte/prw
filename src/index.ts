@@ -1,7 +1,7 @@
-import { resolveScript, selectPackageByArgs } from "./cli";
-import { loadHistory, saveHistory } from "./history";
-import { runScript } from "./runner";
-import { findWorkspaceRoot, getPackages } from "./workspace";
+import { resolveScript, selectPackageByArgs } from "./cli.js";
+import { loadHistory, saveHistory } from "./history.js";
+import { runScript } from "./runner.js";
+import { findWorkspaceRoot, getPackages } from "./workspace.js";
 
 export async function main() {
   try {

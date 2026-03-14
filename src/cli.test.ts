@@ -16,11 +16,11 @@ vi.mock("./workspace", async (importOriginal) => {
   };
 });
 
-import { resolveScript, selectPackageByArgs } from "./cli";
-import type { HistoryEntry } from "./history";
-import { selectPackage, selectScript } from "./ui";
-import type { Package } from "./workspace";
-import { getScripts } from "./workspace";
+import { resolveScript, selectPackageByArgs } from "./cli.js";
+import type { HistoryEntry } from "./history.js";
+import { selectPackage, selectScript } from "./ui.js";
+import type { Package } from "./workspace.js";
+import { getScripts } from "./workspace.js";
 
 const packages: Package[] = [
   { name: "@myapp/api", dir: "apps/api" },
