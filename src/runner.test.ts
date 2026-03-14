@@ -34,20 +34,21 @@ describe("runner", () => {
 
   it("runs script with --filter for regular package", () => {
     const pkg: Package = { name: "@myapp/web", dir: "apps/web" };
-    runScript(pkg, "dev");
+    runScript("/repo", pkg, "dev");
 
     expect(spawnSync).toHaveBeenCalledWith(
       "pnpm",
       ["--filter", "@myapp/web", "run", "dev"],
-      { stdio: "inherit" }
+      { cwd: "/repo", stdio: "inherit" }
     );
   });
 
   it("runs script without --filter for root package", () => {
     const pkg: Package = { name: "(root)", dir: "." };
-    runScript(pkg, "build");
+    runScript("/repo", pkg, "build");
 
     expect(spawnSync).toHaveBeenCalledWith("pnpm", ["run", "build"], {
+      cwd: "/repo",
       stdio: "inherit",
     });
   });
@@ -64,7 +65,7 @@ describe("runner", () => {
       .mockImplementation(() => undefined as never);
     vi.mocked(spawnSync).mockReturnValue(spawnResult);
 
-    runScript({ name: "@myapp/web", dir: "apps/web" }, "dev");
+    runScript("/repo", { name: "@myapp/web", dir: "apps/web" }, "dev");
 
     expect(exitSpy).toHaveBeenCalledWith(1);
     exitSpy.mockRestore();

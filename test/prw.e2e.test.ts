@@ -1,4 +1,4 @@
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -45,6 +45,10 @@ function createIsolatedHome(): string {
   return mkdtempSync(join(tmpdir(), "prw-tuistory-"));
 }
 
+function createOutsideWorkspaceDir(): string {
+  return mkdtempSync(join(tmpdir(), "prw-outside-"));
+}
+
 function launchPrwSession({
   cwd,
   args = [],
@@ -69,8 +73,21 @@ function readTerminal(session: Session): Promise<string> {
   return session.text({ trimEnd: true });
 }
 
+async function waitForPackagePicker(session: Session): Promise<void> {
+  await session.waitForText("Select package", { timeout: 15_000 });
+}
+
 async function waitForScriptPicker(session: Session): Promise<void> {
   await session.waitForText("Select script", { timeout: 15_000 });
+}
+
+async function getPackageSearchTerminalText(
+  session: Session,
+  query: string
+): Promise<string> {
+  await session.type(query);
+  await session.waitForText(`Search: ${query}`, { timeout: 15_000 });
+  return readTerminal(session);
 }
 
 async function getScriptSearchTerminalText(
@@ -79,6 +96,12 @@ async function getScriptSearchTerminalText(
 ): Promise<string> {
   await session.type(query);
   await session.waitForText(`Search: ${query}`, { timeout: 15_000 });
+  return readTerminal(session);
+}
+
+async function cancelAndReadTerminal(session: Session): Promise<string> {
+  await session.press("esc");
+  await new Promise((resolve) => setTimeout(resolve, 250));
   return readTerminal(session);
 }
 
@@ -98,10 +121,15 @@ function closeSessionSafely(session: Session | undefined): Promise<void> {
 
 describe.sequential("prw e2e", () => {
   let session: Session | undefined;
+  let outsideWorkspaceDir: string | undefined;
 
   afterEach(async () => {
     await closeSessionSafely(session);
     session = undefined;
+    if (outsideWorkspaceDir) {
+      rmSync(outsideWorkspaceDir, { recursive: true, force: true });
+      outsideWorkspaceDir = undefined;
+    }
   });
 
   it("shows the script picker for simple workspace package selection", async () => {
@@ -149,9 +177,43 @@ describe.sequential("prw e2e", () => {
       cwd: resolve(repoRoot, "example/large"),
     });
 
-    await session.waitForText("Select package", { timeout: 15_000 });
+    await waitForPackagePicker(session);
 
     expect(await readTerminal(session)).toMatchSnapshot();
+  });
+
+  for (const query of ["web", "zzz"]) {
+    it(`shows the package picker while searching for "${query}"`, async () => {
+      session = await launchPrwSession({
+        cwd: resolve(repoRoot, "example/large"),
+      });
+
+      await waitForPackagePicker(session);
+      expect(
+        await getPackageSearchTerminalText(session, query)
+      ).toMatchSnapshot();
+    });
+  }
+
+  it('shows the filtered package picker for the query "a"', async () => {
+    session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/large"),
+      args: ["a"],
+    });
+
+    await waitForPackagePicker(session);
+
+    expect(await readTerminal(session)).toMatchSnapshot();
+  });
+
+  it("shows the package picker cancellation state", async () => {
+    session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/large"),
+    });
+
+    await waitForPackagePicker(session);
+
+    expect(await cancelAndReadTerminal(session)).toMatchSnapshot();
   });
 
   it("runs a script directly in the large workspace", async () => {
@@ -192,6 +254,28 @@ describe.sequential("prw e2e", () => {
     });
   }
 
+  it("shows the root script picker", async () => {
+    session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/simple"),
+      args: ["root"],
+    });
+
+    await waitForScriptPicker(session);
+
+    expect(await readTerminal(session)).toMatchSnapshot();
+  });
+
+  it("shows the script picker cancellation state", async () => {
+    session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/simple"),
+      args: ["web"],
+    });
+
+    await waitForScriptPicker(session);
+
+    expect(await cancelAndReadTerminal(session)).toMatchSnapshot();
+  });
+
   it("reports a missing script list for unnamed packages", async () => {
     session = await launchPrwSession({
       cwd: resolve(repoRoot, "example/edge-cases"),
@@ -216,8 +300,49 @@ describe.sequential("prw e2e", () => {
       timeout: 15_000,
     });
 
+    expect(await readTerminal(session)).toMatchSnapshot();
     expect(await readTerminal(session)).toContain(
       "No scripts in @edge/no-scripts"
     );
+  });
+
+  it("shows the package picker when launched from inside a workspace subdirectory", async () => {
+    session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/simple/apps/web"),
+    });
+
+    await waitForPackagePicker(session);
+
+    expect(await readTerminal(session)).toMatchSnapshot();
+  });
+
+  it("runs root workspace scripts when launched from inside a workspace subdirectory", async () => {
+    session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/simple/apps/web"),
+      args: ["root", "build"],
+    });
+
+    await session.waitForText("@simple/web building", {
+      timeout: 15_000,
+    });
+
+    const output = await readTerminal(session);
+
+    expect(output).toContain("simple-workspace@1.0.0 build");
+    expect(output).toContain("/example/simple");
+    expect(output).toContain("@simple/web building");
+  });
+
+  it("reports an error when launched completely outside a workspace", async () => {
+    outsideWorkspaceDir = createOutsideWorkspaceDir();
+    session = await launchPrwSession({
+      cwd: outsideWorkspaceDir,
+    });
+
+    await session.waitForText("Run prw inside a pnpm workspace.", {
+      timeout: 15_000,
+    });
+
+    expect(await readTerminal(session)).toMatchSnapshot();
   });
 });

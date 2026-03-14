@@ -19,7 +19,7 @@ export async function main() {
 
     saveHistory({ package: pkg.name, script, timestamp: Date.now() }, history);
 
-    runScript(pkg, script);
+    runScript(root, pkg, script);
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     process.exit(1);

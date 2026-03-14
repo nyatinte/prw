@@ -1,11 +1,44 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`prw e2e > reports a missing script list for named packages with no scripts 1`] = `
+"
+│
+◇  Select package
+│  @edge/no-scripts
+No scripts in @edge/no-scripts"
+`;
+
 exports[`prw e2e > reports a missing script list for unnamed packages 1`] = `
 "
 │
 ◇  Select package
 │  apps/unnamed
 No scripts in apps/unnamed"
+`;
+
+exports[`prw e2e > reports an error when launched completely outside a workspace 1`] = `
+"
+Run prw inside a pnpm workspace."
+`;
+
+exports[`prw e2e > shows the filtered package picker for the query "a" 1`] = `
+"
+│
+◆  Select package
+│
+│  Search: _
+│  ● @large/admin (apps/admin)
+│  ○ @large/api
+│  ○ @large/config
+│  ○ @large/dashboard
+│  ○ @large/logger
+│  ○ @large/mobile
+│  ○ @large/types
+│  ○ @large/ui
+│  ○ @large/utils
+│  ○ @large/web
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
 `;
 
 exports[`prw e2e > shows the minimal script picker in edge-cases workspace 1`] = `
@@ -50,6 +83,14 @@ exports[`prw e2e > shows the minimal script picker while searching for "zzz" 1`]
 └"
 `;
 
+exports[`prw e2e > shows the package picker cancellation state 1`] = `
+"
+│
+■  Select package
+│
+Cancelled."
+`;
+
 exports[`prw e2e > shows the package picker for the large workspace 1`] = `
 "
 │
@@ -69,6 +110,68 @@ exports[`prw e2e > shows the package picker for the large workspace 1`] = `
 │  ○ @large/web
 │  ↑/↓ to select • Enter: confirm • Type: to search
 └"
+`;
+
+exports[`prw e2e > shows the package picker when launched from inside a workspace subdirectory 1`] = `
+"
+│
+◆  Select package
+│
+│  Search: _
+│  ● (root)
+│  ○ @simple/api
+│  ○ @simple/web
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
+
+exports[`prw e2e > shows the package picker while searching for "web" 1`] = `
+"
+│
+◆  Select package
+│
+│  Search: web█ (1 match)
+│  ● @large/web (apps/web)
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
+
+exports[`prw e2e > shows the package picker while searching for "zzz" 1`] = `
+"
+│
+◆  Select package
+│
+│  Search: zzz█ (0 matches)
+│  No matches found
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
+
+exports[`prw e2e > shows the root script picker 1`] = `
+"
+│
+◇  Select package
+│  (root)
+│
+◆  Select script
+│
+│  Search: _
+│  ● build (pnpm -r run build)
+│  ○ dev
+│  ○ prw
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
+
+exports[`prw e2e > shows the script picker cancellation state 1`] = `
+"
+│
+◇  Select package
+│  @simple/web
+│
+■  Select script
+│
+Cancelled."
 `;
 
 exports[`prw e2e > shows the script picker for simple workspace package selection 1`] = `
