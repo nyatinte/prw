@@ -9,6 +9,9 @@
     "build": "tsdown",
     "test": "vitest",
     "prepublishOnly": "pnpm build",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish",
     "check": "ultracite check",
     "fix": "ultracite fix",
     "prepare": "lefthook install"
@@ -20,12 +23,25 @@
   ],
   "author": "nyatinte",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nyatinte/prw.git"
+  },
+  "homepage": "https://github.com/nyatinte/prw#readme",
+  "bugs": {
+    "url": "https://github.com/nyatinte/prw/issues"
+  },
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "packageManager": "pnpm@10.30.3",
   "devDependencies": {
     "@biomejs/biome": "2.4.0",
+    "@changesets/cli": "2.30.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.4.0",
     "lefthook": "^2.1.2",
