@@ -43,11 +43,6 @@
     "node": ">=24.14.0",
     "pnpm": "10.30.3"
   },
-  "pnpm": {
-    "allowBuilds": {
-      "node-pty": true
-    }
-  },
   "packageManager": "pnpm@10.30.3",
   "publishConfig": {
     "access": "public",

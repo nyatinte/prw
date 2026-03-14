@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const binPath = resolve(repoRoot, "dist/bin.mjs");
+const E2E_WAIT_TIMEOUT = 1500;
 
 /*
 Use this file for end-to-end tests that validate the real interactive terminal
@@ -74,11 +75,11 @@ function readTerminal(session: Session): Promise<string> {
 }
 
 async function waitForPackagePicker(session: Session): Promise<void> {
-  await session.waitForText("Select package", { timeout: 15_000 });
+  await session.waitForText("Select package", { timeout: E2E_WAIT_TIMEOUT });
 }
 
 async function waitForScriptPicker(session: Session): Promise<void> {
-  await session.waitForText("Select script", { timeout: 15_000 });
+  await session.waitForText("Select script", { timeout: E2E_WAIT_TIMEOUT });
 }
 
 async function getPackageSearchTerminalText(
@@ -86,7 +87,7 @@ async function getPackageSearchTerminalText(
   query: string
 ): Promise<string> {
   await session.type(query);
-  await session.waitForText(`Search: ${query}`, { timeout: 15_000 });
+  await session.waitForText(`Search: ${query}`, { timeout: E2E_WAIT_TIMEOUT });
   return readTerminal(session);
 }
 
@@ -95,7 +96,7 @@ async function getScriptSearchTerminalText(
   query: string
 ): Promise<string> {
   await session.type(query);
-  await session.waitForText(`Search: ${query}`, { timeout: 15_000 });
+  await session.waitForText(`Search: ${query}`, { timeout: E2E_WAIT_TIMEOUT });
   return readTerminal(session);
 }
 
@@ -164,7 +165,7 @@ describe.sequential("prw e2e", () => {
     });
 
     await session.waitForText("🚀 @simple/web dev starting...", {
-      timeout: 15_000,
+      timeout: E2E_WAIT_TIMEOUT,
     });
 
     expect(await readTerminal(session)).toContain(
@@ -223,7 +224,7 @@ describe.sequential("prw e2e", () => {
     });
 
     await session.waitForText("📦 @large/api building...", {
-      timeout: 15_000,
+      timeout: E2E_WAIT_TIMEOUT,
     });
 
     expect(await readTerminal(session)).toContain("📦 @large/api building...");
@@ -283,7 +284,7 @@ describe.sequential("prw e2e", () => {
     });
 
     await session.waitForText("No scripts in apps/unnamed", {
-      timeout: 15_000,
+      timeout: E2E_WAIT_TIMEOUT,
     });
 
     expect(await readTerminal(session)).toMatchSnapshot();
@@ -297,7 +298,7 @@ describe.sequential("prw e2e", () => {
     });
 
     await session.waitForText("No scripts in @edge/no-scripts", {
-      timeout: 15_000,
+      timeout: E2E_WAIT_TIMEOUT,
     });
 
     expect(await readTerminal(session)).toMatchSnapshot();
@@ -323,7 +324,7 @@ describe.sequential("prw e2e", () => {
     });
 
     await session.waitForText("@simple/web building", {
-      timeout: 15_000,
+      timeout: E2E_WAIT_TIMEOUT,
     });
 
     const output = await readTerminal(session);
@@ -340,7 +341,7 @@ describe.sequential("prw e2e", () => {
     });
 
     await session.waitForText("Run prw inside a pnpm workspace.", {
-      timeout: 15_000,
+      timeout: E2E_WAIT_TIMEOUT,
     });
 
     expect(await readTerminal(session)).toMatchSnapshot();
