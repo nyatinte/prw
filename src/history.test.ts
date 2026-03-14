@@ -12,8 +12,8 @@ function getWrittenHistory(): HistoryEntry[] {
   return JSON.parse(vi.mocked(writeFileSync).mock.calls[0][1] as string);
 }
 
-function getLegacyHistoryDir(): string {
-  return join(homedir(), ".config", "prw");
+function getDefaultHistoryDir(): string {
+  return join(homedir(), ".local", "state", "prw");
 }
 
 describe("history", () => {
@@ -45,7 +45,7 @@ describe("history", () => {
       vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries));
       expect(loadHistory()).toEqual(entries);
       expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
-        join(getLegacyHistoryDir(), "history.json"),
+        join(getDefaultHistoryDir(), "history.json"),
         "utf-8"
       );
     });
@@ -62,14 +62,13 @@ describe("history", () => {
       );
     });
 
-    it("falls back to XDG_CONFIG_HOME when XDG_STATE_HOME is unset", () => {
-      vi.stubEnv("XDG_CONFIG_HOME", "/tmp/config");
+    it("falls back to the XDG state default when XDG_STATE_HOME is unset", () => {
       vi.mocked(readFileSync).mockReturnValue("[]");
 
       loadHistory();
 
       expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
-        "/tmp/config/prw/history.json",
+        join(getDefaultHistoryDir(), "history.json"),
         "utf-8"
       );
     });
@@ -142,14 +141,17 @@ describe("history", () => {
       );
     });
 
-    it("falls back to the legacy config path when XDG env vars are unset", () => {
+    it("falls back to the XDG state default when XDG_STATE_HOME is unset", () => {
       saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
 
-      expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith(getLegacyHistoryDir(), {
-        recursive: true,
-      });
+      expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith(
+        getDefaultHistoryDir(),
+        {
+          recursive: true,
+        }
+      );
       expect(vi.mocked(writeFileSync)).toHaveBeenCalledWith(
-        join(getLegacyHistoryDir(), "history.json"),
+        join(getDefaultHistoryDir(), "history.json"),
         expect.any(String)
       );
     });

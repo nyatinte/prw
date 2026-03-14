@@ -16,12 +16,7 @@ function resolveHistoryDir(): string {
     return join(stateHome, "prw");
   }
 
-  const configHome = process.env.XDG_CONFIG_HOME;
-  if (configHome) {
-    return join(configHome, "prw");
-  }
-
-  return join(homedir(), ".config", "prw");
+  return join(homedir(), ".local", "state", "prw");
 }
 
 function resolveHistoryFile(): string {
