@@ -69,3 +69,24 @@ $ prw
 
 MIT
 
+## リリース運用
+
+このリポジトリは Changesets でリリース管理します。
+
+```bash
+# 変更内容に対する release intent を追加
+pnpm changeset
+
+# pending changeset を package.json / changelog に反映
+pnpm version-packages
+```
+
+`.github/workflows/release.yml` は `main` への push ごとに pending changeset を
+集約した release PR を作成または更新します。release PR が merge されると、
+同じ workflow から `pnpm release` を実行して npm publish し、GitHub Release も
+自動作成します。
+
+npm への publish は GitHub Actions の Trusted Publishing を前提にしており、
+この workflow には `id-token: write` を付与しています。初回 publish 前に npm 側で
+`nyatinte/prw` と `.github/workflows/release.yml` を trusted publisher として
+関連付けてください。
