@@ -63,8 +63,8 @@ function launchPrwSession({
     cols: 100,
     rows: 30,
     env: {
-      ...process.env,
       HOME: createIsolatedHome(),
+      PATH: process.env.PATH,
     },
   });
 }
