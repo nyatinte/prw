@@ -17,9 +17,17 @@ describe("history", () => {
 
   describe("loadHistory", () => {
     it.each([
-      ["file does not exist", (): string => { throw Object.assign(new Error("ENOENT"), { code: "ENOENT" }); }],
+      [
+        "file does not exist",
+        (): string => {
+          throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
+        },
+      ],
       ["file contains invalid JSON", (): string => "not-valid-json"],
-      ["file contains non-array JSON", (): string => JSON.stringify({ foo: "bar" })],
+      [
+        "file contains non-array JSON",
+        (): string => JSON.stringify({ foo: "bar" }),
+      ],
     ])("returns [] when %s", (_, readImpl) => {
       vi.mocked(readFileSync).mockImplementation(readImpl);
       expect(loadHistory()).toEqual([]);
@@ -44,10 +52,17 @@ describe("history", () => {
         { package: "@myapp/web", script: "dev", timestamp: 2 },
       ];
 
-      saveHistory({ package: "@myapp/api", script: "dev", timestamp: 999 }, existing);
+      saveHistory(
+        { package: "@myapp/api", script: "dev", timestamp: 999 },
+        existing
+      );
 
       const written = getWrittenHistory();
-      expect(written[0]).toEqual({ package: "@myapp/api", script: "dev", timestamp: 999 });
+      expect(written[0]).toEqual({
+        package: "@myapp/api",
+        script: "dev",
+        timestamp: 999,
+      });
       expect(written).toHaveLength(2);
     });
 
@@ -58,7 +73,10 @@ describe("history", () => {
         timestamp: i,
       }));
 
-      saveHistory({ package: "new-pkg", script: "test", timestamp: 999 }, existing);
+      saveHistory(
+        { package: "new-pkg", script: "test", timestamp: 999 },
+        existing
+      );
 
       const written = getWrittenHistory();
       expect(written).toHaveLength(50);

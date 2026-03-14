@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
-import { isRootPackage } from "./workspace";
 import type { Package } from "./workspace";
+import { isRootPackage } from "./workspace";
 
 export function runScript(pkg: Package, script: string): void {
   const isRoot = isRootPackage(pkg);

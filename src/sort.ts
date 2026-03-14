@@ -8,7 +8,9 @@ function buildFirstOccurrenceIndex(
   const index = new Map<string, number>();
   entries.forEach((h, i) => {
     const key = getKey(h);
-    if (!index.has(key)) index.set(key, i);
+    if (!index.has(key)) {
+      index.set(key, i);
+    }
   });
   return index;
 }
@@ -24,15 +26,25 @@ function sortByHistory<T>(
   const withHistory: T[] = [];
   const withoutHistory: T[] = [];
   for (const item of items) {
-    if (historyIndex.has(getItemKey(item))) withHistory.push(item);
-    else withoutHistory.push(item);
+    if (historyIndex.has(getItemKey(item))) {
+      withHistory.push(item);
+    } else {
+      withoutHistory.push(item);
+    }
   }
-  withHistory.sort((a, b) => historyIndex.get(getItemKey(a))! - historyIndex.get(getItemKey(b))!);
+  withHistory.sort(
+    (a, b) =>
+      (historyIndex.get(getItemKey(a)) ?? 0) -
+      (historyIndex.get(getItemKey(b)) ?? 0)
+  );
   withoutHistory.sort(compareFallback);
   return [...withHistory, ...withoutHistory];
 }
 
-export function sortPackages(packages: Package[], history: HistoryEntry[]): Package[] {
+export function sortPackages(
+  packages: Package[],
+  history: HistoryEntry[]
+): Package[] {
   return sortByHistory(
     packages,
     history,
@@ -42,7 +54,11 @@ export function sortPackages(packages: Package[], history: HistoryEntry[]): Pack
   );
 }
 
-export function sortScripts(scripts: string[], packageName: string, history: HistoryEntry[]): string[] {
+export function sortScripts(
+  scripts: string[],
+  packageName: string,
+  history: HistoryEntry[]
+): string[] {
   const pkgHistory = history.filter((h) => h.package === packageName);
   return sortByHistory(
     scripts,

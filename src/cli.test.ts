@@ -16,8 +16,8 @@ vi.mock("./workspace", async (importOriginal) => {
   };
 });
 
-import type { HistoryEntry } from "./history";
 import { resolveScript, selectPackageByArgs } from "./cli";
+import type { HistoryEntry } from "./history";
 import { selectPackage, selectScript } from "./ui";
 import type { Package } from "./workspace";
 import { getScripts } from "./workspace";
@@ -64,7 +64,10 @@ describe("selectPackageByArgs", () => {
 
   describe("prw <package> <script> — two args", () => {
     it("returns matched package and script for direct execution", async () => {
-      const result = await selectPackageByArgs(packages, history, ["api", "dev"]);
+      const result = await selectPackageByArgs(packages, history, [
+        "api",
+        "dev",
+      ]);
       expect(result.pkg.name).toBe("@myapp/api");
       expect(result.script).toBe("dev");
     });

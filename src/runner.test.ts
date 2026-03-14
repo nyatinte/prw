@@ -9,7 +9,9 @@ vi.mock("node:child_process", () => ({
 
 import { spawnSync } from "node:child_process";
 
-function mockSpawnResult(partial: Partial<SpawnSyncReturns<Buffer>>): SpawnSyncReturns<Buffer> {
+function mockSpawnResult(
+  partial: Partial<SpawnSyncReturns<Buffer>>
+): SpawnSyncReturns<Buffer> {
   return {
     pid: 0,
     output: [],
@@ -52,7 +54,10 @@ describe("runner", () => {
 
   it.each([
     ["script fails with non-zero status", mockSpawnResult({ status: 1 })],
-    ["pnpm command is not found", mockSpawnResult({ error: new Error("ENOENT"), status: null })],
+    [
+      "pnpm command is not found",
+      mockSpawnResult({ error: new Error("ENOENT"), status: null }),
+    ],
   ])("exits with code 1 when %s", (_, spawnResult) => {
     const exitSpy = vi
       .spyOn(process, "exit")

@@ -22,7 +22,10 @@ export function loadHistory(): HistoryEntry[] {
   }
 }
 
-export function saveHistory(entry: HistoryEntry, previous: HistoryEntry[]): void {
+export function saveHistory(
+  entry: HistoryEntry,
+  previous: HistoryEntry[]
+): void {
   try {
     const filtered = previous.filter(
       (h) => !(h.package === entry.package && h.script === entry.script)
