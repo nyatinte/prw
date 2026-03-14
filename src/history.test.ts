@@ -1,86 +1,114 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-vi.mock("node:fs");
-
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
+import { createFixture } from "fs-fixture";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { HistoryEntry } from "./history.js";
 import { loadHistory, saveHistory } from "./history.js";
-
-function getWrittenHistory(): HistoryEntry[] {
-  return JSON.parse(vi.mocked(writeFileSync).mock.calls[0][1] as string);
-}
-
-function getDefaultHistoryFile(): string {
-  return join(homedir(), ".local", "state", "prw", "history.json");
-}
 
 describe("history", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
-    vi.clearAllMocks();
   });
 
   describe("loadHistory", () => {
-    it.each([
-      [
-        "file does not exist",
-        (): string => {
-          throw Object.assign(new Error("ENOENT"), { code: "ENOENT" });
-        },
-      ],
-      ["file contains invalid JSON", (): string => "not-valid-json"],
-      [
-        "file contains non-array JSON",
-        (): string => JSON.stringify({ foo: "bar" }),
-      ],
-    ])("returns [] when %s", (_, readImpl) => {
-      vi.mocked(readFileSync).mockImplementation(readImpl);
+    it("returns [] when file does not exist", async () => {
+      await using fixture = await createFixture();
+      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
+
       expect(loadHistory()).toEqual([]);
     });
 
-    it("returns parsed entries when file is valid", () => {
+    it("returns [] when file contains invalid JSON", async () => {
+      await using fixture = await createFixture({
+        state: {
+          prw: {
+            "history.json": "not-valid-json",
+          },
+        },
+      });
+      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
+
+      expect(loadHistory()).toEqual([]);
+    });
+
+    it("returns [] when file contains non-array JSON", async () => {
+      await using fixture = await createFixture({
+        state: {
+          prw: {
+            "history.json": JSON.stringify({ foo: "bar" }),
+          },
+        },
+      });
+      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
+
+      expect(loadHistory()).toEqual([]);
+    });
+
+    it("returns parsed entries when file is valid", async () => {
       const entries = [{ package: "@myapp/web", script: "dev", timestamp: 1 }];
-      vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries));
+      await using fixture = await createFixture({
+        state: {
+          prw: {
+            "history.json": JSON.stringify(entries),
+          },
+        },
+      });
+      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
+
       expect(loadHistory()).toEqual(entries);
-      expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
-        getDefaultHistoryFile(),
-        "utf-8"
-      );
     });
 
-    it("prefers XDG_STATE_HOME when reading history", () => {
-      vi.stubEnv("XDG_STATE_HOME", "/tmp/state");
-      vi.mocked(readFileSync).mockReturnValue("[]");
+    it("prefers XDG_STATE_HOME when reading history", async () => {
+      const xdgEntries = [
+        { package: "@myapp/web", script: "dev", timestamp: 1 },
+      ];
+      const homeEntries = [
+        { package: "@myapp/api", script: "build", timestamp: 2 },
+      ];
 
-      loadHistory();
+      await using xdgFixture = await createFixture({
+        state: {
+          prw: {
+            "history.json": JSON.stringify(xdgEntries),
+          },
+        },
+      });
+      await using homeFixture = await createFixture({
+        ".local": {
+          state: {
+            prw: {
+              "history.json": JSON.stringify(homeEntries),
+            },
+          },
+        },
+      });
 
-      expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
-        "/tmp/state/prw/history.json",
-        "utf-8"
-      );
+      vi.stubEnv("XDG_STATE_HOME", xdgFixture.getPath("state"));
+      vi.stubEnv("HOME", homeFixture.path);
+
+      expect(loadHistory()).toEqual(xdgEntries);
     });
 
-    it("falls back to the XDG state default when XDG_STATE_HOME is unset", () => {
-      vi.mocked(readFileSync).mockReturnValue("[]");
+    it("falls back to the XDG state default when XDG_STATE_HOME is unset", async () => {
+      const entries = [{ package: "@myapp/web", script: "dev", timestamp: 1 }];
+      await using fixture = await createFixture({
+        ".local": {
+          state: {
+            prw: {
+              "history.json": JSON.stringify(entries),
+            },
+          },
+        },
+      });
+      vi.stubEnv("HOME", fixture.path);
 
-      loadHistory();
-
-      expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
-        getDefaultHistoryFile(),
-        "utf-8"
-      );
+      expect(loadHistory()).toEqual(entries);
     });
   });
 
   describe("saveHistory", () => {
-    beforeEach(() => {
-      vi.mocked(mkdirSync).mockReturnValue(undefined);
-      vi.mocked(writeFileSync).mockReturnValue(undefined);
-    });
+    it("deduplicates and moves existing entry to front", async () => {
+      await using fixture = await createFixture();
+      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
 
-    it("deduplicates and moves existing entry to front", () => {
       const existing = [
         { package: "@myapp/api", script: "dev", timestamp: 1 },
         { package: "@myapp/web", script: "dev", timestamp: 2 },
@@ -91,7 +119,9 @@ describe("history", () => {
         existing
       );
 
-      const written = getWrittenHistory();
+      const written = await fixture.readJson<HistoryEntry[]>(
+        "state/prw/history.json"
+      );
       expect(written[0]).toEqual({
         package: "@myapp/api",
         script: "dev",
@@ -100,7 +130,10 @@ describe("history", () => {
       expect(written).toHaveLength(2);
     });
 
-    it("truncates to 50 entries", () => {
+    it("truncates to 50 entries", async () => {
+      await using fixture = await createFixture();
+      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
+
       const existing = Array.from({ length: 50 }, (_, i) => ({
         package: `@pkg${i}`,
         script: "test",
@@ -112,48 +145,48 @@ describe("history", () => {
         existing
       );
 
-      const written = getWrittenHistory();
+      const written = await fixture.readJson<HistoryEntry[]>(
+        "state/prw/history.json"
+      );
       expect(written).toHaveLength(50);
       expect(written[0]).toMatchObject({ package: "new-pkg" });
     });
 
-    it("does not throw when write fails", () => {
-      vi.mocked(writeFileSync).mockImplementation(() => {
-        throw new Error("ENOSPC: no space left on device");
+    it("does not throw when write fails", async () => {
+      await using fixture = await createFixture({
+        state: {
+          prw: "not-a-directory",
+        },
       });
+      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
 
       expect(() =>
         saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, [])
       ).not.toThrow();
     });
 
-    it("writes to XDG_STATE_HOME when set", () => {
-      vi.stubEnv("XDG_STATE_HOME", "/tmp/state");
+    it("writes to XDG_STATE_HOME when set", async () => {
+      await using fixture = await createFixture();
+      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
 
       saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
 
-      expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith("/tmp/state/prw", {
-        recursive: true,
-      });
-      expect(vi.mocked(writeFileSync)).toHaveBeenCalledWith(
-        "/tmp/state/prw/history.json",
-        expect.any(String)
-      );
+      expect(await fixture.exists("state/prw/history.json")).toBe(true);
+      expect(
+        await fixture.readJson<HistoryEntry[]>("state/prw/history.json")
+      ).toEqual([{ package: "@myapp/web", script: "dev", timestamp: 1 }]);
     });
 
-    it("falls back to the XDG state default when XDG_STATE_HOME is unset", () => {
+    it("falls back to the XDG state default when XDG_STATE_HOME is unset", async () => {
+      await using fixture = await createFixture();
+      vi.stubEnv("HOME", fixture.path);
+
       saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
 
-      expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith(
-        join(homedir(), ".local", "state", "prw"),
-        {
-          recursive: true,
-        }
-      );
-      expect(vi.mocked(writeFileSync)).toHaveBeenCalledWith(
-        getDefaultHistoryFile(),
-        expect.any(String)
-      );
+      expect(await fixture.exists(".local/state/prw/history.json")).toBe(true);
+      expect(
+        await fixture.readJson<HistoryEntry[]>(".local/state/prw/history.json")
+      ).toEqual([{ package: "@myapp/web", script: "dev", timestamp: 1 }]);
     });
   });
 });
