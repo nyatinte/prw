@@ -74,12 +74,19 @@ function readTerminal(session: Session): Promise<string> {
   return session.text({ trimEnd: true });
 }
 
+async function waitForTerminalText(
+  session: Session,
+  text: string
+): Promise<void> {
+  await session.waitForText(text, { timeout: E2E_WAIT_TIMEOUT });
+}
+
 async function waitForPackagePicker(session: Session): Promise<void> {
-  await session.waitForText("Select package", { timeout: E2E_WAIT_TIMEOUT });
+  await waitForTerminalText(session, "Select package");
 }
 
 async function waitForScriptPicker(session: Session): Promise<void> {
-  await session.waitForText("Select script", { timeout: E2E_WAIT_TIMEOUT });
+  await waitForTerminalText(session, "Select script");
 }
 
 async function getPackageSearchTerminalText(
@@ -87,7 +94,7 @@ async function getPackageSearchTerminalText(
   query: string
 ): Promise<string> {
   await session.type(query);
-  await session.waitForText(`Search: ${query}`, { timeout: E2E_WAIT_TIMEOUT });
+  await waitForTerminalText(session, `Search: ${query}`);
   return readTerminal(session);
 }
 
@@ -96,7 +103,7 @@ async function getScriptSearchTerminalText(
   query: string
 ): Promise<string> {
   await session.type(query);
-  await session.waitForText(`Search: ${query}`, { timeout: E2E_WAIT_TIMEOUT });
+  await waitForTerminalText(session, `Search: ${query}`);
   return readTerminal(session);
 }
 
@@ -144,19 +151,21 @@ describe.sequential("prw e2e", () => {
     expect(await readTerminal(session)).toMatchSnapshot();
   });
 
-  for (const query of ["build", "dev", "test", "type-check", "zzz"]) {
-    it(`shows the simple workspace script picker while searching for "${query}"`, async () => {
-      session = await launchPrwSession({
-        cwd: resolve(repoRoot, "example/simple"),
-        args: ["web"],
-      });
-
-      await waitForScriptPicker(session);
-      expect(
-        await getScriptSearchTerminalText(session, query)
-      ).toMatchSnapshot();
+  it.each([
+    "build",
+    "dev",
+    "test",
+    "type-check",
+    "zzz",
+  ])('shows the simple workspace script picker while searching for "%s"', async (query) => {
+    session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/simple"),
+      args: ["web"],
     });
-  }
+
+    await waitForScriptPicker(session);
+    expect(await getScriptSearchTerminalText(session, query)).toMatchSnapshot();
+  });
 
   it("runs a script directly in the simple workspace", async () => {
     session = await launchPrwSession({
@@ -164,9 +173,7 @@ describe.sequential("prw e2e", () => {
       args: ["web", "dev"],
     });
 
-    await session.waitForText("🚀 @simple/web dev starting...", {
-      timeout: E2E_WAIT_TIMEOUT,
-    });
+    await waitForTerminalText(session, "🚀 @simple/web dev starting...");
 
     expect(await readTerminal(session)).toContain(
       "🚀 @simple/web dev starting..."
@@ -183,18 +190,19 @@ describe.sequential("prw e2e", () => {
     expect(await readTerminal(session)).toMatchSnapshot();
   });
 
-  for (const query of ["web", "zzz"]) {
-    it(`shows the package picker while searching for "${query}"`, async () => {
-      session = await launchPrwSession({
-        cwd: resolve(repoRoot, "example/large"),
-      });
-
-      await waitForPackagePicker(session);
-      expect(
-        await getPackageSearchTerminalText(session, query)
-      ).toMatchSnapshot();
+  it.each([
+    "web",
+    "zzz",
+  ])('shows the package picker while searching for "%s"', async (query) => {
+    session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/large"),
     });
-  }
+
+    await waitForPackagePicker(session);
+    expect(
+      await getPackageSearchTerminalText(session, query)
+    ).toMatchSnapshot();
+  });
 
   it('shows the filtered package picker for the query "a"', async () => {
     session = await launchPrwSession({
@@ -223,9 +231,7 @@ describe.sequential("prw e2e", () => {
       args: ["api", "build"],
     });
 
-    await session.waitForText("📦 @large/api building...", {
-      timeout: E2E_WAIT_TIMEOUT,
-    });
+    await waitForTerminalText(session, "📦 @large/api building...");
 
     expect(await readTerminal(session)).toContain("📦 @large/api building...");
   });
@@ -241,19 +247,18 @@ describe.sequential("prw e2e", () => {
     expect(await readTerminal(session)).toMatchSnapshot();
   });
 
-  for (const query of ["build", "zzz"]) {
-    it(`shows the minimal script picker while searching for "${query}"`, async () => {
-      session = await launchPrwSession({
-        cwd: resolve(repoRoot, "example/edge-cases"),
-        args: ["minimal"],
-      });
-
-      await waitForScriptPicker(session);
-      expect(
-        await getScriptSearchTerminalText(session, query)
-      ).toMatchSnapshot();
+  it.each([
+    "build",
+    "zzz",
+  ])('shows the minimal script picker while searching for "%s"', async (query) => {
+    session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/edge-cases"),
+      args: ["minimal"],
     });
-  }
+
+    await waitForScriptPicker(session);
+    expect(await getScriptSearchTerminalText(session, query)).toMatchSnapshot();
+  });
 
   it("shows the root script picker", async () => {
     session = await launchPrwSession({
@@ -283,9 +288,7 @@ describe.sequential("prw e2e", () => {
       args: ["unnamed"],
     });
 
-    await session.waitForText("No scripts in apps/unnamed", {
-      timeout: E2E_WAIT_TIMEOUT,
-    });
+    await waitForTerminalText(session, "No scripts in apps/unnamed");
 
     expect(await readTerminal(session)).toMatchSnapshot();
     expect(await readTerminal(session)).toContain("No scripts in apps/unnamed");
@@ -297,9 +300,7 @@ describe.sequential("prw e2e", () => {
       args: ["no-scripts"],
     });
 
-    await session.waitForText("No scripts in @edge/no-scripts", {
-      timeout: E2E_WAIT_TIMEOUT,
-    });
+    await waitForTerminalText(session, "No scripts in @edge/no-scripts");
 
     expect(await readTerminal(session)).toMatchSnapshot();
     expect(await readTerminal(session)).toContain(
@@ -323,9 +324,7 @@ describe.sequential("prw e2e", () => {
       args: ["root", "build"],
     });
 
-    await session.waitForText("@simple/web building", {
-      timeout: E2E_WAIT_TIMEOUT,
-    });
+    await waitForTerminalText(session, "@simple/web building");
 
     const output = await readTerminal(session);
 
@@ -340,9 +339,7 @@ describe.sequential("prw e2e", () => {
       cwd: outsideWorkspaceDir,
     });
 
-    await session.waitForText("Run prw inside a pnpm workspace.", {
-      timeout: E2E_WAIT_TIMEOUT,
-    });
+    await waitForTerminalText(session, "Run prw inside a pnpm workspace.");
 
     expect(await readTerminal(session)).toMatchSnapshot();
   });
