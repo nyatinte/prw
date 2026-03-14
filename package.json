@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "Interactive pnpm workspace package & script runner",
   "type": "module",
-  "main": "./dist/index.mjs",
   "bin": {
     "prw": "./dist/bin.mjs"
   },
@@ -46,12 +45,16 @@
       "@biomejs/biome"
     ]
   },
+  "engines": {
+    "node": ">=24.14.0",
+    "pnpm": "10.30.3"
+  },
   "packageManager": "pnpm@10.30.3",
   "devDependencies": {
     "@biomejs/biome": "2.4.0",
     "@changesets/cli": "2.30.0",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^25.4.0",
+    "@types/node": "^24.12.0",
     "knip": "^5.86.0",
     "lefthook": "^2.1.2",
     "tsdown": "^0.20.3",
