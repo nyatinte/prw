@@ -1,4 +1,5 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -7,19 +8,20 @@ export type HistoryEntry = {
   script: string;
 };
 
-const HISTORY_FILE_NAME = "history.json";
+const HISTORY_DIR_NAME = "histories";
 const MAX_HISTORY = 50;
 
-function resolveHistoryFile(): string {
+function resolveHistoryFile(workspaceRoot: string): string {
   const stateHome = process.env.XDG_STATE_HOME;
-  return stateHome
-    ? join(stateHome, "prw", HISTORY_FILE_NAME)
-    : join(homedir(), ".local", "state", "prw", HISTORY_FILE_NAME);
+  const historyDir = stateHome
+    ? join(stateHome, "prw", HISTORY_DIR_NAME)
+    : join(homedir(), ".local", "state", "prw", HISTORY_DIR_NAME);
+  return join(historyDir, `${getWorkspaceId(workspaceRoot)}.json`);
 }
 
-export function loadHistory(): HistoryEntry[] {
+export function loadHistory(workspaceRoot: string): HistoryEntry[] {
   try {
-    const content = readFileSync(resolveHistoryFile(), "utf-8");
+    const content = readFileSync(resolveHistoryFile(workspaceRoot), "utf-8");
     const parsed = JSON.parse(content);
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -27,7 +29,12 @@ export function loadHistory(): HistoryEntry[] {
   }
 }
 
+export function getWorkspaceId(workspaceRoot: string): string {
+  return createHash("sha256").update(realpathSync(workspaceRoot)).digest("hex");
+}
+
 export function saveHistory(
+  workspaceRoot: string,
   entry: HistoryEntry,
   previous: HistoryEntry[]
 ): void {
@@ -36,7 +43,7 @@ export function saveHistory(
       (h) => !(h.package === entry.package && h.script === entry.script)
     );
     const updated = [entry, ...filtered].slice(0, MAX_HISTORY);
-    const historyFile = resolveHistoryFile();
+    const historyFile = resolveHistoryFile(workspaceRoot);
     mkdirSync(dirname(historyFile), { recursive: true });
     writeFileSync(historyFile, JSON.stringify(updated, null, 2));
   } catch {
