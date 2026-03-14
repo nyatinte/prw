@@ -69,6 +69,19 @@ function readTerminal(session: Session): Promise<string> {
   return session.text({ trimEnd: true });
 }
 
+async function waitForScriptPicker(session: Session): Promise<void> {
+  await session.waitForText("Select script", { timeout: 15_000 });
+}
+
+async function getScriptSearchTerminalText(
+  session: Session,
+  query: string
+): Promise<string> {
+  await session.type(query);
+  await session.waitForText(`Search: ${query}`, { timeout: 15_000 });
+  return readTerminal(session);
+}
+
 function closeSessionSafely(session: Session | undefined): Promise<void> {
   if (!session) {
     return Promise.resolve();
@@ -97,10 +110,24 @@ describe.sequential("prw e2e", () => {
       args: ["web"],
     });
 
-    await session.waitForText("Select script", { timeout: 15_000 });
+    await waitForScriptPicker(session);
 
     expect(await readTerminal(session)).toMatchSnapshot();
   });
+
+  for (const query of ["build", "dev", "test", "type-check"]) {
+    it(`shows the simple workspace script picker while searching for "${query}"`, async () => {
+      session = await launchPrwSession({
+        cwd: resolve(repoRoot, "example/simple"),
+        args: ["web"],
+      });
+
+      await waitForScriptPicker(session);
+      expect(
+        await getScriptSearchTerminalText(session, query)
+      ).toMatchSnapshot();
+    });
+  }
 
   it("runs a script directly in the simple workspace", async () => {
     session = await launchPrwSession({
@@ -146,9 +173,21 @@ describe.sequential("prw e2e", () => {
       args: ["minimal"],
     });
 
-    await session.waitForText("Select script", { timeout: 15_000 });
+    await waitForScriptPicker(session);
 
     expect(await readTerminal(session)).toMatchSnapshot();
+  });
+
+  it('shows the minimal script picker while searching for "build"', async () => {
+    session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/edge-cases"),
+      args: ["minimal"],
+    });
+
+    await waitForScriptPicker(session);
+    expect(
+      await getScriptSearchTerminalText(session, "build")
+    ).toMatchSnapshot();
   });
 
   it("reports a missing script list for unnamed packages", async () => {

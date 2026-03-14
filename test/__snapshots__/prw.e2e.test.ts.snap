@@ -22,6 +22,20 @@ exports[`prw e2e > shows the minimal script picker in edge-cases workspace 1`] =
 └"
 `;
 
+exports[`prw e2e > shows the minimal script picker while searching for "build" 1`] = `
+"
+│
+◇  Select package
+│  @edge/minimal
+│
+◆  Select script
+│
+│  Search: build█
+│  ● build (echo '📦 Building @edge/minimal...')
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
+
 exports[`prw e2e > shows the package picker for the large workspace 1`] = `
 "
 │
@@ -56,6 +70,62 @@ exports[`prw e2e > shows the script picker for simple workspace package selectio
 │  ○ dev
 │  ○ test
 │  ○ type-check
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
+
+exports[`prw e2e > shows the simple workspace script picker while searching for "build" 1`] = `
+"
+│
+◇  Select package
+│  @simple/web
+│
+◆  Select script
+│
+│  Search: build█ (1 match)
+│  ● build (echo '📦 @simple/web building...')
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
+
+exports[`prw e2e > shows the simple workspace script picker while searching for "dev" 1`] = `
+"
+│
+◇  Select package
+│  @simple/web
+│
+◆  Select script
+│
+│  Search: dev█ (1 match)
+│  ● dev (echo '🚀 @simple/web dev starting...')
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
+
+exports[`prw e2e > shows the simple workspace script picker while searching for "test" 1`] = `
+"
+│
+◇  Select package
+│  @simple/web
+│
+◆  Select script
+│
+│  Search: test█ (1 match)
+│  ● test (echo '✓ All tests passed')
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└"
+`;
+
+exports[`prw e2e > shows the simple workspace script picker while searching for "type-check" 1`] = `
+"
+│
+◇  Select package
+│  @simple/web
+│
+◆  Select script
+│
+│  Search: type-check█ (1 match)
+│  ● type-check (echo '✓ Type check passed')
 │  ↑/↓ to select • Enter: confirm • Type: to search
 └"
 `;
