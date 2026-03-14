@@ -4,6 +4,8 @@ import { sortPackages, sortScripts } from "./sort";
 import type { Package } from "./workspace";
 import { isRootPackage } from "./workspace";
 
+export const SELECT_PACKAGE_MESSAGE = "Select package";
+
 export async function selectPackage(
   packages: Package[],
   history: HistoryEntry[]
@@ -11,7 +13,7 @@ export async function selectPackage(
   const sorted = sortPackages(packages, history);
 
   const selected = await autocomplete({
-    message: "Select package",
+    message: SELECT_PACKAGE_MESSAGE,
     options: sorted.map((pkg) => ({
       value: pkg.name,
       label: pkg.name,
