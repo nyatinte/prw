@@ -4,6 +4,8 @@ import { sortPackages, sortScripts } from "./sort.js";
 import type { Package } from "./workspace.js";
 
 describe("sortPackages", () => {
+  const workspaceId = "workspace-a";
+
   it("prioritizes packages with history", () => {
     const packages: Package[] = [
       { name: "(root)", dir: "." },
@@ -12,7 +14,7 @@ describe("sortPackages", () => {
     ];
 
     const history: HistoryEntry[] = [
-      { package: "@myapp/web", script: "dev", timestamp: 2 },
+      { workspaceId, package: "@myapp/web", script: "dev", timestamp: 2 },
     ];
 
     const result = sortPackages(packages, history);
@@ -39,8 +41,8 @@ describe("sortPackages", () => {
     ];
 
     const history: HistoryEntry[] = [
-      { package: "@myapp/api", script: "dev", timestamp: 2 },
-      { package: "@myapp/web", script: "dev", timestamp: 1 },
+      { workspaceId, package: "@myapp/api", script: "dev", timestamp: 2 },
+      { workspaceId, package: "@myapp/web", script: "dev", timestamp: 1 },
     ];
 
     const result = sortPackages(packages, history);
@@ -55,9 +57,9 @@ describe("sortPackages", () => {
     ];
 
     const history: HistoryEntry[] = [
-      { package: "@myapp/web", script: "dev", timestamp: 3 },
-      { package: "@myapp/api", script: "build", timestamp: 2 },
-      { package: "@myapp/web", script: "build", timestamp: 1 },
+      { workspaceId, package: "@myapp/web", script: "dev", timestamp: 3 },
+      { workspaceId, package: "@myapp/api", script: "build", timestamp: 2 },
+      { workspaceId, package: "@myapp/web", script: "build", timestamp: 1 },
     ];
 
     const result = sortPackages(packages, history);
@@ -67,6 +69,8 @@ describe("sortPackages", () => {
 });
 
 describe("sortScripts", () => {
+  const workspaceId = "workspace-a";
+
   it("prioritizes scripts with history", () => {
     const scripts = [
       { name: "build", command: "tsc" },
@@ -74,7 +78,7 @@ describe("sortScripts", () => {
       { name: "test", command: "vitest" },
     ];
     const history: HistoryEntry[] = [
-      { package: "@myapp/web", script: "test", timestamp: 1 },
+      { workspaceId, package: "@myapp/web", script: "test", timestamp: 1 },
     ];
 
     const result = sortScripts(scripts, "@myapp/web", history);

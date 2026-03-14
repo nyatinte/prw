@@ -1,8 +1,10 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 
 export type HistoryEntry = {
+  workspaceId: string;
   package: string;
   script: string;
   timestamp: number;
@@ -28,13 +30,22 @@ export function loadHistory(): HistoryEntry[] {
   }
 }
 
+export function getWorkspaceId(workspaceRoot: string): string {
+  return createHash("sha256").update(realpathSync(workspaceRoot)).digest("hex");
+}
+
 export function saveHistory(
   entry: HistoryEntry,
   previous: HistoryEntry[]
 ): void {
   try {
     const filtered = previous.filter(
-      (h) => !(h.package === entry.package && h.script === entry.script)
+      (h) =>
+        !(
+          h.workspaceId === entry.workspaceId &&
+          h.package === entry.package &&
+          h.script === entry.script
+        )
     );
     const updated = [entry, ...filtered].slice(0, MAX_HISTORY);
     const historyFile = resolveHistoryFile();

@@ -2,11 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("node:fs");
 
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { HistoryEntry } from "./history.js";
-import { loadHistory, saveHistory } from "./history.js";
+import { getWorkspaceId, loadHistory, saveHistory } from "./history.js";
 
 function getWrittenHistory(): HistoryEntry[] {
   return JSON.parse(vi.mocked(writeFileSync).mock.calls[0][1] as string);
@@ -41,7 +42,14 @@ describe("history", () => {
     });
 
     it("returns parsed entries when file is valid", () => {
-      const entries = [{ package: "@myapp/web", script: "dev", timestamp: 1 }];
+      const entries: HistoryEntry[] = [
+        {
+          workspaceId: "workspace-a",
+          package: "@myapp/web",
+          script: "dev",
+          timestamp: 1,
+        },
+      ];
       vi.mocked(readFileSync).mockReturnValue(JSON.stringify(entries));
       expect(loadHistory()).toEqual(entries);
       expect(vi.mocked(readFileSync)).toHaveBeenCalledWith(
@@ -74,6 +82,20 @@ describe("history", () => {
     });
   });
 
+  describe("getWorkspaceId", () => {
+    it("hashes the canonical workspace path", () => {
+      vi.mocked(realpathSync).mockReturnValue("/real/workspace");
+      const expected = createHash("sha256")
+        .update("/real/workspace")
+        .digest("hex");
+
+      expect(getWorkspaceId("/symlink/workspace")).toBe(expected);
+      expect(vi.mocked(realpathSync)).toHaveBeenCalledWith(
+        "/symlink/workspace"
+      );
+    });
+  });
+
   describe("saveHistory", () => {
     beforeEach(() => {
       vi.mocked(mkdirSync).mockReturnValue(undefined);
@@ -82,17 +104,33 @@ describe("history", () => {
 
     it("deduplicates and moves existing entry to front", () => {
       const existing = [
-        { package: "@myapp/api", script: "dev", timestamp: 1 },
-        { package: "@myapp/web", script: "dev", timestamp: 2 },
+        {
+          workspaceId: "workspace-a",
+          package: "@myapp/api",
+          script: "dev",
+          timestamp: 1,
+        },
+        {
+          workspaceId: "workspace-a",
+          package: "@myapp/web",
+          script: "dev",
+          timestamp: 2,
+        },
       ];
 
       saveHistory(
-        { package: "@myapp/api", script: "dev", timestamp: 999 },
+        {
+          workspaceId: "workspace-a",
+          package: "@myapp/api",
+          script: "dev",
+          timestamp: 999,
+        },
         existing
       );
 
       const written = getWrittenHistory();
       expect(written[0]).toEqual({
+        workspaceId: "workspace-a",
         package: "@myapp/api",
         script: "dev",
         timestamp: 999,
@@ -102,13 +140,19 @@ describe("history", () => {
 
     it("truncates to 50 entries", () => {
       const existing = Array.from({ length: 50 }, (_, i) => ({
+        workspaceId: "workspace-a",
         package: `@pkg${i}`,
         script: "test",
         timestamp: i,
       }));
 
       saveHistory(
-        { package: "new-pkg", script: "test", timestamp: 999 },
+        {
+          workspaceId: "workspace-a",
+          package: "new-pkg",
+          script: "test",
+          timestamp: 999,
+        },
         existing
       );
 
@@ -123,14 +167,30 @@ describe("history", () => {
       });
 
       expect(() =>
-        saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, [])
+        saveHistory(
+          {
+            workspaceId: "workspace-a",
+            package: "@myapp/web",
+            script: "dev",
+            timestamp: 1,
+          },
+          []
+        )
       ).not.toThrow();
     });
 
     it("writes to XDG_STATE_HOME when set", () => {
       vi.stubEnv("XDG_STATE_HOME", "/tmp/state");
 
-      saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
+      saveHistory(
+        {
+          workspaceId: "workspace-a",
+          package: "@myapp/web",
+          script: "dev",
+          timestamp: 1,
+        },
+        []
+      );
 
       expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith("/tmp/state/prw", {
         recursive: true,
@@ -142,7 +202,15 @@ describe("history", () => {
     });
 
     it("falls back to the XDG state default when XDG_STATE_HOME is unset", () => {
-      saveHistory({ package: "@myapp/web", script: "dev", timestamp: 1 }, []);
+      saveHistory(
+        {
+          workspaceId: "workspace-a",
+          package: "@myapp/web",
+          script: "dev",
+          timestamp: 1,
+        },
+        []
+      );
 
       expect(vi.mocked(mkdirSync)).toHaveBeenCalledWith(
         join(homedir(), ".local", "state", "prw"),
@@ -154,6 +222,42 @@ describe("history", () => {
         getDefaultHistoryFile(),
         expect.any(String)
       );
+    });
+
+    it("keeps matching package/script history from other workspaces", () => {
+      const existing = [
+        {
+          workspaceId: "workspace-b",
+          package: "@myapp/web",
+          script: "dev",
+          timestamp: 1,
+        },
+      ];
+
+      saveHistory(
+        {
+          workspaceId: "workspace-a",
+          package: "@myapp/web",
+          script: "dev",
+          timestamp: 2,
+        },
+        existing
+      );
+
+      expect(getWrittenHistory()).toEqual([
+        {
+          workspaceId: "workspace-a",
+          package: "@myapp/web",
+          script: "dev",
+          timestamp: 2,
+        },
+        {
+          workspaceId: "workspace-b",
+          package: "@myapp/web",
+          script: "dev",
+          timestamp: 1,
+        },
+      ]);
     });
   });
 });
