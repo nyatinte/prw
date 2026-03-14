@@ -21,7 +21,7 @@ pnpm vitest run src/path/to/file.test.ts
 
 ## Conventions
 
-- `findWorkspaceRoot` only checks the current directory — no parent traversal. Must be run from the workspace root.
+- `findWorkspaceRoot` traverses parent directories until it finds the nearest `pnpm-workspace.yaml`.
 - History is stored at `~/.config/prw/history.json` (max 50 entries), not in the project directory.
 
 ## Release

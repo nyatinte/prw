@@ -30,13 +30,11 @@ export function findWorkspaceRoot(cwd: string): string {
 
   while (true) {
     const workspacePath = join(current, WORKSPACE_CONFIG_FILE);
-
     if (existsSync(workspacePath)) {
       return current;
     }
 
     const parent = dirname(current);
-
     if (parent === current) {
       break;
     }
