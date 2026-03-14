@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "Interactive pnpm workspace package & script runner",
   "type": "module",
-  "main": "./dist/index.mjs",
   "bin": {
     "prw": "./dist/bin.mjs"
   },
