@@ -1,5 +1,14 @@
 # @nyatinte/prw
 
+## 0.1.1
+
+### Patch Changes
+
+- a0e3266: add CLAUDE.md, AGENTS.md for Agentic Coding
+- ccc6cfa: Replace `fast-glob` with `tinyglobby` and `js-yaml` with `yaml`.
+
+  Keep workspace package discovery behavior compatible by normalizing matched directory paths.
+
 ## 0.1.0
 
 ### Features

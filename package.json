@@ -1,6 +1,6 @@
 {
   "name": "@nyatinte/prw",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Interactive pnpm workspace package & script runner",
   "author": "nyatinte",
   "license": "MIT",
