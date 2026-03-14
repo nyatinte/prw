@@ -1,12 +1,14 @@
 import osLocale from "os-locale";
-import * as messages from "./paraglide/messages.js";
+import { m as paraglideMessages } from "./paraglide/messages.js";
 import { setLocale } from "./paraglide/runtime.js";
 
-export type SupportedLocale = "en" | "ja";
+type SupportedLocale = "en" | "ja";
 
 const DEFAULT_LOCALE: SupportedLocale = "en";
+const LOCALE_SEPARATOR_PATTERN = /_/g;
+const LOCALE_SUFFIX_PATTERN = /[.:].*$/;
 
-export const m = messages;
+export const m = paraglideMessages;
 
 export function resolveSupportedLocale(
   input: string | undefined
@@ -17,8 +19,8 @@ export function resolveSupportedLocale(
 
   const normalized = input
     .trim()
-    .replace(/_/g, "-")
-    .replace(/[.:].*$/, "")
+    .replace(LOCALE_SEPARATOR_PATTERN, "-")
+    .replace(LOCALE_SUFFIX_PATTERN, "")
     .toLowerCase();
 
   return normalized.startsWith("ja") ? "ja" : DEFAULT_LOCALE;

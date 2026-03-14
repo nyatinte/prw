@@ -14,10 +14,10 @@ export class WorkspaceNotFoundError extends Error {
   }
 }
 
-export interface Package {
+export type Package = {
   readonly dir: string;
   readonly name: string;
-}
+};
 
 export const ROOT_PACKAGE: Package = { name: "(root)", dir: "." };
 

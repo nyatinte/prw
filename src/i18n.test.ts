@@ -9,9 +9,9 @@ import { initializeLocale, resolveSupportedLocale } from "./i18n";
 import { getLocale, setLocale } from "./paraglide/runtime.js";
 
 describe("i18n", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
-    void setLocale("en", { reload: false });
+    await setLocale("en", { reload: false });
   });
 
   afterEach(() => {
@@ -42,17 +42,14 @@ describe("i18n", () => {
     vi.mocked(osLocale).mockImplementation(() => {
       throw new Error("unavailable");
     });
-    vi.stubGlobal(
-      "Intl",
-      {
-        ...Intl,
-        DateTimeFormat: class {
-          resolvedOptions() {
-            return { locale: "ja-JP" };
-          }
-        },
-      } satisfies typeof Intl
-    );
+    vi.stubGlobal("Intl", {
+      ...Intl,
+      DateTimeFormat: class {
+        resolvedOptions() {
+          return { locale: "ja-JP" };
+        }
+      },
+    } satisfies typeof Intl);
 
     await expect(initializeLocale()).resolves.toBe("ja");
     expect(getLocale()).toBe("ja");

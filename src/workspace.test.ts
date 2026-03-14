@@ -16,9 +16,9 @@ import {
 describe("workspace", () => {
   const tmpDir = join("/tmp", `prw-test-${Date.now()}`);
 
-  beforeEach(() => {
+  beforeEach(async () => {
     mkdirSync(tmpDir, { recursive: true });
-    void setLocale("en", { reload: false });
+    await setLocale("en", { reload: false });
   });
 
   afterEach(() => {

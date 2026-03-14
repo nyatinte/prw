@@ -1,5 +1,3 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 // TODO: UI prompt i18n should be covered from a higher-level entrypoint/E2E test
 // once the current test structure stops mocking ./ui.
 vi.mock("@clack/prompts", async (importOriginal) => {
@@ -29,10 +27,11 @@ vi.mock("./workspace", async (importOriginal) => {
   };
 });
 
+import { isCancel } from "@clack/prompts";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveScript, selectPackageByArgs } from "./cli";
 import type { HistoryEntry } from "./history";
 import { m } from "./i18n";
-import { isCancel } from "@clack/prompts";
 import { setLocale } from "./paraglide/runtime.js";
 import { selectPackage, selectScript } from "./ui";
 import type { Package } from "./workspace";
@@ -46,9 +45,9 @@ const packages: Package[] = [
 
 const history: HistoryEntry[] = [];
 
-function resetCliTestState(): void {
+async function resetCliTestState(): Promise<void> {
   vi.clearAllMocks();
-  void setLocale("en", { reload: false });
+  await setLocale("en", { reload: false });
   // UI helpers are mocked in this file, so cancellation is opt-in per test.
   vi.mocked(isCancel).mockReturnValue(false);
   vi.spyOn(process, "exit").mockImplementation((code?: string | number) => {
@@ -56,36 +55,48 @@ function resetCliTestState(): void {
   });
 }
 
-async function expectPackageSelectionError(
-  args: string[],
-  expectedMessage: string
-): Promise<void> {
-  const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+async function capturePackageSelectionError(args: string[]): Promise<{
+  errorSpy: ReturnType<typeof vi.spyOn>;
+  thrown: unknown;
+}> {
+  const errorSpy = vi
+    .spyOn(console, "error")
+    .mockImplementation(() => undefined);
+  let thrown: unknown;
 
-  await expect(selectPackageByArgs(packages, history, args)).rejects.toThrow(
-    "process.exit(1)"
-  );
+  try {
+    await selectPackageByArgs(packages, history, args);
+  } catch (error) {
+    thrown = error;
+  }
 
-  expect(errorSpy).toHaveBeenCalledWith(expectedMessage);
+  return { errorSpy, thrown };
 }
 
-async function expectResolveScriptError(
+async function captureResolveScriptError(
   root: string,
-  pkg: Package,
-  expectedMessage: string
-): Promise<void> {
-  const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+  pkg: Package
+): Promise<{
+  errorSpy: ReturnType<typeof vi.spyOn>;
+  thrown: unknown;
+}> {
+  const errorSpy = vi
+    .spyOn(console, "error")
+    .mockImplementation(() => undefined);
+  let thrown: unknown;
 
-  await expect(resolveScript(root, pkg, undefined, [])).rejects.toThrow(
-    "process.exit(1)"
-  );
+  try {
+    await resolveScript(root, pkg, undefined, []);
+  } catch (error) {
+    thrown = error;
+  }
 
-  expect(errorSpy).toHaveBeenCalledWith(expectedMessage);
+  return { errorSpy, thrown };
 }
 
 describe("selectPackageByArgs", () => {
-  beforeEach(() => {
-    resetCliTestState();
+  beforeEach(async () => {
+    await resetCliTestState();
   });
 
   describe("prw <package> — single arg", () => {
@@ -96,8 +107,12 @@ describe("selectPackageByArgs", () => {
     });
 
     it("exits with code 1 when no packages match", async () => {
-      await expectPackageSelectionError(
-        ["nonexistent"],
+      const { errorSpy, thrown } = await capturePackageSelectionError([
+        "nonexistent",
+      ]);
+
+      expect(thrown).toEqual(new Error("process.exit(1)"));
+      expect(errorSpy).toHaveBeenCalledWith(
         m.no_packages_match({ query: "nonexistent" })
       );
     });
@@ -114,7 +129,9 @@ describe("selectPackageByArgs", () => {
 
     it("logs localized cancel message when package picker is cancelled", async () => {
       const cancelSymbol = Symbol("cancel");
-      const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+      const logSpy = vi
+        .spyOn(console, "log")
+        .mockImplementation(() => undefined);
       vi.mocked(selectPackage).mockResolvedValue(cancelSymbol);
       vi.mocked(isCancel).mockImplementation((value) => value === cancelSymbol);
 
@@ -137,15 +154,25 @@ describe("selectPackageByArgs", () => {
     });
 
     it("exits with code 1 when no packages match", async () => {
-      await expectPackageSelectionError(
-        ["nonexistent", "dev"],
+      const { errorSpy, thrown } = await capturePackageSelectionError([
+        "nonexistent",
+        "dev",
+      ]);
+
+      expect(thrown).toEqual(new Error("process.exit(1)"));
+      expect(errorSpy).toHaveBeenCalledWith(
         m.no_packages_match({ query: "nonexistent" })
       );
     });
 
     it("exits with code 1 when multiple packages match", async () => {
-      await expectPackageSelectionError(
-        ["web", "dev"],
+      const { errorSpy, thrown } = await capturePackageSelectionError([
+        "web",
+        "dev",
+      ]);
+
+      expect(thrown).toEqual(new Error("process.exit(1)"));
+      expect(errorSpy).toHaveBeenCalledWith(
         m.multiple_packages_match({ query: "web" })
       );
     });
@@ -155,8 +182,8 @@ describe("selectPackageByArgs", () => {
 describe("resolveScript", () => {
   const pkg: Package = { name: "@myapp/api", dir: "apps/api" };
 
-  beforeEach(() => {
-    resetCliTestState();
+  beforeEach(async () => {
+    await resetCliTestState();
   });
 
   it("returns initialScript directly when provided", async () => {
@@ -174,9 +201,10 @@ describe("resolveScript", () => {
 
   it("exits with code 1 when no scripts available", async () => {
     vi.mocked(getScripts).mockReturnValue([]);
-    await expectResolveScriptError(
-      "/root",
-      pkg,
+    const { errorSpy, thrown } = await captureResolveScriptError("/root", pkg);
+
+    expect(thrown).toEqual(new Error("process.exit(1)"));
+    expect(errorSpy).toHaveBeenCalledWith(
       m.no_scripts_in_package({ packageName: pkg.name })
     );
   });
