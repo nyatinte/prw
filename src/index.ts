@@ -1,4 +1,4 @@
-import { selectPackageByArgs, resolveScript } from "./cli";
+import { resolveScript, selectPackageByArgs } from "./cli";
 import { loadHistory, saveHistory } from "./history";
 import { runScript } from "./runner";
 import { findWorkspaceRoot, getPackages } from "./workspace";
