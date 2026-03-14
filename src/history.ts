@@ -2,11 +2,11 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-export interface HistoryEntry {
+export type HistoryEntry = {
   package: string;
   script: string;
   timestamp: number;
-}
+};
 
 const HISTORY_DIR = join(homedir(), ".config", "prw");
 const HISTORY_FILE = join(HISTORY_DIR, "history.json");
