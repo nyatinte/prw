@@ -440,6 +440,24 @@ describe.sequential("prw e2e", () => {
     }
   });
 
+  it("shows version when -v is passed", async () => {
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: fixture.path,
+      homeDir: fixture.path,
+      args: ["-v"],
+    });
+
+    try {
+      await session.waitForText(pkg.version);
+
+      const output = await readTerminal(session);
+      expect(output).toContain(pkg.version);
+    } finally {
+      await closeSessionSafely(session);
+    }
+  });
+
   it("reports an error when launched completely outside a workspace", async () => {
     await using fixture = await createFixture();
     await using homeFixture = await createFixture();
