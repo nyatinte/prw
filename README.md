@@ -6,7 +6,7 @@ English | [日本語](./README.ja.md)
 [![npm downloads](https://img.shields.io/npm/dm/%40nyatinte%2Fprw)](https://npmx.dev/package/@nyatinte/prw#downloads)
 [![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
 
-`prw` is a CLI for selecting a package and running one of its scripts from a pnpm workspace.
+`prw` is a CLI for interactively selecting a package and script in a pnpm workspace and running it. It only uses existing `package.json` scripts — no extra config files required.
 
 <table>
   <tr>
@@ -18,22 +18,10 @@ English | [日本語](./README.ja.md)
     </td>
   </tr>
   <tr>
-    <td align="center"><small>Filter packages with a short query.</small></td>
+    <td align="center"><small>Filter packages with fuzzy search.</small></td>
     <td align="center"><small>Pick a script and run it immediately.</small></td>
   </tr>
 </table>
-
-At a glance: run `prw`, narrow down the target package, choose a script, and execute an existing workspace task from anywhere inside the workspace.
-
-> [!IMPORTANT]
-> `prw` is intentionally small.
-> It only runs scripts that already exist in your workspace.
-> It does not add its own task system.
-
-## What It Does
-
-`prw` lets you pick a package and a script from your pnpm workspace, then runs it.
-It only uses scripts already defined in `package.json`.
 
 ## Installation
 
@@ -51,20 +39,18 @@ pnpm add -g @nyatinte/prw
 prw
 ```
 
-Pick a package, pick a script, and run it.
-You can also select the workspace root package.
+Interactively select a package and script, then run it.
+The root package is also available.
 
-### 2. Pass a package first
+### 2. Pass a package name
 
 ```bash
 prw web
 ```
 
-Package names can be matched loosely.
-You do not need to type the full name every time.
-If only one package matches, `prw` goes straight to script selection.
-If multiple packages match, it shows the package picker.
-Frequently used packages are shown first.
+Package names are matched with fuzzy search.
+If one package matches, it goes straight to script selection. If multiple match, the package picker is shown.
+Frequently used packages are shown first based on history.
 
 ### 3. Pass both package and script
 
@@ -72,26 +58,43 @@ Frequently used packages are shown first.
 prw @myapp/web dev
 ```
 
-If the package and script are clear, `prw` runs them directly.
-Only scripts defined in `package.json` are runnable.
-Frequently used scripts are shown first.
+If both are unambiguous, `prw` skips the selection screens and runs immediately.
+Frequently used scripts are also shown first based on history.
 
 > [!NOTE]
-> Short input like `prw web` is enough in many cases.
+> You don't need to type the full package name every time.
+> A short query like `prw web` is usually enough.
 
 ## Example
 
 ```text
 $ prw
-? Select package
-❯ (root)
-  @myapp/web      apps/web
-  @myapp/api      apps/api
+│
+◆  Select package
+│
+│  Search: _
+│  ● (root)
+│  ○ @myapp/web
+│  ○ @myapp/api
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└
+```
 
-? Select script
-❯ dev
-  build
-  test
+After selecting a package, you move on to script selection. The focused script shows its full command in `(...)`.
+
+```text
+│
+◇  Select package
+│  @myapp/web
+│
+◆  Select script
+│
+│  Search: _
+│  ● dev (vite)
+│  ○ build
+│  ○ test
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└
 ```
 
 ## Workspace Layout
@@ -110,13 +113,13 @@ $ prw
       └─ package.json
 ```
 
-From anywhere in the workspace, `prw` can run scripts from `apps/*` and `packages/*`.
+With a monorepo like this, you can run scripts from anywhere under apps/ or packages/, from anywhere in the workspace.
 
-## Notes
+## Spec
 
 > [!IMPORTANT]
-> Run `prw` anywhere inside the workspace.
-> It finds the nearest `pnpm-workspace.yaml` by walking up parent directories.
+> `prw` can be run from anywhere inside the workspace.
+> It walks up parent directories to find the nearest `pnpm-workspace.yaml`.
 
 > [!NOTE]
 > Usage history is stored per workspace at `$XDG_STATE_HOME/prw/histories/<workspace-id>.json`
