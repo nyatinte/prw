@@ -16,18 +16,22 @@
   "bugs": {
     "url": "https://github.com/nyatinte/prw/issues"
   },
+  "imports": {
+    "#paraglide/*": "./generated/paraglide/*"
+  },
   "keywords": [
     "pnpm",
     "workspace",
     "cli"
   ],
   "scripts": {
-    "build": "tsdown",
+    "build": "pnpm paraglide:compile && tsdown",
     "build:man": "marked-man man/prw.1.md -o man/prw.1",
     "changeset": "changeset",
-    "check": "ultracite check",
-    "fix": "ultracite fix",
+    "check": "pnpm paraglide:compile && ultracite check",
+    "fix": "pnpm paraglide:compile && ultracite fix",
     "knip": "knip",
+    "paraglide:compile": "paraglide-js compile --project ./project.inlang --outdir ./generated/paraglide --silent",
     "prepare": "lefthook install",
     "prepublishOnly": "pnpm build && pnpm build:man",
     "release": "changeset publish",
@@ -35,7 +39,7 @@
     "test:run": "pnpm build && vitest run",
     "test:coverage": "pnpm build && vitest run --coverage",
     "test:update": "pnpm build && vitest -u",
-    "typecheck": "tsgo --noEmit -p tsconfig.json",
+    "typecheck": "pnpm paraglide:compile && tsgo --noEmit -p tsconfig.json",
     "version-packages": "changeset version"
   },
   "man": [
@@ -57,6 +61,7 @@
   "dependencies": {
     "@clack/prompts": "1.1.0",
     "citty": "0.2.1",
+    "os-locale": "8.0.0",
     "picocolors": "1.1.1",
     "tinyglobby": "0.2.15",
     "yaml": "2.8.2"
@@ -64,6 +69,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.6",
     "@changesets/cli": "2.30.0",
+    "@inlang/paraglide-js": "2.15.0",
     "@types/node": "24.12.0",
     "@typescript/native-preview": "7.0.0-dev.20260314.1",
     "@vitest/coverage-v8": "4.1.0",

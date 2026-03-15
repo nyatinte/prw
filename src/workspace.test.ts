@@ -57,7 +57,7 @@ describe("workspace", () => {
       await using fixture = await createFixture();
 
       expect(() => findWorkspaceRoot(fixture.path)).toThrow(
-        new WorkspaceNotFoundError("Run prw inside a pnpm workspace.")
+        WorkspaceNotFoundError
       );
     });
   });
