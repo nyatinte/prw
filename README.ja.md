@@ -8,7 +8,7 @@
 
 `prw` は、pnpm workspace でパッケージと script を選んで実行できる CLI ツールです。既存の `package.json` scripts だけを使い、独自の設定ファイルは不要です。
 
-![Demo](https://cdn.jsdelivr.net/gh/nyatinte/prw@main/.github/assets/readme-demo.gif)
+![prw CLIのインタラクティブな操作デモ](https://cdn.jsdelivr.net/gh/nyatinte/prw@main/.github/assets/readme-demo.gif)
 
 <table>
   <tr>
