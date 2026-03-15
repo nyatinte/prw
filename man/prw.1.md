@@ -45,7 +45,7 @@ Run the `dev` script in `@myapp/web` directly:
 
 ## FILES
 
-- `$XDG_STATE_HOME/prw/history.json`: Execution history (max 50 entries). Defaults to `~/.local/state/prw/history.json` when `XDG_STATE_HOME` is not set.
+- `$XDG_STATE_HOME/prw/histories/<workspace-id>.json`: Execution history (max 50 entries) scoped per workspace. Defaults to `~/.local/state/prw/histories/<workspace-id>.json` when `XDG_STATE_HOME` is not set. `<workspace-id>` is a SHA-256 hash of the resolved workspace root path.
 
 ## SEE ALSO
 
