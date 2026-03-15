@@ -30,7 +30,7 @@ const packages: Package[] = [
 
 const history: HistoryEntry[] = [];
 
-describe("selectPackageByArgs", () => {
+describe(selectPackageByArgs, () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(process, "exit").mockImplementation((code?: string | number) => {
@@ -86,7 +86,7 @@ describe("selectPackageByArgs", () => {
   });
 });
 
-describe("resolveScript", () => {
+describe(resolveScript, () => {
   const pkg: Package = { name: "@myapp/api", dir: "apps/api" };
 
   beforeEach(() => {

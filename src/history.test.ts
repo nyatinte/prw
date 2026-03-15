@@ -17,7 +17,7 @@ describe("history", () => {
     vi.restoreAllMocks();
   });
 
-  describe("loadHistory", () => {
+  describe(loadHistory, () => {
     it("returns [] when file does not exist", async () => {
       await using fixture = await createFixture({
         workspace: {},
@@ -143,7 +143,7 @@ describe("history", () => {
     });
   });
 
-  describe("saveHistory", () => {
+  describe(saveHistory, () => {
     it("deduplicates and moves existing entry to front", async () => {
       await using fixture = await createFixture({
         workspace: {},

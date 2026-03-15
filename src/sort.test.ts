@@ -3,7 +3,7 @@ import type { HistoryEntry } from "./history.js";
 import { sortPackages, sortScripts } from "./sort.js";
 import type { Package } from "./workspace.js";
 
-describe("sortPackages", () => {
+describe(sortPackages, () => {
   it("prioritizes packages with history", () => {
     const packages: Package[] = [
       { name: "(root)", dir: "." },
@@ -64,7 +64,7 @@ describe("sortPackages", () => {
   });
 });
 
-describe("sortScripts", () => {
+describe(sortScripts, () => {
   it("prioritizes scripts with history", () => {
     const scripts = [
       { name: "build", command: "tsc" },
