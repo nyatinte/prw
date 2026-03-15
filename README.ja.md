@@ -119,6 +119,11 @@ $ prw
 > `prw` は workspace 内であればどこからでも実行できます。
 > 親ディレクトリをたどって最も近い `pnpm-workspace.yaml` を見つけます。
 
+> [!NOTE]
+> 実行履歴は workspace ごとに `$XDG_STATE_HOME/prw/histories/<workspace-id>.json`
+> （`XDG_STATE_HOME` 未設定時は `~/.local/state/prw/histories/<workspace-id>.json`）へ保存されます。
+> `<workspace-id>` は、解決された workspace root path の SHA-256 ハッシュです。
+
 ## License
 
 MIT

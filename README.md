@@ -118,6 +118,11 @@ From anywhere in the workspace, `prw` can run scripts from `apps/*` and `package
 > Run `prw` anywhere inside the workspace.
 > It finds the nearest `pnpm-workspace.yaml` by walking up parent directories.
 
+> [!NOTE]
+> Usage history is stored per workspace at `$XDG_STATE_HOME/prw/histories/<workspace-id>.json`
+> (or `~/.local/state/prw/histories/<workspace-id>.json` when `XDG_STATE_HOME` is unset).
+> `<workspace-id>` is a SHA-256 hash of the resolved workspace root path.
+
 ## License
 
 MIT
