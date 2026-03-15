@@ -5,8 +5,6 @@ export { m } from "#paraglide/messages.js";
 
 import { baseLocale, locales, overwriteGetLocale } from "#paraglide/runtime.js";
 
-type Locale = (typeof locales)[number];
-
 export function initializeLocale(): void {
   const tag = osLocale();
   let language: string;
@@ -15,8 +13,6 @@ export function initializeLocale(): void {
   } catch {
     language = baseLocale;
   }
-  const locale = locales.includes(language as Locale)
-    ? (language as Locale)
-    : baseLocale;
+  const locale = locales.find((l) => l === language) ?? baseLocale;
   overwriteGetLocale(() => locale);
 }
