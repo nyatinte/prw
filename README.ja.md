@@ -6,7 +6,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/%40nyatinte%2Fprw)](https://npmx.dev/package/@nyatinte/prw#downloads)
 [![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
 
-`prw` は、pnpm workspace 内でパッケージとスクリプトを選んで実行するための CLI ツールです。
+`prw` は、pnpm workspace でパッケージと script を選んで実行できる CLI ツールです。既存の `package.json` scripts だけを使い、独自の設定ファイルは不要です。
 
 <table>
   <tr>
@@ -18,22 +18,10 @@
     </td>
   </tr>
   <tr>
-    <td align="center"><small>短い入力で package を絞り込めます。</small></td>
-    <td align="center"><small>script を選んだらそのまま実行できます。</small></td>
+    <td align="center"><small>fuzzy 検索で package を絞り込めます。</small></td>
+    <td align="center"><small>script を選んで実行できます。</small></td>
   </tr>
 </table>
-
-一目で分かるように言うと、`prw` は workspace 内のどこからでも package を絞り込み、その package に定義済みの script を選んで実行するためのツールです。
-
-> [!IMPORTANT]
-> `prw` は意図的に機能を絞っています。
-> workspace 内にすでに定義されている script を選んで実行することだけを扱います。
-> 独自のタスク定義や追加の仕組みは持ち込みません。
-
-## これは何をするツールか
-
-pnpm workspace で、実行したい package と script を workspace 内から選んで実行します。
-使うのは既存の `package.json` scripts だけです。
 
 ## インストール
 
@@ -51,48 +39,62 @@ pnpm add -g @nyatinte/prw
 prw
 ```
 
-package を選んで、script を選んで、そのまま実行します。
-workspace root の package も選択できます。
+対話形式で package と script を選んで実行します。
+ルートパッケージも選択できます。
 
-### 2. package を先に指定する
+### 2. package を指定する
 
 ```bash
 prw web
 ```
 
-package 名はラフに指定できます。
-完全一致でなくても、名前の一部が合っていれば絞り込めます。
-マッチする package が 1 件なら、そのまま script 選択に進みます。
-複数マッチした場合は package 選択画面が表示されます。
-よく使う package は履歴に基づいて上に表示されます。
+package 名は fuzzy で指定できます。
+1 件にマッチすれば script 選択へ、複数マッチすれば package 選択画面が表示されます。
+よく使う package は履歴順で上位に表示されます。
 
-### 3. package と script を直接指定する
+### 3. package と script を指定する
 
 ```bash
 prw @myapp/web dev
 ```
 
-package と script が特定できれば、そのまま実行します。
-実行できるのは `package.json` に定義された script だけです。
-よく使う script も履歴に基づいて上に表示されます。
+両方が一意に決まれば、選択画面をスキップして即実行します。
+よく使う script も履歴順で上位に表示されます。
 
 > [!NOTE]
-> package 名を毎回フルで打つ必要はありません。
+> package 名をフルで入力する必要はありません。
 > `prw web` のような短い指定でも使えます。
 
 ## 実行イメージ
 
 ```text
 $ prw
-? Select package
-❯ (root)
-  @myapp/web      apps/web
-  @myapp/api      apps/api
+│
+◆  Select package
+│
+│  Search: _
+│  ● (root)
+│  ○ @myapp/web
+│  ○ @myapp/api
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└
+```
 
-? Select script
-❯ dev
-  build
-  test
+package を選ぶと script 選択へ進みます。フォーカス中の script はコマンド本体が `(...)` で表示されます。
+
+```text
+│
+◇  Select package
+│  @myapp/web
+│
+◆  Select script
+│
+│  Search: _
+│  ● dev (vite)
+│  ○ build
+│  ○ test
+│  ↑/↓ to select • Enter: confirm • Type: to search
+└
 ```
 
 ## workspace の例
@@ -111,9 +113,9 @@ $ prw
       └─ package.json
 ```
 
-このような monorepo で、workspace 内のどこからでも `apps/*` や `packages/*` の scripts を選んで実行できます。
+このような monorepo で、workspace 内のどこからでも apps/ や packages/ 配下の script を選んで実行できます。
 
-## 注意事項
+## 仕様
 
 > [!IMPORTANT]
 > `prw` は workspace 内であればどこからでも実行できます。
