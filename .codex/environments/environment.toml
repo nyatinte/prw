@@ -6,9 +6,9 @@ name = "prw"
 script = "pnpm install && pnpm build"
 
 [[actions]]
-name = "bin.mjs --help"
+name = "prw"
 icon = "run"
-command = "node dist/bin.mjs --help"
+command = "pnpm build && node dist/bin.mjs"
 
 [[actions]]
 name = "Build"
