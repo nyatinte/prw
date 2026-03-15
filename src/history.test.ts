@@ -224,7 +224,11 @@ describe("history", () => {
       vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
 
       expect(() =>
-        saveHistory(fixture.getPath("workspace"), { package: "@myapp/web", script: "dev" }, [])
+        saveHistory(
+          fixture.getPath("workspace"),
+          { package: "@myapp/web", script: "dev" },
+          []
+        )
       ).not.toThrow();
     });
 
