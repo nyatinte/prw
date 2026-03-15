@@ -30,7 +30,12 @@ USAGE prw [OPTIONS] [PACKAGE] [SCRIPT]
 ARGUMENTS
 
   PACKAGE    Package name or fuzzy search query
-   SCRIPT    Script name to run"
+   SCRIPT    Script name to run in the selected package
+
+OPTIONS
+
+     -h, --help    Show help
+  -v, --version    Show version number"
 `;
 
 exports[`prw e2e > shows the filtered package picker for the query "a" 1`] = `

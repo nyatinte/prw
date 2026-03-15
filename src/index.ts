@@ -34,6 +34,11 @@ const command = defineCommand({
     },
   },
   async run({ args }) {
+    if (args.version) {
+      console.log(pkg.version);
+      return;
+    }
+
     try {
       const root = findWorkspaceRoot(process.cwd());
       const packagesPromise = getPackages(root);
