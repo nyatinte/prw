@@ -30,7 +30,7 @@
     "changeset": "changeset",
     "check": "pnpm paraglide:compile && ultracite check",
     "fix": "pnpm paraglide:compile && ultracite fix",
-    "knip": "knip",
+    "knip": "pnpm paraglide:compile && knip",
     "paraglide:compile": "paraglide-js compile --project ./project.inlang --outdir ./generated/paraglide --silent",
     "prepare": "lefthook install",
     "prepublishOnly": "pnpm build && pnpm build:man",
