@@ -12,6 +12,16 @@ const command = defineCommand({
     description: "Interactive pnpm workspace package & script runner",
   },
   args: {
+    help: {
+      type: "boolean",
+      alias: "h",
+      description: "Show help",
+    },
+    version: {
+      type: "boolean",
+      alias: "v",
+      description: "Show version number",
+    },
     package: {
       type: "positional",
       required: false,
