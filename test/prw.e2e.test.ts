@@ -422,7 +422,10 @@ describe.sequential("prw e2e", () => {
     }
   });
 
-  it.each(["--version", "-v"])('shows version when "%s" is passed', async (flag) => {
+  it.each([
+    "--version",
+    "-v",
+  ])('shows version when "%s" is passed', async (flag) => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
       cwd: fixture.path,
