@@ -2,7 +2,7 @@
 
 ## SYNOPSIS
 
-`prw` [--help] [--version]<br>
+`prw` [-h|--help] [-v|--version]<br>
 `prw` [PACKAGE [SCRIPT]]
 
 ## DESCRIPTION
@@ -27,7 +27,7 @@ of the picker lists.
 ## OPTIONS
 
 - `-h, --help`: Print help and exit.
-- `--version`: Print version and exit.
+- `-v, --version`: Print version and exit.
 
 ## EXAMPLES
 

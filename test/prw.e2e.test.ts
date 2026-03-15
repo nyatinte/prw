@@ -440,6 +440,25 @@ describe.sequential("prw e2e", () => {
     }
   });
 
+  it("shows help when -h is passed", async () => {
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: fixture.path,
+      homeDir: fixture.path,
+      args: ["-h"],
+    });
+
+    try {
+      await session.waitForText("USAGE");
+
+      expect(
+        (await readTerminal(session)).replace(pkg.version, "0.0.0-test")
+      ).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
+  });
+
   it("shows version when -v is passed", async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
