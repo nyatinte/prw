@@ -32,6 +32,7 @@
     "prepublishOnly": "pnpm build && pnpm build:man",
     "release": "changeset publish",
     "test": "pnpm build && vitest",
+    "test:run": "pnpm build && vitest run",
     "test:coverage": "pnpm build && vitest run --coverage",
     "test:update": "pnpm build && vitest -u",
     "typecheck": "tsgo --noEmit -p tsconfig.json",

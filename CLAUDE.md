@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 pnpm build          # Build with tsdown (outputs dist/bin.mjs)
 pnpm build:man      # Generate man page from man/prw.1.md
 pnpm test           # Rebuild, then run Vitest in watch mode
+pnpm test:run       # Rebuild, then run Vitest once without watch mode
 pnpm test:coverage  # vitest run --coverage
 pnpm test:update    # Rebuild, then update Vitest snapshots
 pnpm typecheck      # tsgo --noEmit -p tsconfig.json
@@ -21,6 +22,8 @@ Run a single test file:
 pnpm vitest run src/path/to/file.test.ts
 pnpm vitest run test/prw.e2e.test.ts
 ```
+
+For agent-driven verification, prefer non-interactive commands such as `pnpm test:run`, `pnpm test:coverage`, or `pnpm vitest run ...`. Use `pnpm test` only when watch mode is actually desired.
 
 ## Conventions
 
