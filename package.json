@@ -23,12 +23,13 @@
   ],
   "scripts": {
     "build": "tsdown",
+    "build:man": "marked-man man/prw.1.md -o man/prw.1",
     "changeset": "changeset",
     "check": "ultracite check",
     "fix": "ultracite fix",
     "knip": "knip",
     "prepare": "lefthook install",
-    "prepublishOnly": "pnpm build",
+    "prepublishOnly": "pnpm build && pnpm build:man",
     "release": "changeset publish",
     "test": "pnpm build && vitest",
     "test:coverage": "pnpm build && vitest run --coverage",
@@ -36,8 +37,12 @@
     "typecheck": "tsgo --noEmit -p tsconfig.json",
     "version-packages": "changeset version"
   },
+  "man": [
+    "./man/prw.1"
+  ],
   "files": [
-    "dist"
+    "dist",
+    "man"
   ],
   "engines": {
     "node": ">=24.14.0",
@@ -64,6 +69,7 @@
     "fs-fixture": "2.11.0",
     "knip": "5.86.0",
     "lefthook": "2.1.4",
+    "marked-man": "2.1.0",
     "tsdown": "0.21.2",
     "tuistory": "0.0.16",
     "typescript": "5.9.3",
