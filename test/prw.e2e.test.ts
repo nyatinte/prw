@@ -403,12 +403,12 @@ describe.sequential("prw e2e", () => {
     }
   });
 
-  it("shows help when --help is passed", async () => {
+  it.each(["--help", "-h"])('shows help when "%s" is passed', async (flag) => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
       cwd: fixture.path,
       homeDir: fixture.path,
-      args: ["--help"],
+      args: [flag],
     });
 
     try {
@@ -422,30 +422,12 @@ describe.sequential("prw e2e", () => {
     }
   });
 
-  it("shows version when --version is passed", async () => {
+  it.each(["--version", "-v"])('shows version when "%s" is passed', async (flag) => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
       cwd: fixture.path,
       homeDir: fixture.path,
-      args: ["--version"],
-    });
-
-    try {
-      await session.waitForText(pkg.version);
-
-      const output = await readTerminal(session);
-      expect(output).toContain(pkg.version);
-    } finally {
-      await closeSessionSafely(session);
-    }
-  });
-
-  it("shows version when -v is passed", async () => {
-    await using fixture = await createFixture();
-    const session = await launchPrwSession({
-      cwd: fixture.path,
-      homeDir: fixture.path,
-      args: ["-v"],
+      args: [flag],
     });
 
     try {
