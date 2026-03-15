@@ -8,6 +8,8 @@ English | [日本語](./README.ja.md)
 
 `prw` is a CLI for interactively selecting a package and script in a pnpm workspace and running it. It only uses existing `package.json` scripts — no extra config files required.
 
+![Demonstration of the prw CLI's interactive workflow](https://cdn.jsdelivr.net/gh/nyatinte/prw@main/.github/assets/readme-demo.gif)
+
 <table>
   <tr>
     <td width="50%">
