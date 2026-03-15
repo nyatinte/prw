@@ -1,3 +1,4 @@
 {
-  "ignoreDependencies": ["@biomejs/biome"]
+  "ignoreDependencies": ["@biomejs/biome"],
+  "ignore": ["example/**"]
 }
