@@ -1,19 +1,15 @@
 import { createHash } from "node:crypto";
 import { mkdirSync, symlinkSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname } from "node:path";
 import { createFixture } from "fs-fixture";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { HistoryEntry } from "./history.js";
-import { getWorkspaceId, loadHistory, saveHistory } from "./history.js";
-
-function getHistoryFile(stateRoot: string, workspaceRoot: string): string {
-  return join(
-    stateRoot,
-    "prw",
-    "histories",
-    `${getWorkspaceId(workspaceRoot)}.json`
-  );
-}
+import {
+  getWorkspaceId,
+  loadHistory,
+  resolveHistoryFile,
+  saveHistory,
+} from "./history.js";
 
 describe("history", () => {
   afterEach(() => {
@@ -35,13 +31,10 @@ describe("history", () => {
       await using fixture = await createFixture({
         workspace: {},
       });
-      const historyFile = getHistoryFile(
-        fixture.getPath("state"),
-        fixture.getPath("workspace")
-      );
+      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
+      const historyFile = resolveHistoryFile(fixture.getPath("workspace"));
       mkdirSync(dirname(historyFile), { recursive: true });
       writeFileSync(historyFile, "not-valid-json");
-      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
 
       expect(loadHistory(fixture.getPath("workspace"))).toEqual([]);
     });
@@ -50,13 +43,10 @@ describe("history", () => {
       await using fixture = await createFixture({
         workspace: {},
       });
-      const historyFile = getHistoryFile(
-        fixture.getPath("state"),
-        fixture.getPath("workspace")
-      );
+      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
+      const historyFile = resolveHistoryFile(fixture.getPath("workspace"));
       mkdirSync(dirname(historyFile), { recursive: true });
       writeFileSync(historyFile, JSON.stringify({ foo: "bar" }));
-      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
 
       expect(loadHistory(fixture.getPath("workspace"))).toEqual([]);
     });
@@ -68,13 +58,10 @@ describe("history", () => {
       await using fixture = await createFixture({
         workspace: {},
       });
-      const historyFile = getHistoryFile(
-        fixture.getPath("state"),
-        fixture.getPath("workspace")
-      );
+      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
+      const historyFile = resolveHistoryFile(fixture.getPath("workspace"));
       mkdirSync(dirname(historyFile), { recursive: true });
       writeFileSync(historyFile, JSON.stringify(entries));
-      vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
 
       expect(loadHistory(fixture.getPath("workspace"))).toEqual(entries);
     });
@@ -94,21 +81,20 @@ describe("history", () => {
         home: {},
       });
       const workspaceRoot = xdgFixture.getPath("workspace");
-      const xdgHistoryFile = getHistoryFile(
-        xdgFixture.getPath("state"),
-        workspaceRoot
-      );
-      const homeHistoryFile = getHistoryFile(
-        join(homeFixture.getPath("home"), ".local", "state"),
-        workspaceRoot
-      );
+
+      vi.stubEnv("XDG_STATE_HOME", xdgFixture.getPath("state"));
+      const xdgHistoryFile = resolveHistoryFile(workspaceRoot);
+
+      vi.stubEnv("XDG_STATE_HOME", "");
+      vi.stubEnv("HOME", homeFixture.getPath("home"));
+      const homeHistoryFile = resolveHistoryFile(workspaceRoot);
+
       mkdirSync(dirname(xdgHistoryFile), { recursive: true });
       writeFileSync(xdgHistoryFile, JSON.stringify(xdgEntries));
       mkdirSync(dirname(homeHistoryFile), { recursive: true });
       writeFileSync(homeHistoryFile, JSON.stringify(homeEntries));
 
       vi.stubEnv("XDG_STATE_HOME", xdgFixture.getPath("state"));
-      vi.stubEnv("HOME", homeFixture.getPath("home"));
 
       expect(loadHistory(workspaceRoot)).toEqual(xdgEntries);
     });
@@ -121,14 +107,11 @@ describe("history", () => {
         workspace: {},
         home: {},
       });
-      const historyFile = getHistoryFile(
-        join(fixture.getPath("home"), ".local", "state"),
-        fixture.getPath("workspace")
-      );
-      mkdirSync(dirname(historyFile), { recursive: true });
-      writeFileSync(historyFile, JSON.stringify(entries));
       vi.stubEnv("XDG_STATE_HOME", "");
       vi.stubEnv("HOME", fixture.getPath("home"));
+      const historyFile = resolveHistoryFile(fixture.getPath("workspace"));
+      mkdirSync(dirname(historyFile), { recursive: true });
+      writeFileSync(historyFile, JSON.stringify(entries));
 
       expect(loadHistory(fixture.getPath("workspace"))).toEqual(entries);
     });

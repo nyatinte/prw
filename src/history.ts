@@ -11,7 +11,7 @@ export type HistoryEntry = {
 const HISTORY_DIR_NAME = "histories";
 const MAX_HISTORY = 50;
 
-function resolveHistoryFile(workspaceRoot: string): string {
+export function resolveHistoryFile(workspaceRoot: string): string {
   const stateHome = process.env.XDG_STATE_HOME;
   const historyDir = stateHome
     ? join(stateHome, "prw", HISTORY_DIR_NAME)
