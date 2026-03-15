@@ -2,8 +2,13 @@ import { defineCommand, runMain } from "citty";
 import pkg from "../package.json" with { type: "json" };
 import { resolveScript, selectPackageByArgs } from "./cli.js";
 import { loadHistory, saveHistory } from "./history.js";
+import { initializeLocale, m } from "./i18n.js";
 import { runScript } from "./runner.js";
-import { findWorkspaceRoot, getPackages } from "./workspace.js";
+import {
+  findWorkspaceRoot,
+  getPackages,
+  WorkspaceNotFoundError,
+} from "./workspace.js";
 
 const command = defineCommand({
   meta: {
@@ -39,6 +44,8 @@ const command = defineCommand({
       return;
     }
 
+    initializeLocale();
+
     try {
       const root = findWorkspaceRoot(process.cwd());
       const packagesPromise = getPackages(root);
@@ -61,7 +68,11 @@ const command = defineCommand({
 
       runScript(root, pkg, script);
     } catch (error) {
-      console.error(error instanceof Error ? error.message : String(error));
+      if (error instanceof WorkspaceNotFoundError) {
+        console.error(m.workspace_root_required());
+      } else {
+        console.error(error instanceof Error ? error.message : String(error));
+      }
       process.exit(1);
     }
   },

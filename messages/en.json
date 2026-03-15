@@ -1,0 +1,10 @@
+{
+  "select_package": "Select package",
+  "select_script": "Select script",
+  "cancelled": "Cancelled.",
+  "no_packages_match": "No packages match: {query}",
+  "multiple_packages_match": "Multiple packages match: {query}. Be more specific.",
+  "no_scripts_in_package": "No scripts in {name}",
+  "workspace_root_required": "Run prw inside a pnpm workspace.",
+  "pnpm_run_failed": "Failed to run pnpm: {message}"
+}

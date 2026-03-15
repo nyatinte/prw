@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { m } from "./i18n.js";
 import type { Package } from "./workspace.js";
 import { isRootPackage } from "./workspace.js";
 
@@ -12,7 +13,7 @@ export function runScript(root: string, pkg: Package, script: string): void {
   });
 
   if (result.error) {
-    console.error(`Failed to run pnpm: ${result.error.message}`);
+    console.error(m.pnpm_run_failed({ message: result.error.message }));
     process.exit(1);
   }
 

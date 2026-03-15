@@ -1,4 +1,7 @@
 {
   "ignoreDependencies": ["@biomejs/biome"],
-  "ignore": ["example/**"]
+  "ignore": ["example/**"],
+  "paths": {
+    "#paraglide/*": ["./generated/paraglide/*"]
+  }
 }

@@ -8,8 +8,8 @@ const WORKSPACE_CONFIG_FILE = "pnpm-workspace.yaml";
 const TRAILING_PATH_SEPARATOR_PATTERN = /[\\/]+$/;
 
 export class WorkspaceNotFoundError extends Error {
-  constructor(message: string) {
-    super(message);
+  constructor() {
+    super();
     this.name = "WorkspaceNotFoundError";
   }
 }
@@ -42,7 +42,7 @@ export function findWorkspaceRoot(cwd: string): string {
     current = parent;
   }
 
-  throw new WorkspaceNotFoundError("Run prw inside a pnpm workspace.");
+  throw new WorkspaceNotFoundError();
 }
 
 export async function getPackages(root: string): Promise<Package[]> {

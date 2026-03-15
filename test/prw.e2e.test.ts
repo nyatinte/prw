@@ -45,10 +45,12 @@ function launchPrwSession({
   cwd,
   homeDir,
   args = [],
+  locale = "en_US.UTF-8",
 }: {
   cwd: string;
   homeDir: string;
   args?: string[];
+  locale?: string;
 }): Promise<Session> {
   return launchTerminal({
     command: "node",
@@ -59,6 +61,9 @@ function launchPrwSession({
     env: {
       HOME: homeDir,
       PATH: process.env.PATH,
+      LC_ALL: locale,
+      LC_MESSAGES: locale,
+      LANG: locale,
     },
   });
 }
@@ -455,6 +460,45 @@ describe.sequential("prw e2e", () => {
       await session.waitForText("Run prw inside a pnpm workspace.");
 
       expect(await readTerminal(session)).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
+  });
+
+  it("shows Japanese package picker when LANG is ja_JP", async () => {
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: resolve(repoRoot, "example/large"),
+      homeDir: fixture.path,
+      locale: "ja_JP.UTF-8",
+    });
+
+    try {
+      await session.waitForText("パッケージを選択");
+
+      expect(await readTerminal(session)).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
+  });
+
+  it("shows Japanese error when launched outside a workspace with LANG=ja_JP", async () => {
+    await using fixture = await createFixture();
+    await using homeFixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: fixture.path,
+      homeDir: homeFixture.path,
+      locale: "ja_JP.UTF-8",
+    });
+
+    try {
+      await session.waitForText(
+        "pnpm ワークスペース内で prw を実行してください。"
+      );
+
+      expect(await readTerminal(session)).toContain(
+        "pnpm ワークスペース内で prw を実行してください。"
+      );
     } finally {
       await closeSessionSafely(session);
     }

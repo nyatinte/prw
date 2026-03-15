@@ -1,0 +1,10 @@
+{
+  "select_package": "パッケージを選択",
+  "select_script": "スクリプトを選択",
+  "cancelled": "キャンセルしました。",
+  "no_packages_match": "一致するパッケージがありません: {query}",
+  "multiple_packages_match": "複数のパッケージが一致します: {query}。もっと絞り込んでください。",
+  "no_scripts_in_package": "{name} にスクリプトがありません",
+  "workspace_root_required": "pnpm ワークスペース内で prw を実行してください。",
+  "pnpm_run_failed": "pnpm の実行に失敗しました: {message}"
+}
