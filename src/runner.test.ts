@@ -59,6 +59,10 @@ describe("runner", () => {
       "pnpm command is not found",
       mockSpawnResult({ error: new Error("ENOENT"), status: null }),
     ],
+    [
+      "pnpm is killed by a signal",
+      mockSpawnResult({ status: null, signal: "SIGINT" }),
+    ],
   ])("exits with code 1 when %s", (_, spawnResult) => {
     const exitSpy = vi
       .spyOn(process, "exit")

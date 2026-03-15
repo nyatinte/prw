@@ -71,5 +71,5 @@ const command = defineCommand({
 });
 
 export function main() {
-  runMain(command);
+  return runMain(command);
 }
