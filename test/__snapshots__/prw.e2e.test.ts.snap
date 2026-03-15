@@ -21,6 +21,18 @@ exports[`prw e2e > reports an error when launched completely outside a workspace
 Run prw inside a pnpm workspace."
 `;
 
+exports[`prw e2e > shows help when --help is passed 1`] = `
+"
+Interactive pnpm workspace package & script runner (prw v0.3.0)
+
+USAGE prw [OPTIONS] [PACKAGE] [SCRIPT]
+
+ARGUMENTS
+
+  PACKAGE    Package name or fuzzy search query
+   SCRIPT    Script name to run"
+`;
+
 exports[`prw e2e > shows the filtered package picker for the query "a" 1`] = `
 "
 │

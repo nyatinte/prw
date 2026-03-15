@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { createFixture } from "fs-fixture";
 import { launchTerminal, type Session } from "tuistory";
 import { describe, expect, it } from "vitest";
+import pkg from "../package.json" with { type: "json" };
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const binPath = resolve(repoRoot, "dist/bin.mjs");
@@ -397,6 +398,41 @@ describe.sequential("prw e2e", () => {
       expect(output).toContain("simple-workspace@1.0.0 build");
       expect(output).toContain("/example/simple");
       expect(output).toContain("@simple/web building");
+    } finally {
+      await closeSessionSafely(session);
+    }
+  });
+
+  it("shows help when --help is passed", async () => {
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: fixture.path,
+      homeDir: fixture.path,
+      args: ["--help"],
+    });
+
+    try {
+      await session.waitForText("USAGE");
+
+      expect(await readTerminal(session)).toMatchSnapshot();
+    } finally {
+      await closeSessionSafely(session);
+    }
+  });
+
+  it("shows version when --version is passed", async () => {
+    await using fixture = await createFixture();
+    const session = await launchPrwSession({
+      cwd: fixture.path,
+      homeDir: fixture.path,
+      args: ["--version"],
+    });
+
+    try {
+      await session.waitForText(pkg.version);
+
+      const output = await readTerminal(session);
+      expect(output).toContain(pkg.version);
     } finally {
       await closeSessionSafely(session);
     }
