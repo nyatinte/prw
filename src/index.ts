@@ -20,7 +20,7 @@ const command = defineCommand({
     script: {
       type: "positional",
       required: false,
-      description: "Script name to run",
+      description: "Script name to run in the selected package",
     },
   },
   async run({ args }) {
