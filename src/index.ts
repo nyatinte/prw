@@ -57,10 +57,7 @@ const command = defineCommand({
 
       const script = await resolveScript(root, pkg, initialScript, history);
 
-      saveHistory(
-        { package: pkg.name, script, timestamp: Date.now() },
-        history
-      );
+      saveHistory({ package: pkg.name, script }, history);
 
       runScript(root, pkg, script);
     } catch (error) {

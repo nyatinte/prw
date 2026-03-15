@@ -11,9 +11,7 @@ describe("sortPackages", () => {
       { name: "@myapp/web", dir: "apps/web" },
     ];
 
-    const history: HistoryEntry[] = [
-      { package: "@myapp/web", script: "dev", timestamp: 2 },
-    ];
+    const history: HistoryEntry[] = [{ package: "@myapp/web", script: "dev" }];
 
     const result = sortPackages(packages, history);
     expect(result[0].name).toBe("@myapp/web");
@@ -39,8 +37,8 @@ describe("sortPackages", () => {
     ];
 
     const history: HistoryEntry[] = [
-      { package: "@myapp/api", script: "dev", timestamp: 2 },
-      { package: "@myapp/web", script: "dev", timestamp: 1 },
+      { package: "@myapp/api", script: "dev" },
+      { package: "@myapp/web", script: "dev" },
     ];
 
     const result = sortPackages(packages, history);
@@ -55,9 +53,9 @@ describe("sortPackages", () => {
     ];
 
     const history: HistoryEntry[] = [
-      { package: "@myapp/web", script: "dev", timestamp: 3 },
-      { package: "@myapp/api", script: "build", timestamp: 2 },
-      { package: "@myapp/web", script: "build", timestamp: 1 },
+      { package: "@myapp/web", script: "dev" },
+      { package: "@myapp/api", script: "build" },
+      { package: "@myapp/web", script: "build" },
     ];
 
     const result = sortPackages(packages, history);
@@ -73,9 +71,7 @@ describe("sortScripts", () => {
       { name: "dev", command: "vite" },
       { name: "test", command: "vitest" },
     ];
-    const history: HistoryEntry[] = [
-      { package: "@myapp/web", script: "test", timestamp: 1 },
-    ];
+    const history: HistoryEntry[] = [{ package: "@myapp/web", script: "test" }];
 
     const result = sortScripts(scripts, "@myapp/web", history);
     expect(result[0].name).toBe("test");
