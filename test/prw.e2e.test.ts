@@ -414,7 +414,9 @@ describe.sequential("prw e2e", () => {
     try {
       await session.waitForText("USAGE");
 
-      expect(await readTerminal(session)).toMatchSnapshot();
+      expect(
+        (await readTerminal(session)).replace(pkg.version, "0.0.0-test")
+      ).toMatchSnapshot();
     } finally {
       await closeSessionSafely(session);
     }

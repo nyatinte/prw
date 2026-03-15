@@ -23,7 +23,7 @@ Run prw inside a pnpm workspace."
 
 exports[`prw e2e > shows help when --help is passed 1`] = `
 "
-Interactive pnpm workspace package & script runner (prw v0.3.0)
+Interactive pnpm workspace package & script runner (prw v0.0.0-test)
 
 USAGE prw [OPTIONS] [PACKAGE] [SCRIPT]
 
