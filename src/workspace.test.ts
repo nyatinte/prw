@@ -11,7 +11,7 @@ import {
 } from "./workspace.js";
 
 describe("workspace", () => {
-  describe("findWorkspaceRoot", () => {
+  describe(findWorkspaceRoot, () => {
     it("returns path with pnpm-workspace.yaml in current dir", async () => {
       await using fixture = await createFixture({
         "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
@@ -62,7 +62,7 @@ describe("workspace", () => {
     });
   });
 
-  describe("getPackages", () => {
+  describe(getPackages, () => {
     it("returns packages from glob pattern", async () => {
       await using fixture = await createFixture({
         "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
@@ -149,7 +149,7 @@ describe("workspace", () => {
     });
   });
 
-  describe("getScripts", () => {
+  describe(getScripts, () => {
     it("returns script names and commands from package.json", async () => {
       await using fixture = await createFixture({
         apps: {
@@ -195,7 +195,7 @@ describe("workspace", () => {
     });
   });
 
-  describe("isRootPackage", () => {
+  describe(isRootPackage, () => {
     it.each([
       [ROOT_PACKAGE, true],
       [{ name: "@myapp/web", dir: "apps/web" }, false],
@@ -204,7 +204,7 @@ describe("workspace", () => {
     });
   });
 
-  describe("matchPackages", () => {
+  describe(matchPackages, () => {
     const packages = [
       { name: "@myapp/api", dir: "apps/api" },
       { name: "@myapp/web", dir: "apps/web" },

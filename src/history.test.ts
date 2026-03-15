@@ -8,7 +8,7 @@ describe("history", () => {
     vi.unstubAllEnvs();
   });
 
-  describe("loadHistory", () => {
+  describe(loadHistory, () => {
     it("returns [] when file does not exist", async () => {
       await using fixture = await createFixture();
       vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
@@ -109,7 +109,7 @@ describe("history", () => {
     });
   });
 
-  describe("saveHistory", () => {
+  describe(saveHistory, () => {
     it("deduplicates and moves existing entry to front", async () => {
       await using fixture = await createFixture();
       vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
