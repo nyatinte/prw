@@ -29,8 +29,7 @@ For agent-driven verification, prefer non-interactive commands such as `pnpm tes
 
 - `findWorkspaceRoot` traverses parent directories until it finds the nearest `pnpm-workspace.yaml`.
 - `prw` always runs from the resolved workspace root, even when launched from a nested subdirectory.
-- History is stored at `$XDG_STATE_HOME/prw/history.json` or `~/.local/state/prw/history.json` when `XDG_STATE_HOME` is unset.
-- History is an LRU-style list capped at 50 entries.
+- History is stored per-workspace under `~/.local/state/prw/histories/` (or `$XDG_STATE_HOME/prw/histories/`), with each workspace identified by a SHA-256 hash of its root path (max 50 entries per workspace).
 - The workspace root package is always included as `(root)`.
 - If a workspace package has no `name`, the package directory path is used as its fallback label.
 - `pnpm-workspace.yaml` exclusion patterns are supported because package discovery uses the workspace `packages` globs directly.

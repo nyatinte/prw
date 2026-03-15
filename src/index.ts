@@ -42,7 +42,7 @@ const command = defineCommand({
     try {
       const root = findWorkspaceRoot(process.cwd());
       const packagesPromise = getPackages(root);
-      const history = loadHistory();
+      const history = loadHistory(root);
       const packages = await packagesPromise;
 
       const cliArgs = [args.package, args.script].filter(
@@ -57,7 +57,7 @@ const command = defineCommand({
 
       const script = await resolveScript(root, pkg, initialScript, history);
 
-      saveHistory({ package: pkg.name, script }, history);
+      saveHistory(root, { package: pkg.name, script }, history);
 
       runScript(root, pkg, script);
     } catch (error) {
