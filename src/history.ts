@@ -11,17 +11,19 @@ export type HistoryEntry = {
 const HISTORY_DIR_NAME = "histories";
 const MAX_HISTORY = 50;
 
-export function resolveHistoryFile(workspaceRoot: string): string {
-  const stateHome = process.env.XDG_STATE_HOME;
-  const historyDir = stateHome
-    ? join(stateHome, "prw", HISTORY_DIR_NAME)
-    : join(homedir(), ".local", "state", "prw", HISTORY_DIR_NAME);
-  return join(historyDir, `${getWorkspaceId(workspaceRoot)}.json`);
+export function resolveHistoryFile(workspaceRootPath: string): string {
+  const stateHome =
+    process.env.XDG_STATE_HOME || join(homedir(), ".local", "state");
+  const historyDir = join(stateHome, "prw", HISTORY_DIR_NAME);
+  return join(historyDir, `${getWorkspaceId(workspaceRootPath)}.json`);
 }
 
-export function loadHistory(workspaceRoot: string): HistoryEntry[] {
+export function loadHistory(workspaceRootPath: string): HistoryEntry[] {
   try {
-    const content = readFileSync(resolveHistoryFile(workspaceRoot), "utf-8");
+    const content = readFileSync(
+      resolveHistoryFile(workspaceRootPath),
+      "utf-8"
+    );
     const parsed = JSON.parse(content);
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -29,12 +31,14 @@ export function loadHistory(workspaceRoot: string): HistoryEntry[] {
   }
 }
 
-export function getWorkspaceId(workspaceRoot: string): string {
-  return createHash("sha256").update(realpathSync(workspaceRoot)).digest("hex");
+export function getWorkspaceId(workspaceRootPath: string): string {
+  return createHash("sha256")
+    .update(realpathSync(workspaceRootPath))
+    .digest("hex");
 }
 
 export function saveHistory(
-  workspaceRoot: string,
+  workspaceRootPath: string,
   entry: HistoryEntry,
   previous: HistoryEntry[]
 ): void {
@@ -43,7 +47,7 @@ export function saveHistory(
       (h) => !(h.package === entry.package && h.script === entry.script)
     );
     const updated = [entry, ...filtered].slice(0, MAX_HISTORY);
-    const historyFile = resolveHistoryFile(workspaceRoot);
+    const historyFile = resolveHistoryFile(workspaceRootPath);
     mkdirSync(dirname(historyFile), { recursive: true });
     writeFileSync(historyFile, JSON.stringify(updated, null, 2));
   } catch {
