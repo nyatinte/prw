@@ -16,6 +16,10 @@ export function runScript(root: string, pkg: Package, script: string): void {
     process.exit(1);
   }
 
+  if (result.signal) {
+    process.exit(1);
+  }
+
   if (result.status !== null && result.status !== 0) {
     process.exit(result.status);
   }
