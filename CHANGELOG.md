@@ -1,5 +1,21 @@
 # @nyatinte/prw
 
+## 0.4.0
+
+### Minor Changes
+
+- 24619d7: Add built-in `-h`/`--help` and `-v`/`--version` CLI output, and ship a `man prw` manual page.
+
+### Patch Changes
+
+- 03f5bae: Scope saved history by workspace so package and script ordering does not leak across unrelated pnpm workspaces.
+- 28f0f2f: Fix signal-killed child process treated as success and unhandled rejection in bin.ts
+
+  - `runner.ts`: exit with code 1 when `spawnSync` returns a non-null `signal` (e.g. SIGINT from Ctrl+C), instead of silently exiting 0
+  - `bin.ts`: chain `.catch()` on `main()` so unexpected rejections are logged and cause a non-zero exit instead of an unhandled promise rejection
+
+- 025b71b: Remove unused `timestamp` field from `HistoryEntry`. History entries are now `{ package: string; script: string }` only.
+
 ## 0.3.0
 
 ### Minor Changes
