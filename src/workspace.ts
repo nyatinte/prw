@@ -6,7 +6,7 @@ import { parse } from "yaml";
 
 const WORKSPACE_CONFIG_FILE = "pnpm-workspace.yaml";
 const TRAILING_PATH_SEPARATOR_PATTERN = /[\\/]+$/;
-const IGNORE_GLOBS = ["**/node_modules/**"];
+const IGNORE_GLOBS = ["**/node_modules", "**/node_modules/**"];
 
 export class WorkspaceNotFoundError extends Error {
   constructor(message: string) {
