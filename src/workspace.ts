@@ -6,6 +6,7 @@ import { parse } from "yaml";
 
 const WORKSPACE_CONFIG_FILE = "pnpm-workspace.yaml";
 const TRAILING_PATH_SEPARATOR_PATTERN = /[\\/]+$/;
+const IGNORE_GLOBS = ["**/node_modules/**"];
 
 export class WorkspaceNotFoundError extends Error {
   constructor(message: string) {
@@ -61,6 +62,7 @@ export async function getPackages(root: string): Promise<Package[]> {
   const dirs = await glob(config.packages, {
     cwd: root,
     absolute: false,
+    ignore: IGNORE_GLOBS,
     onlyDirectories: true,
   });
 
