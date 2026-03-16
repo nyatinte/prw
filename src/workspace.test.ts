@@ -129,21 +129,23 @@ describe("workspace", () => {
 
     it("ignores packages matched inside node_modules", async () => {
       await using fixture = await createFixture({
-        "pnpm-workspace.yaml": "packages:\n  - app*\n",
-        app: {
-          "package.json": JSON.stringify({ name: "@myapp/app" }),
-        },
-        app2: {
-          node_modules: {
-            dep: {
-              "package.json": JSON.stringify({ name: "@dep/should-ignore" }),
+        "pnpm-workspace.yaml": `packages:
+  - apps/**
+`,
+        apps: {
+          web: {
+            "package.json": JSON.stringify({ name: "@myapp/web" }),
+            node_modules: {
+              dep: {
+                "package.json": JSON.stringify({ name: "@dep/should-ignore" }),
+              },
             },
           },
         },
       });
 
       const packages = await getPackages(fixture.path);
-      expect(packages.some((p) => p.name === "@myapp/app")).toBe(true);
+      expect(packages.some((p) => p.name === "@myapp/web")).toBe(true);
       expect(packages.some((p) => p.name === "@dep/should-ignore")).toBe(false);
     });
 
