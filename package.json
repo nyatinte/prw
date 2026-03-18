@@ -23,6 +23,7 @@
   ],
   "scripts": {
     "build": "tsdown",
+    "clean:dist": "rm -rf dist",
     "build:man": "marked-man man/prw.1.md -o man/prw.1",
     "changeset": "changeset",
     "check": "ultracite check",
