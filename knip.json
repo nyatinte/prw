@@ -1,5 +1,4 @@
 {
-  "ignore": [
-    "example/**"
-  ]
+  "ignore": ["example/**"],
+  "ignoreDependencies": ["oxfmt"]
 }

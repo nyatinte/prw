@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
+
 import { glob } from "tinyglobby";
 import { parse } from "yaml";
 
@@ -15,12 +16,12 @@ export class WorkspaceNotFoundError extends Error {
   }
 }
 
-export type Package = {
+export interface Package {
   readonly dir: string;
   readonly name: string;
-};
+}
 
-export const ROOT_PACKAGE: Package = { name: "(root)", dir: "." };
+export const ROOT_PACKAGE: Package = { dir: ".", name: "(root)" };
 
 export function isRootPackage(pkg: Package): boolean {
   return pkg.dir === ".";
@@ -49,7 +50,7 @@ export function findWorkspaceRoot(cwd: string): string {
 export async function getPackages(root: string): Promise<Package[]> {
   const workspaceConfig = await readFile(
     join(root, WORKSPACE_CONFIG_FILE),
-    "utf-8"
+    "utf8"
   );
   const config = (parse(workspaceConfig) ?? {}) as { packages?: string[] };
 
@@ -60,8 +61,8 @@ export async function getPackages(root: string): Promise<Package[]> {
   }
 
   const dirs = await glob(config.packages, {
-    cwd: root,
     absolute: false,
+    cwd: root,
     ignore: IGNORE_GLOBS,
     onlyDirectories: true,
   });
@@ -71,9 +72,9 @@ export async function getPackages(root: string): Promise<Package[]> {
       const dir = rawDir.replace(TRAILING_PATH_SEPARATOR_PATTERN, "");
       try {
         const pkgJson = JSON.parse(
-          await readFile(join(root, dir, "package.json"), "utf-8")
+          await readFile(join(root, dir, "package.json"), "utf8")
         );
-        return { name: pkgJson.name || dir, dir } as Package;
+        return { dir, name: pkgJson.name || dir } as Package;
       } catch {
         return null;
       }
@@ -84,23 +85,23 @@ export async function getPackages(root: string): Promise<Package[]> {
   return packages;
 }
 
-export type Script = {
+export interface Script {
   readonly command: string;
   readonly name: string;
-};
+}
 
 export function getScripts(root: string, pkg: Package): Script[] {
   try {
     const pkgJson = JSON.parse(
-      readFileSync(join(root, pkg.dir, "package.json"), "utf-8")
+      readFileSync(join(root, pkg.dir, "package.json"), "utf8")
     );
-    const scripts = pkgJson.scripts;
+    const { scripts } = pkgJson;
     if (!scripts || typeof scripts !== "object") {
       return [];
     }
     return Object.entries(scripts).map(([name, command]) => ({
-      name,
       command: typeof command === "string" ? command : "",
+      name,
     }));
   } catch {
     return [];

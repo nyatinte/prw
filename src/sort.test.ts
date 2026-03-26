@@ -1,4 +1,3 @@
-import { describe, expect, it } from "vitest";
 import type { HistoryEntry } from "./history.js";
 import { sortPackages, sortScripts } from "./sort.js";
 import type { Package } from "./workspace.js";
@@ -6,9 +5,9 @@ import type { Package } from "./workspace.js";
 describe(sortPackages, () => {
   it("prioritizes packages with history", () => {
     const packages: Package[] = [
-      { name: "(root)", dir: "." },
-      { name: "@myapp/api", dir: "apps/api" },
-      { name: "@myapp/web", dir: "apps/web" },
+      { dir: ".", name: "(root)" },
+      { dir: "apps/api", name: "@myapp/api" },
+      { dir: "apps/web", name: "@myapp/web" },
     ];
 
     const history: HistoryEntry[] = [{ package: "@myapp/web", script: "dev" }];
@@ -19,9 +18,9 @@ describe(sortPackages, () => {
 
   it("sorts non-history packages alphabetically", () => {
     const packages: Package[] = [
-      { name: "(root)", dir: "." },
-      { name: "@myapp/api", dir: "apps/api" },
-      { name: "@myapp/web", dir: "apps/web" },
+      { dir: ".", name: "(root)" },
+      { dir: "apps/api", name: "@myapp/api" },
+      { dir: "apps/web", name: "@myapp/web" },
     ];
 
     const result = sortPackages(packages, []);
@@ -32,8 +31,8 @@ describe(sortPackages, () => {
 
   it("preserves history order when multiple packages have history", () => {
     const packages: Package[] = [
-      { name: "@myapp/api", dir: "apps/api" },
-      { name: "@myapp/web", dir: "apps/web" },
+      { dir: "apps/api", name: "@myapp/api" },
+      { dir: "apps/web", name: "@myapp/web" },
     ];
 
     const history: HistoryEntry[] = [
@@ -48,8 +47,8 @@ describe(sortPackages, () => {
 
   it("uses first occurrence when same package appears multiple times in history", () => {
     const packages: Package[] = [
-      { name: "@myapp/api", dir: "apps/api" },
-      { name: "@myapp/web", dir: "apps/web" },
+      { dir: "apps/api", name: "@myapp/api" },
+      { dir: "apps/web", name: "@myapp/web" },
     ];
 
     const history: HistoryEntry[] = [
@@ -67,9 +66,9 @@ describe(sortPackages, () => {
 describe(sortScripts, () => {
   it("prioritizes scripts with history", () => {
     const scripts = [
-      { name: "build", command: "tsc" },
-      { name: "dev", command: "vite" },
-      { name: "test", command: "vitest" },
+      { command: "tsc", name: "build" },
+      { command: "vite", name: "dev" },
+      { command: "vitest", name: "test" },
     ];
     const history: HistoryEntry[] = [{ package: "@myapp/web", script: "test" }];
 
@@ -79,11 +78,11 @@ describe(sortScripts, () => {
 
   it("sorts non-history scripts alphabetically", () => {
     const scripts = [
-      { name: "test", command: "vitest" },
-      { name: "build", command: "tsc" },
-      { name: "dev", command: "vite" },
+      { command: "vitest", name: "test" },
+      { command: "tsc", name: "build" },
+      { command: "vite", name: "dev" },
     ];
     const result = sortScripts(scripts, "@myapp/web", []);
-    expect(result.map((s) => s.name)).toEqual(["build", "dev", "test"]);
+    expect(result.map((s) => s.name)).toStrictEqual(["build", "dev", "test"]);
   });
 });

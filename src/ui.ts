@@ -1,4 +1,5 @@
 import { autocomplete, isCancel } from "@clack/prompts";
+
 import type { HistoryEntry } from "./history.js";
 import { sortPackages, sortScripts } from "./sort.js";
 import type { Package, Script } from "./workspace.js";
@@ -15,9 +16,9 @@ export async function selectPackage(
   const selected = await autocomplete({
     message: SELECT_PACKAGE_MESSAGE,
     options: sorted.map((pkg) => ({
-      value: pkg.name,
-      label: pkg.name,
       hint: isRootPackage(pkg) ? "" : pkg.dir,
+      label: pkg.name,
+      value: pkg.name,
     })),
   });
 
@@ -42,9 +43,9 @@ export async function selectScript(
   const selected = await autocomplete({
     message: "Select script",
     options: sorted.map((script) => ({
-      value: script.name,
-      label: script.name,
       hint: script.command,
+      label: script.name,
+      value: script.name,
     })),
   });
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { main } from "./index.js";
 
-main().catch((e) => {
-  console.error(e instanceof Error ? e.message : String(e));
+main().catch((error) => {
+  console.error(error instanceof Error ? error.message : String(error));
   process.exit(1);
 });

@@ -1,4 +1,5 @@
 import { defineCommand, runMain } from "citty";
+
 import pkg from "../package.json" with { type: "json" };
 import { resolveScript, selectPackageByArgs } from "./cli.js";
 import { loadHistory, saveHistory } from "./history.js";
@@ -6,11 +7,6 @@ import { runScript } from "./runner.js";
 import { findWorkspaceRoot, getPackages } from "./workspace.js";
 
 const command = defineCommand({
-  meta: {
-    name: "prw",
-    version: pkg.version,
-    description: "Interactive pnpm workspace package & script runner",
-  },
   args: {
     help: {
       type: "boolean",
@@ -32,6 +28,11 @@ const command = defineCommand({
       required: false,
       description: "Script name to run in the selected package",
     },
+  },
+  meta: {
+    name: "prw",
+    version: pkg.version,
+    description: "Interactive pnpm workspace package & script runner",
   },
   async run({ args }) {
     if (args.version) {

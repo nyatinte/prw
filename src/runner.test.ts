@@ -1,11 +1,14 @@
 import type { SpawnSyncReturns } from "node:child_process";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { runScript } from "./runner.js";
 import type { Package } from "./workspace.js";
 
-vi.mock("node:child_process", () => ({
-  spawnSync: vi.fn(),
-}));
+vi.mock<typeof import("node:child_process")>(
+  import("node:child_process"),
+  () => ({
+    spawnSync: vi.fn(),
+  })
+);
 
 import { spawnSync } from "node:child_process";
 
@@ -13,12 +16,12 @@ function mockSpawnResult(
   partial: Partial<SpawnSyncReturns<Buffer>>
 ): SpawnSyncReturns<Buffer> {
   return {
-    pid: 0,
     output: [],
-    stdout: Buffer.from(""),
-    stderr: Buffer.from(""),
-    status: 0,
+    pid: 0,
     signal: null,
+    status: 0,
+    stderr: Buffer.from(""),
+    stdout: Buffer.from(""),
     ...partial,
   };
 }
@@ -33,7 +36,7 @@ describe("runner", () => {
   });
 
   it("runs script with --filter for regular package", () => {
-    const pkg: Package = { name: "@myapp/web", dir: "apps/web" };
+    const pkg: Package = { dir: "apps/web", name: "@myapp/web" };
     runScript("/repo", pkg, "dev");
 
     expect(spawnSync).toHaveBeenCalledWith(
@@ -44,7 +47,7 @@ describe("runner", () => {
   });
 
   it("runs script without --filter for root package", () => {
-    const pkg: Package = { name: "(root)", dir: "." };
+    const pkg: Package = { dir: ".", name: "(root)" };
     runScript("/repo", pkg, "build");
 
     expect(spawnSync).toHaveBeenCalledWith("pnpm", ["run", "build"], {
@@ -61,15 +64,15 @@ describe("runner", () => {
     ],
     [
       "pnpm is killed by a signal",
-      mockSpawnResult({ status: null, signal: "SIGINT" }),
+      mockSpawnResult({ signal: "SIGINT", status: null }),
     ],
   ])("exits with code 1 when %s", (_, spawnResult) => {
     const exitSpy = vi
       .spyOn(process, "exit")
-      .mockImplementation(() => undefined as never);
+      .mockReturnValue(undefined as never);
     vi.mocked(spawnSync).mockReturnValue(spawnResult);
 
-    runScript("/repo", { name: "@myapp/web", dir: "apps/web" }, "dev");
+    runScript("/repo", { dir: "apps/web", name: "@myapp/web" }, "dev");
 
     expect(exitSpy).toHaveBeenCalledWith(1);
     exitSpy.mockRestore();

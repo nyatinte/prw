@@ -18,6 +18,7 @@ pnpm knip           # detect unused exports/dependencies
 ```
 
 Run a single test file:
+
 ```bash
 pnpm vitest run src/path/to/file.test.ts
 pnpm vitest run test/prw.e2e.test.ts

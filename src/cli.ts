@@ -1,5 +1,6 @@
 import { isCancel, log, S_STEP_SUBMIT } from "@clack/prompts";
 import color from "picocolors";
+
 import type { HistoryEntry } from "./history.js";
 import { SELECT_PACKAGE_MESSAGE, selectPackage, selectScript } from "./ui.js";
 import type { Package } from "./workspace.js";
