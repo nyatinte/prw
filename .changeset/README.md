@@ -8,5 +8,4 @@ Common commands:
 - `pnpm version-packages` to apply pending version updates locally
 - `pnpm release` to publish the currently versioned package to npm
 
-The GitHub Actions release workflow creates or updates the release PR from pending
-changesets, then publishes from `main` after that PR is merged.
+The GitHub Actions release workflow creates or updates the release PR from pending changesets, then publishes from `main` after that PR is merged.

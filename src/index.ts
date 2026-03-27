@@ -1,38 +1,38 @@
-import { defineCommand, runMain } from "citty";
+import { defineCommand, runMain } from 'citty';
 
-import pkg from "../package.json" with { type: "json" };
-import { resolveScript, selectPackageByArgs } from "./cli.js";
-import { loadHistory, saveHistory } from "./history.js";
-import { runScript } from "./runner.js";
-import { findWorkspaceRoot, getPackages } from "./workspace.js";
+import pkg from '../package.json' with { type: 'json' };
+import { resolveScript, selectPackageByArgs } from './cli.js';
+import { loadHistory, saveHistory } from './history.js';
+import { runScript } from './runner.js';
+import { findWorkspaceRoot, getPackages } from './workspace.js';
 
 const command = defineCommand({
   args: {
     help: {
-      type: "boolean",
-      alias: "h",
-      description: "Show help",
-    },
-    version: {
-      type: "boolean",
-      alias: "v",
-      description: "Show version number",
+      alias: 'h',
+      description: 'Show help',
+      type: 'boolean',
     },
     package: {
-      type: "positional",
+      description: 'Package name or fuzzy search query',
       required: false,
-      description: "Package name or fuzzy search query",
+      type: 'positional',
     },
     script: {
-      type: "positional",
+      description: 'Script name to run in the selected package',
       required: false,
-      description: "Script name to run in the selected package",
+      type: 'positional',
+    },
+    version: {
+      alias: 'v',
+      description: 'Show version number',
+      type: 'boolean',
     },
   },
   meta: {
-    name: "prw",
+    description: 'Interactive pnpm workspace package & script runner',
+    name: 'prw',
     version: pkg.version,
-    description: "Interactive pnpm workspace package & script runner",
   },
   async run({ args }) {
     if (args.version) {
@@ -68,6 +68,4 @@ const command = defineCommand({
   },
 });
 
-export function main() {
-  return runMain(command);
-}
+export const main = async () => runMain(command);

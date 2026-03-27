@@ -1,10 +1,10 @@
-import { isCancel, log, S_STEP_SUBMIT } from "@clack/prompts";
-import color from "picocolors";
+import { isCancel, log, S_STEP_SUBMIT } from '@clack/prompts';
+import color from 'picocolors';
 
-import type { HistoryEntry } from "./history.js";
-import { SELECT_PACKAGE_MESSAGE, selectPackage, selectScript } from "./ui.js";
-import type { Package } from "./workspace.js";
-import { getScripts, matchPackages } from "./workspace.js";
+import type { HistoryEntry } from './history.js';
+import { SELECT_PACKAGE_MESSAGE, selectPackage, selectScript } from './ui.js';
+import type { Package } from './workspace.js';
+import { getScripts, matchPackages } from './workspace.js';
 
 function logSelectedPackage(pkg: Package): void {
   log.message([SELECT_PACKAGE_MESSAGE, color.dim(pkg.name)], {
@@ -14,10 +14,10 @@ function logSelectedPackage(pkg: Package): void {
 
 function exitOnCancel<T>(selected: T | symbol): T {
   if (isCancel(selected)) {
-    console.log("Cancelled.");
+    console.log('Cancelled.');
     process.exit(0);
   }
-  return selected as T;
+  return selected;
 }
 
 export async function selectPackageByArgs(

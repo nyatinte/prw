@@ -1,9 +1,9 @@
 ---
 name: Feature Request
 about: Propose a new feature or UX improvement
-title: ""
+title: ''
 labels: enhancement
-assignees: ""
+assignees: ''
 ---
 
 ## AS IS

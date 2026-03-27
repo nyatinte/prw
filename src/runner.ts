@@ -1,15 +1,15 @@
-import { spawnSync } from "node:child_process";
+import { spawnSync } from 'node:child_process';
 
-import type { Package } from "./workspace.js";
-import { isRootPackage } from "./workspace.js";
+import type { Package } from './workspace.js';
+import { isRootPackage } from './workspace.js';
 
 export function runScript(root: string, pkg: Package, script: string): void {
   const isRoot = isRootPackage(pkg);
-  const args = isRoot ? ["run", script] : ["--filter", pkg.name, "run", script];
+  const args = isRoot ? ['run', script] : ['--filter', pkg.name, 'run', script];
 
-  const result = spawnSync("pnpm", args, {
+  const result = spawnSync('pnpm', args, {
     cwd: root,
-    stdio: "inherit",
+    stdio: 'inherit',
   });
 
   if (result.error) {
