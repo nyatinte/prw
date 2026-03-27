@@ -33,21 +33,20 @@
     "provenance": true
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "clean:dist": "rm -rf dist",
     "build:man": "marked-man man/prw.1.md -o man/prw.1",
     "changeset": "changeset",
-    "check": "ultracite check",
-    "fix": "ultracite fix",
+    "check": "vp check",
+    "fix": "vp check --fix",
     "knip": "knip",
     "prepare": "lefthook install",
     "prepublishOnly": "pnpm build && pnpm build:man",
     "release": "changeset publish",
-    "test": "pnpm build && vitest",
-    "test:run": "pnpm build && vitest run",
-    "test:coverage": "pnpm build && vitest run --coverage",
-    "test:update": "pnpm build && vitest -u",
-    "typecheck": "tsgo --noEmit -p tsconfig.json",
+    "test": "pnpm build && vp test",
+    "test:run": "pnpm build && vp test run",
+    "test:coverage": "pnpm build && vp test run --coverage",
+    "test:update": "pnpm build && vp test -u",
     "version-packages": "changeset version"
   },
   "dependencies": {
@@ -63,16 +62,15 @@
     "@typescript/native-preview": "7.0.0-dev.20260314.1",
     "@vitest/coverage-v8": "4.1.0",
     "fs-fixture": "2.11.0",
+    "jsonc-parser": "3.3.1",
     "knip": "5.86.0",
     "lefthook": "2.1.4",
     "marked-man": "2.1.0",
-    "oxfmt": "latest",
-    "oxlint": "latest",
-    "tsdown": "0.21.2",
     "tuistory": "0.0.16",
     "typescript": "5.9.3",
     "ultracite": "7.3.0",
-    "vitest": "4.1.0"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   },
   "engines": {
     "node": ">=24.14.0",
