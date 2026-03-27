@@ -3,10 +3,10 @@ import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 
-export type HistoryEntry = {
+export interface HistoryEntry {
   package: string;
   script: string;
-};
+}
 
 const HISTORY_DIR_NAME = "histories";
 const MAX_HISTORY = 50;
@@ -20,10 +20,7 @@ export function resolveHistoryFile(workspaceRootPath: string): string {
 
 export function loadHistory(workspaceRootPath: string): HistoryEntry[] {
   try {
-    const content = readFileSync(
-      resolveHistoryFile(workspaceRootPath),
-      "utf-8"
-    );
+    const content = readFileSync(resolveHistoryFile(workspaceRootPath), "utf8");
     const parsed = JSON.parse(content);
     return Array.isArray(parsed) ? parsed : [];
   } catch {

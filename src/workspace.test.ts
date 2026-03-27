@@ -1,5 +1,5 @@
 import { createFixture } from "fs-fixture";
-import { describe, expect, it } from "vitest";
+
 import {
   findWorkspaceRoot,
   getPackages,
@@ -22,8 +22,8 @@ describe("workspace", () => {
 
     it("returns nearest workspace root from nested workspace dir", async () => {
       await using fixture = await createFixture({
-        "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
         "apps/web/src": {},
+        "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
       });
 
       expect(findWorkspaceRoot(fixture.getPath("apps", "web", "src"))).toBe(
@@ -33,7 +33,6 @@ describe("workspace", () => {
 
     it("returns nearest workspace root when nested workspaces exist", async () => {
       await using fixture = await createFixture({
-        "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
         apps: {
           web: {
             "pnpm-workspace.yaml": "packages:\n  - packages/*\n",
@@ -44,6 +43,7 @@ describe("workspace", () => {
             },
           },
         },
+        "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
       });
 
       expect(
@@ -65,7 +65,6 @@ describe("workspace", () => {
   describe(getPackages, () => {
     it("returns packages from glob pattern", async () => {
       await using fixture = await createFixture({
-        "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
         apps: {
           web: {
             "package.json": JSON.stringify({ name: "@myapp/web" }),
@@ -74,27 +73,28 @@ describe("workspace", () => {
             "package.json": JSON.stringify({ name: "@myapp/api" }),
           },
         },
+        "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
       });
 
       const packages = await getPackages(fixture.path);
-      expect(packages.length).toBe(3);
-      expect(packages[0]).toEqual({ name: "(root)", dir: "." });
-      expect(packages.some((p) => p.name === "@myapp/web")).toBe(true);
-      expect(packages.some((p) => p.name === "@myapp/api")).toBe(true);
+      expect(packages).toHaveLength(3);
+      expect(packages[0]).toStrictEqual({ dir: ".", name: "(root)" });
+      expect(packages.some((p) => p.name === "@myapp/web")).toBeTruthy();
+      expect(packages.some((p) => p.name === "@myapp/api")).toBeTruthy();
     });
 
     it("uses dir as fallback when package.json has no name", async () => {
       await using fixture = await createFixture({
-        "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
         apps: {
           unnamed: {
             "package.json": JSON.stringify({}),
           },
         },
+        "pnpm-workspace.yaml": "packages:\n  - apps/*\n",
       });
 
       const packages = await getPackages(fixture.path);
-      expect(packages.some((p) => p.name === "apps/unnamed")).toBe(true);
+      expect(packages.some((p) => p.name === "apps/unnamed")).toBeTruthy();
     });
 
     it.each([
@@ -106,12 +106,11 @@ describe("workspace", () => {
       });
 
       const packages = await getPackages(fixture.path);
-      expect(packages).toEqual([{ name: "(root)", dir: "." }]);
+      expect(packages).toStrictEqual([{ dir: ".", name: "(root)" }]);
     });
 
     it("excludes directories matching negation pattern", async () => {
       await using fixture = await createFixture({
-        "pnpm-workspace.yaml": "packages:\n  - apps/*\n  - '!apps/legacy'\n",
         apps: {
           web: {
             "package.json": JSON.stringify({ name: "@myapp/web" }),
@@ -120,18 +119,16 @@ describe("workspace", () => {
             "package.json": JSON.stringify({ name: "@myapp/legacy" }),
           },
         },
+        "pnpm-workspace.yaml": "packages:\n  - apps/*\n  - '!apps/legacy'\n",
       });
 
       const packages = await getPackages(fixture.path);
-      expect(packages.some((p) => p.name === "@myapp/web")).toBe(true);
-      expect(packages.some((p) => p.name === "@myapp/legacy")).toBe(false);
+      expect(packages.some((p) => p.name === "@myapp/web")).toBeTruthy();
+      expect(packages.some((p) => p.name === "@myapp/legacy")).toBeFalsy();
     });
 
     it("ignores packages matched inside node_modules", async () => {
       await using fixture = await createFixture({
-        "pnpm-workspace.yaml": `packages:
-  - apps/**
-`,
         apps: {
           web: {
             "package.json": JSON.stringify({ name: "@myapp/web" }),
@@ -142,18 +139,18 @@ describe("workspace", () => {
             },
           },
         },
+        "pnpm-workspace.yaml": `packages:
+  - apps/**
+`,
       });
 
       const packages = await getPackages(fixture.path);
-      expect(packages.some((p) => p.name === "@myapp/web")).toBe(true);
-      expect(packages.some((p) => p.name === "@dep/should-ignore")).toBe(false);
+      expect(packages.some((p) => p.name === "@myapp/web")).toBeTruthy();
+      expect(packages.some((p) => p.name === "@dep/should-ignore")).toBeFalsy();
     });
 
     it("ignores node_modules directory entries themselves", async () => {
       await using fixture = await createFixture({
-        "pnpm-workspace.yaml": `packages:
-  - apps/**
-`,
         apps: {
           web: {
             "package.json": JSON.stringify({ name: "@myapp/web" }),
@@ -164,17 +161,19 @@ describe("workspace", () => {
             },
           },
         },
+        "pnpm-workspace.yaml": `packages:
+  - apps/**
+`,
       });
 
       const packages = await getPackages(fixture.path);
-      expect(packages.some((p) => p.name === "@dep/root-should-ignore")).toBe(
-        false
-      );
+      expect(
+        packages.some((p) => p.name === "@dep/root-should-ignore")
+      ).toBeFalsy();
     });
 
     it("handles multiple patterns", async () => {
       await using fixture = await createFixture({
-        "pnpm-workspace.yaml": "packages:\n  - apps/*\n  - packages/*\n",
         apps: {
           web: {
             "package.json": JSON.stringify({ name: "@myapp/web" }),
@@ -185,12 +184,13 @@ describe("workspace", () => {
             "package.json": JSON.stringify({ name: "@myapp/ui" }),
           },
         },
+        "pnpm-workspace.yaml": "packages:\n  - apps/*\n  - packages/*\n",
       });
 
       const packages = await getPackages(fixture.path);
-      expect(packages.length).toBe(3);
-      expect(packages.some((p) => p.name === "@myapp/web")).toBe(true);
-      expect(packages.some((p) => p.name === "@myapp/ui")).toBe(true);
+      expect(packages).toHaveLength(3);
+      expect(packages.some((p) => p.name === "@myapp/web")).toBeTruthy();
+      expect(packages.some((p) => p.name === "@myapp/ui")).toBeTruthy();
     });
   });
 
@@ -201,17 +201,17 @@ describe("workspace", () => {
           web: {
             "package.json": JSON.stringify({
               name: "@myapp/web",
-              scripts: { dev: "vite", build: "tsc" },
+              scripts: { build: "tsc", dev: "vite" },
             }),
           },
         },
       });
 
       expect(
-        getScripts(fixture.path, { name: "@myapp/web", dir: "apps/web" })
-      ).toEqual([
-        { name: "dev", command: "vite" },
-        { name: "build", command: "tsc" },
+        getScripts(fixture.path, { dir: "apps/web", name: "@myapp/web" })
+      ).toStrictEqual([
+        { command: "tsc", name: "build" },
+        { command: "vite", name: "dev" },
       ]);
     });
 
@@ -225,8 +225,8 @@ describe("workspace", () => {
       });
 
       expect(
-        getScripts(fixture.path, { name: "@myapp/api", dir: "apps/api" })
-      ).toEqual([]);
+        getScripts(fixture.path, { dir: "apps/api", name: "@myapp/api" })
+      ).toStrictEqual([]);
     });
 
     it("returns empty array when package.json does not exist", async () => {
@@ -235,15 +235,15 @@ describe("workspace", () => {
       });
 
       expect(
-        getScripts(fixture.path, { name: "@myapp/ghost", dir: "apps/ghost" })
-      ).toEqual([]);
+        getScripts(fixture.path, { dir: "apps/ghost", name: "@myapp/ghost" })
+      ).toStrictEqual([]);
     });
   });
 
   describe(isRootPackage, () => {
     it.each([
       [ROOT_PACKAGE, true],
-      [{ name: "@myapp/web", dir: "apps/web" }, false],
+      [{ dir: "apps/web", name: "@myapp/web" }, false],
     ])("returns %s for %o", (pkg, expected) => {
       expect(isRootPackage(pkg)).toBe(expected);
     });
@@ -251,9 +251,9 @@ describe("workspace", () => {
 
   describe(matchPackages, () => {
     const packages = [
-      { name: "@myapp/api", dir: "apps/api" },
-      { name: "@myapp/web", dir: "apps/web" },
-      { name: "@myapp/web-admin", dir: "apps/web-admin" },
+      { dir: "apps/api", name: "@myapp/api" },
+      { dir: "apps/web", name: "@myapp/web" },
+      { dir: "apps/web-admin", name: "@myapp/web-admin" },
     ];
 
     it.each([
@@ -263,7 +263,7 @@ describe("workspace", () => {
       ["nonexistent", []],
     ])("matchPackages('%s') returns %j", (query, expectedNames) => {
       const result = matchPackages(packages, query);
-      expect(result.map((p) => p.name)).toEqual(expectedNames);
+      expect(result.map((p) => p.name)).toStrictEqual(expectedNames);
     });
   });
 });

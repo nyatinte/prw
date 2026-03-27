@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto";
 import { mkdirSync, symlinkSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
+
 import { createFixture } from "fs-fixture";
-import { afterEach, describe, expect, it, vi } from "vitest";
+
 import type { HistoryEntry } from "./history.js";
 import {
   getWorkspaceId,
@@ -24,7 +25,7 @@ describe("history", () => {
       });
       vi.stubEnv("XDG_STATE_HOME", fixture.getPath("state"));
 
-      expect(loadHistory(fixture.getPath("workspace"))).toEqual([]);
+      expect(loadHistory(fixture.getPath("workspace"))).toStrictEqual([]);
     });
 
     it("returns [] when file contains invalid JSON", async () => {
@@ -36,7 +37,7 @@ describe("history", () => {
       mkdirSync(dirname(historyFile), { recursive: true });
       writeFileSync(historyFile, "not-valid-json");
 
-      expect(loadHistory(fixture.getPath("workspace"))).toEqual([]);
+      expect(loadHistory(fixture.getPath("workspace"))).toStrictEqual([]);
     });
 
     it("returns [] when file contains non-array JSON", async () => {
@@ -48,7 +49,7 @@ describe("history", () => {
       mkdirSync(dirname(historyFile), { recursive: true });
       writeFileSync(historyFile, JSON.stringify({ foo: "bar" }));
 
-      expect(loadHistory(fixture.getPath("workspace"))).toEqual([]);
+      expect(loadHistory(fixture.getPath("workspace"))).toStrictEqual([]);
     });
 
     it("returns parsed entries when file is valid", async () => {
@@ -63,7 +64,7 @@ describe("history", () => {
       mkdirSync(dirname(historyFile), { recursive: true });
       writeFileSync(historyFile, JSON.stringify(entries));
 
-      expect(loadHistory(fixture.getPath("workspace"))).toEqual(entries);
+      expect(loadHistory(fixture.getPath("workspace"))).toStrictEqual(entries);
     });
 
     it("prefers XDG_STATE_HOME when reading history", async () => {
@@ -96,7 +97,7 @@ describe("history", () => {
 
       vi.stubEnv("XDG_STATE_HOME", xdgFixture.getPath("state"));
 
-      expect(loadHistory(workspaceRoot)).toEqual(xdgEntries);
+      expect(loadHistory(workspaceRoot)).toStrictEqual(xdgEntries);
     });
 
     it("falls back to the XDG state default when XDG_STATE_HOME is unset", async () => {
@@ -104,8 +105,8 @@ describe("history", () => {
         { package: "@myapp/web", script: "dev" },
       ];
       await using fixture = await createFixture({
-        workspace: {},
         home: {},
+        workspace: {},
       });
       vi.stubEnv("XDG_STATE_HOME", "");
       vi.stubEnv("HOME", fixture.getPath("home"));
@@ -113,11 +114,11 @@ describe("history", () => {
       mkdirSync(dirname(historyFile), { recursive: true });
       writeFileSync(historyFile, JSON.stringify(entries));
 
-      expect(loadHistory(fixture.getPath("workspace"))).toEqual(entries);
+      expect(loadHistory(fixture.getPath("workspace"))).toStrictEqual(entries);
     });
   });
 
-  describe("getWorkspaceId", () => {
+  describe(getWorkspaceId, () => {
     it("hashes the canonical workspace path", async () => {
       await using fixture = await createFixture({
         real: {},
@@ -164,7 +165,7 @@ describe("history", () => {
       const written = await fixture.readJson<HistoryEntry[]>(
         `state/prw/histories/${getWorkspaceId(fixture.getPath("workspace"))}.json`
       );
-      expect(written[0]).toEqual({
+      expect(written[0]).toStrictEqual({
         package: "@myapp/api",
         script: "dev",
       });
@@ -228,16 +229,16 @@ describe("history", () => {
       );
 
       const historyFile = `state/prw/histories/${getWorkspaceId(fixture.getPath("workspace"))}.json`;
-      expect(await fixture.exists(historyFile)).toBe(true);
-      expect(await fixture.readJson<HistoryEntry[]>(historyFile)).toEqual([
-        { package: "@myapp/web", script: "dev" },
-      ]);
+      await expect(fixture.exists(historyFile)).resolves.toBeTruthy();
+      await expect(
+        fixture.readJson<HistoryEntry[]>(historyFile)
+      ).resolves.toStrictEqual([{ package: "@myapp/web", script: "dev" }]);
     });
 
     it("falls back to the XDG state default when XDG_STATE_HOME is unset", async () => {
       await using fixture = await createFixture({
-        workspace: {},
         home: {},
+        workspace: {},
       });
       vi.stubEnv("XDG_STATE_HOME", "");
       vi.stubEnv("HOME", fixture.getPath("home"));
@@ -249,10 +250,10 @@ describe("history", () => {
       );
 
       const historyFile = `home/.local/state/prw/histories/${getWorkspaceId(fixture.getPath("workspace"))}.json`;
-      expect(await fixture.exists(historyFile)).toBe(true);
-      expect(await fixture.readJson<HistoryEntry[]>(historyFile)).toEqual([
-        { package: "@myapp/web", script: "dev" },
-      ]);
+      await expect(fixture.exists(historyFile)).resolves.toBeTruthy();
+      await expect(
+        fixture.readJson<HistoryEntry[]>(historyFile)
+      ).resolves.toStrictEqual([{ package: "@myapp/web", script: "dev" }]);
     });
 
     it("stores separate history files for different workspaces", async () => {
@@ -275,12 +276,12 @@ describe("history", () => {
 
       const workspaceAHistoryFile = `state/prw/histories/${getWorkspaceId(fixture.getPath("workspace-a"))}.json`;
       const workspaceBHistoryFile = `state/prw/histories/${getWorkspaceId(fixture.getPath("workspace-b"))}.json`;
-      expect(
-        await fixture.readJson<HistoryEntry[]>(workspaceAHistoryFile)
-      ).toEqual([{ package: "@myapp/web", script: "dev" }]);
-      expect(
-        await fixture.readJson<HistoryEntry[]>(workspaceBHistoryFile)
-      ).toEqual([{ package: "@myapp/web", script: "dev" }]);
+      await expect(
+        fixture.readJson<HistoryEntry[]>(workspaceAHistoryFile)
+      ).resolves.toStrictEqual([{ package: "@myapp/web", script: "dev" }]);
+      await expect(
+        fixture.readJson<HistoryEntry[]>(workspaceBHistoryFile)
+      ).resolves.toStrictEqual([{ package: "@myapp/web", script: "dev" }]);
     });
   });
 });

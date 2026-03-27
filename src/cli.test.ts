@@ -1,6 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-vi.mock("./ui", async (importOriginal) => {
+vi.mock<typeof import("./ui")>(import("./ui"), async (importOriginal) => {
   const actual = await importOriginal<typeof import("./ui")>();
   return {
     ...actual,
@@ -8,13 +6,16 @@ vi.mock("./ui", async (importOriginal) => {
     selectScript: vi.fn(),
   };
 });
-vi.mock("./workspace", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("./workspace")>();
-  return {
-    ...actual,
-    getScripts: vi.fn(),
-  };
-});
+vi.mock<typeof import("./workspace")>(
+  import("./workspace"),
+  async (importOriginal) => {
+    const actual = await importOriginal<typeof import("./workspace")>();
+    return {
+      ...actual,
+      getScripts: vi.fn(),
+    };
+  }
+);
 
 import { resolveScript, selectPackageByArgs } from "./cli.js";
 import type { HistoryEntry } from "./history.js";
@@ -23,9 +24,9 @@ import type { Package } from "./workspace.js";
 import { getScripts } from "./workspace.js";
 
 const packages: Package[] = [
-  { name: "@myapp/api", dir: "apps/api" },
-  { name: "@myapp/web", dir: "apps/web" },
-  { name: "@myapp/web-admin", dir: "apps/web-admin" },
+  { dir: "apps/api", name: "@myapp/api" },
+  { dir: "apps/web", name: "@myapp/web" },
+  { dir: "apps/web-admin", name: "@myapp/web-admin" },
 ];
 
 const history: HistoryEntry[] = [];
@@ -53,8 +54,8 @@ describe(selectPackageByArgs, () => {
 
     it("calls selectPackage UI when multiple packages match", async () => {
       vi.mocked(selectPackage).mockResolvedValue({
-        name: "@myapp/web",
         dir: "apps/web",
+        name: "@myapp/web",
       });
       const result = await selectPackageByArgs(packages, history, ["web"]);
       expect(selectPackage).toHaveBeenCalled();
@@ -87,7 +88,7 @@ describe(selectPackageByArgs, () => {
 });
 
 describe(resolveScript, () => {
-  const pkg: Package = { name: "@myapp/api", dir: "apps/api" };
+  const pkg: Package = { dir: "apps/api", name: "@myapp/api" };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -103,8 +104,8 @@ describe(resolveScript, () => {
 
   it("calls selectScript when no initial script", async () => {
     vi.mocked(getScripts).mockReturnValue([
-      { name: "dev", command: "vite" },
-      { name: "build", command: "tsc" },
+      { command: "vite", name: "dev" },
+      { command: "tsc", name: "build" },
     ]);
     vi.mocked(selectScript).mockResolvedValue("dev");
     const result = await resolveScript("/root", pkg, undefined, []);

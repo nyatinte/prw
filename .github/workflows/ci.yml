@@ -39,8 +39,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm knip
 
-  biome:
-    name: Biome Check
+  lint:
+    name: Ultracite Check (Oxc)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

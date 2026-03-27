@@ -2,25 +2,36 @@
   "name": "@nyatinte/prw",
   "version": "0.4.1",
   "description": "Interactive pnpm workspace package & script runner",
-  "author": "nyatinte",
-  "license": "MIT",
-  "type": "module",
-  "bin": {
-    "prw": "./dist/bin.mjs"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/nyatinte/prw.git"
-  },
+  "keywords": [
+    "cli",
+    "pnpm",
+    "workspace"
+  ],
   "homepage": "https://github.com/nyatinte/prw#readme",
   "bugs": {
     "url": "https://github.com/nyatinte/prw/issues"
   },
-  "keywords": [
-    "pnpm",
-    "workspace",
-    "cli"
+  "license": "MIT",
+  "author": "nyatinte",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nyatinte/prw.git"
+  },
+  "man": [
+    "./man/prw.1"
   ],
+  "bin": {
+    "prw": "./dist/bin.mjs"
+  },
+  "files": [
+    "dist",
+    "man"
+  ],
+  "type": "module",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsdown",
     "clean:dist": "rm -rf dist",
@@ -39,22 +50,6 @@
     "typecheck": "tsgo --noEmit -p tsconfig.json",
     "version-packages": "changeset version"
   },
-  "man": [
-    "./man/prw.1"
-  ],
-  "files": [
-    "dist",
-    "man"
-  ],
-  "engines": {
-    "node": ">=24.14.0",
-    "pnpm": "10.30.3"
-  },
-  "packageManager": "pnpm@10.30.3",
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  },
   "dependencies": {
     "@clack/prompts": "1.1.0",
     "citty": "0.2.1",
@@ -63,7 +58,6 @@
     "yaml": "2.8.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.6",
     "@changesets/cli": "2.30.0",
     "@types/node": "24.12.0",
     "@typescript/native-preview": "7.0.0-dev.20260314.1",
@@ -72,10 +66,17 @@
     "knip": "5.86.0",
     "lefthook": "2.1.4",
     "marked-man": "2.1.0",
+    "oxfmt": "latest",
+    "oxlint": "latest",
     "tsdown": "0.21.2",
     "tuistory": "0.0.16",
     "typescript": "5.9.3",
     "ultracite": "7.3.0",
     "vitest": "4.1.0"
-  }
+  },
+  "engines": {
+    "node": ">=24.14.0",
+    "pnpm": "10.30.3"
+  },
+  "packageManager": "pnpm@10.30.3"
 }

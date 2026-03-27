@@ -1,0 +1,36 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "extends": ["./node_modules/ultracite/config/oxlint/core/.oxlintrc.json"],
+  "ignorePatterns": ["example/**"],
+  "rules": {
+    "func-style": "off",
+    "sort-keys": "off",
+    "no-shadow": "off",
+    "no-use-before-define": "off",
+    "no-promise-executor-return": "off",
+    "import/no-relative-parent-imports": "off",
+    "import/first": "off",
+    "promise/prefer-await-to-then": "off",
+    "promise/prefer-await-to-callbacks": "off",
+    "promise/avoid-new": "off",
+    "unicorn/no-array-for-each": "off",
+    "unicorn/no-await-expression-member": "off",
+    "typescript/consistent-type-imports": "off"
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/*.{test,spec}.{ts,tsx,js,jsx}",
+        "**/__tests__/**/*.{ts,tsx,js,jsx}",
+        "test/**/*.{ts,tsx,js,jsx}"
+      ],
+      "plugins": ["jest", "vitest"],
+      "rules": {
+        "jest/no-hooks": "off",
+        "jest/valid-title": "off",
+        "jest/prefer-called-with": "off",
+        "vitest/prefer-strict-boolean-matchers": "off"
+      }
+    }
+  ]
+}

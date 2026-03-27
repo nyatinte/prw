@@ -5,6 +5,7 @@ These example directories demonstrate how `@nyatinte/prw` works with different p
 ## 1. `simple/` - Minimal workspace
 
 A simple workspace with 2 packages:
+
 - `@simple/web` - Frontend app
 - `@simple/api` - Backend app
 
@@ -19,6 +20,7 @@ pnpm prw web dev  # Select @simple/web and run dev
 A realistic workspace with 5 applications and 5 shared packages:
 
 **Applications (apps/):**
+
 - `@large/web` - Main web frontend
 - `@large/api` - API server
 - `@large/mobile` - Mobile app
@@ -26,6 +28,7 @@ A realistic workspace with 5 applications and 5 shared packages:
 - `@large/dashboard` - Monitoring dashboard
 
 **Shared packages (packages/):**
+
 - `@large/ui` - UI component library
 - `@large/config` - Shared configuration
 - `@large/logger` - Logging utility
@@ -45,6 +48,7 @@ pnpm prw ui build   # Shared package build
 Tests how prw handles unusual configurations:
 
 **Edge cases included:**
+
 - `apps/unnamed/` - Package with no name field (uses `apps/unnamed` as fallback)
 - `apps/no-scripts/` - Package with empty scripts
 - `packages/minimal/` - Package with only `build` script
