@@ -23,11 +23,9 @@ export interface Package {
 
 export const ROOT_PACKAGE: Package = { dir: ".", name: "(root)" };
 
-export function isRootPackage(pkg: Package): boolean {
-  return pkg.dir === ".";
-}
+export const isRootPackage = (pkg: Package): boolean => pkg.dir === ".";
 
-export function findWorkspaceRoot(cwd: string): string {
+export const findWorkspaceRoot = (cwd: string): string => {
   let current = resolve(cwd);
 
   while (true) {
@@ -45,18 +43,22 @@ export function findWorkspaceRoot(cwd: string): string {
   }
 
   throw new WorkspaceNotFoundError("Run prw inside a pnpm workspace.");
-}
+};
 
-export async function getPackages(root: string): Promise<Package[]> {
+export const getPackages = async (root: string): Promise<Package[]> => {
   const workspaceConfig = await readFile(
     join(root, WORKSPACE_CONFIG_FILE),
     "utf8"
   );
-  const config = (parse(workspaceConfig) ?? {}) as { packages?: string[] };
+  const parsed: unknown = parse(workspaceConfig);
+  const config =
+    typeof parsed === "object" && parsed !== null
+      ? (parsed as { packages?: string[] })
+      : {};
 
   const packages: Package[] = [ROOT_PACKAGE];
 
-  if (!config.packages) {
+  if (config.packages === undefined) {
     return packages;
   }
 
@@ -71,10 +73,14 @@ export async function getPackages(root: string): Promise<Package[]> {
     dirs.map(async (rawDir) => {
       const dir = rawDir.replace(TRAILING_PATH_SEPARATOR_PATTERN, "");
       try {
-        const pkgJson = JSON.parse(
+        const pkgJson: unknown = JSON.parse(
           await readFile(join(root, dir, "package.json"), "utf8")
         );
-        return { dir, name: pkgJson.name || dir } as Package;
+        const name =
+          typeof pkgJson === "object" && pkgJson !== null
+            ? (pkgJson as Record<string, unknown>).name
+            : undefined;
+        return { dir, name: typeof name === "string" ? name : dir };
       } catch {
         return null;
       }
@@ -83,32 +89,44 @@ export async function getPackages(root: string): Promise<Package[]> {
   packages.push(...results.filter((p): p is Package => p !== null));
 
   return packages;
-}
+};
 
 export interface Script {
   readonly command: string;
   readonly name: string;
 }
 
-export function getScripts(root: string, pkg: Package): Script[] {
+export const getScripts = (root: string, pkg: Package): Script[] => {
   try {
-    const pkgJson = JSON.parse(
+    const pkgJson: unknown = JSON.parse(
       readFileSync(join(root, pkg.dir, "package.json"), "utf8")
     );
-    const { scripts } = pkgJson;
-    if (!scripts || typeof scripts !== "object") {
+    if (typeof pkgJson !== "object" || pkgJson === null) {
       return [];
     }
-    return Object.entries(scripts).map(([name, command]) => ({
-      command: typeof command === "string" ? command : "",
-      name,
-    }));
+    const { scripts } = pkgJson as Record<string, unknown>;
+    if (
+      scripts === null ||
+      scripts === undefined ||
+      typeof scripts !== "object"
+    ) {
+      return [];
+    }
+    return Object.entries(scripts as Record<string, unknown>).map(
+      ([name, command]) => ({
+        command: typeof command === "string" ? command : "",
+        name,
+      })
+    );
   } catch {
     return [];
   }
-}
+};
 
-export function matchPackages(packages: Package[], query: string): Package[] {
+export const matchPackages = (
+  packages: Package[],
+  query: string
+): Package[] => {
   const queryLower = query.toLowerCase();
   return packages.filter((p) => p.name.toLowerCase().includes(queryLower));
-}
+};
