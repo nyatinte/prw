@@ -7,10 +7,10 @@ import { isRootPackage } from "./workspace.js";
 
 export const SELECT_PACKAGE_MESSAGE = "Select package";
 
-export async function selectPackage(
+export const selectPackage = async (
   packages: Package[],
   history: HistoryEntry[]
-): Promise<Package | symbol> {
+): Promise<Package | symbol> => {
   const sorted = sortPackages(packages, history);
 
   const selected = await autocomplete({
@@ -31,13 +31,13 @@ export async function selectPackage(
     throw new Error(`Package "${selected}" not found`);
   }
   return found;
-}
+};
 
-export async function selectScript(
+export const selectScript = async (
   pkg: Package,
   scripts: Script[],
   history: HistoryEntry[]
-): Promise<string | symbol> {
+): Promise<string | symbol> => {
   const sorted = sortScripts(scripts, pkg.name, history);
 
   const selected = await autocomplete({
@@ -50,4 +50,4 @@ export async function selectScript(
   });
 
   return selected;
-}
+};
