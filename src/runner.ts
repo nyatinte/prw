@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import type { Package } from "./workspace.js";
 import { isRootPackage } from "./workspace.js";
 
-export function runScript(root: string, pkg: Package, script: string): void {
+export const runScript = (root: string, pkg: Package, script: string): void => {
   const isRoot = isRootPackage(pkg);
   const args = isRoot ? ["run", script] : ["--filter", pkg.name, "run", script];
 
@@ -24,4 +24,4 @@ export function runScript(root: string, pkg: Package, script: string): void {
   if (result.status !== null && result.status !== 0) {
     process.exit(result.status);
   }
-}
+};
