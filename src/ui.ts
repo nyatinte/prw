@@ -1,11 +1,11 @@
-import { autocomplete, isCancel } from "@clack/prompts";
+import { autocomplete, isCancel } from '@clack/prompts';
 
-import type { HistoryEntry } from "./history.js";
-import { sortPackages, sortScripts } from "./sort.js";
-import type { Package, Script } from "./workspace.js";
-import { isRootPackage } from "./workspace.js";
+import type { HistoryEntry } from './history.js';
+import { sortPackages, sortScripts } from './sort.js';
+import type { Package, Script } from './workspace.js';
+import { isRootPackage } from './workspace.js';
 
-export const SELECT_PACKAGE_MESSAGE = "Select package";
+export const SELECT_PACKAGE_MESSAGE = 'Select package';
 
 export async function selectPackage(
   packages: Package[],
@@ -16,7 +16,7 @@ export async function selectPackage(
   const selected = await autocomplete({
     message: SELECT_PACKAGE_MESSAGE,
     options: sorted.map((pkg) => ({
-      hint: isRootPackage(pkg) ? "" : pkg.dir,
+      hint: isRootPackage(pkg) ? '' : pkg.dir,
       label: pkg.name,
       value: pkg.name,
     })),
@@ -26,7 +26,7 @@ export async function selectPackage(
     return selected;
   }
 
-  const found = sorted.find((p) => p.name === (selected as string));
+  const found = sorted.find((p) => p.name === selected);
   if (!found) {
     throw new Error(`Package "${selected}" not found`);
   }
@@ -41,7 +41,7 @@ export async function selectScript(
   const sorted = sortScripts(scripts, pkg.name, history);
 
   const selected = await autocomplete({
-    message: "Select script",
+    message: 'Select script',
     options: sorted.map((script) => ({
       hint: script.command,
       label: script.name,

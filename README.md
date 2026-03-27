@@ -2,9 +2,7 @@
 
 English | [日本語](./README.ja.md)
 
-[![CI](https://github.com/nyatinte/prw/actions/workflows/ci.yml/badge.svg)](https://github.com/nyatinte/prw/actions/workflows/ci.yml)
-[![npm downloads](https://img.shields.io/npm/dm/%40nyatinte%2Fprw)](https://npmx.dev/package/@nyatinte/prw#downloads)
-[![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
+[![CI](https://github.com/nyatinte/prw/actions/workflows/ci.yml/badge.svg)](https://github.com/nyatinte/prw/actions/workflows/ci.yml) [![npm downloads](https://img.shields.io/npm/dm/%40nyatinte%2Fprw)](https://npmx.dev/package/@nyatinte/prw#downloads) [![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
 
 `prw` is a CLI for interactively selecting a package and script in a pnpm workspace and running it. It only uses existing `package.json` scripts — no extra config files required.
 
@@ -41,8 +39,7 @@ pnpm add -g @nyatinte/prw
 prw
 ```
 
-Interactively select a package and script, then run it.
-The root package is also available.
+Interactively select a package and script, then run it. The root package is also available.
 
 ### 2. Pass a package name
 
@@ -50,9 +47,7 @@ The root package is also available.
 prw web
 ```
 
-Package names are matched with fuzzy search.
-If one package matches, it goes straight to script selection. If multiple match, the package picker is shown.
-Frequently used packages are shown first based on history.
+Package names are matched with fuzzy search. If one package matches, it goes straight to script selection. If multiple match, the package picker is shown. Frequently used packages are shown first based on history.
 
 ### 3. Pass both package and script
 
@@ -60,12 +55,9 @@ Frequently used packages are shown first based on history.
 prw @myapp/web dev
 ```
 
-If both are unambiguous, `prw` skips the selection screens and runs immediately.
-Frequently used scripts are also shown first based on history.
+If both are unambiguous, `prw` skips the selection screens and runs immediately. Frequently used scripts are also shown first based on history.
 
-> [!NOTE]
-> You don't need to type the full package name every time.
-> A short query like `prw web` is usually enough.
+> [!NOTE] You don't need to type the full package name every time. A short query like `prw web` is usually enough.
 
 ## Example
 
@@ -119,14 +111,9 @@ With a monorepo like this, you can run scripts from anywhere under apps/ or pack
 
 ## Spec
 
-> [!IMPORTANT]
-> `prw` can be run from anywhere inside the workspace.
-> It walks up parent directories to find the nearest `pnpm-workspace.yaml`.
+> [!IMPORTANT] `prw` can be run from anywhere inside the workspace. It walks up parent directories to find the nearest `pnpm-workspace.yaml`.
 
-> [!NOTE]
-> Usage history is stored per workspace at `$XDG_STATE_HOME/prw/histories/<workspace-id>.json`
-> (or `~/.local/state/prw/histories/<workspace-id>.json` when `XDG_STATE_HOME` is unset).
-> `<workspace-id>` is a SHA-256 hash of the resolved workspace root path.
+> [!NOTE] Usage history is stored per workspace at `$XDG_STATE_HOME/prw/histories/<workspace-id>.json` (or `~/.local/state/prw/histories/<workspace-id>.json` when `XDG_STATE_HOME` is unset). `<workspace-id>` is a SHA-256 hash of the resolved workspace root path.
 
 ## License
 

@@ -1,18 +1,18 @@
-import { existsSync, readFileSync } from "node:fs";
-import { readFile } from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
+import { existsSync, readFileSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import { dirname, join, resolve } from 'node:path';
 
-import { glob } from "tinyglobby";
-import { parse } from "yaml";
+import { glob } from 'tinyglobby';
+import { parse } from 'yaml';
 
-const WORKSPACE_CONFIG_FILE = "pnpm-workspace.yaml";
+const WORKSPACE_CONFIG_FILE = 'pnpm-workspace.yaml';
 const TRAILING_PATH_SEPARATOR_PATTERN = /[\\/]+$/;
-const IGNORE_GLOBS = ["**/node_modules", "**/node_modules/**"];
+const IGNORE_GLOBS = ['**/node_modules', '**/node_modules/**'];
 
 export class WorkspaceNotFoundError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "WorkspaceNotFoundError";
+    this.name = 'WorkspaceNotFoundError';
   }
 }
 
@@ -21,10 +21,10 @@ export interface Package {
   readonly name: string;
 }
 
-export const ROOT_PACKAGE: Package = { dir: ".", name: "(root)" };
+export const ROOT_PACKAGE: Package = { dir: '.', name: '(root)' };
 
 export function isRootPackage(pkg: Package): boolean {
-  return pkg.dir === ".";
+  return pkg.dir === '.';
 }
 
 export function findWorkspaceRoot(cwd: string): string {
@@ -44,13 +44,13 @@ export function findWorkspaceRoot(cwd: string): string {
     current = parent;
   }
 
-  throw new WorkspaceNotFoundError("Run prw inside a pnpm workspace.");
+  throw new WorkspaceNotFoundError('Run prw inside a pnpm workspace.');
 }
 
 export async function getPackages(root: string): Promise<Package[]> {
   const workspaceConfig = await readFile(
     join(root, WORKSPACE_CONFIG_FILE),
-    "utf8"
+    'utf8'
   );
   const config = (parse(workspaceConfig) ?? {}) as { packages?: string[] };
 
@@ -69,12 +69,12 @@ export async function getPackages(root: string): Promise<Package[]> {
 
   const results = await Promise.all(
     dirs.map(async (rawDir) => {
-      const dir = rawDir.replace(TRAILING_PATH_SEPARATOR_PATTERN, "");
+      const dir = rawDir.replace(TRAILING_PATH_SEPARATOR_PATTERN, '');
       try {
         const pkgJson = JSON.parse(
-          await readFile(join(root, dir, "package.json"), "utf8")
+          await readFile(join(root, dir, 'package.json'), 'utf8')
         );
-        return { dir, name: pkgJson.name || dir } as Package;
+        return { dir, name: pkgJson.name ?? dir } as Package;
       } catch {
         return null;
       }
@@ -93,14 +93,14 @@ export interface Script {
 export function getScripts(root: string, pkg: Package): Script[] {
   try {
     const pkgJson = JSON.parse(
-      readFileSync(join(root, pkg.dir, "package.json"), "utf8")
+      readFileSync(join(root, pkg.dir, 'package.json'), 'utf8')
     );
     const { scripts } = pkgJson;
-    if (!scripts || typeof scripts !== "object") {
+    if (!scripts || typeof scripts !== 'object') {
       return [];
     }
     return Object.entries(scripts).map(([name, command]) => ({
-      command: typeof command === "string" ? command : "",
+      command: typeof command === 'string' ? command : '',
       name,
     }));
   } catch {

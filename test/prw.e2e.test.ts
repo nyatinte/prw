@@ -1,14 +1,14 @@
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import { createFixture } from "fs-fixture";
-import { launchTerminal } from "tuistory";
-import type { Session } from "tuistory";
+import { createFixture } from 'fs-fixture';
+import { launchTerminal } from 'tuistory';
+import type { Session } from 'tuistory';
 
-import pkg from "../package.json" with { type: "json" };
+import pkg from '../package.json' with { type: 'json' };
 
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const binPath = resolve(repoRoot, "dist/bin.mjs");
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const binPath = resolve(repoRoot, 'dist/bin.mjs');
 
 /*
 Use this file for end-to-end tests that validate the real interactive terminal
@@ -43,7 +43,7 @@ history handling, and runner behavior should stay in unit tests unless the real
 terminal rendering is the thing under test.
 */
 
-function launchPrwSession({
+async function launchPrwSession({
   cwd,
   homeDir,
   args = [],
@@ -55,7 +55,7 @@ function launchPrwSession({
   return launchTerminal({
     args: [binPath, ...args],
     cols: 100,
-    command: "node",
+    command: 'node',
     cwd,
     env: {
       HOME: homeDir,
@@ -65,7 +65,7 @@ function launchPrwSession({
   });
 }
 
-function readTerminal(session: Session): Promise<string> {
+async function readTerminal(session: Session): Promise<string> {
   return session.text({ trimEnd: true });
 }
 
@@ -88,14 +88,14 @@ async function getScriptSearchTerminalText(
 }
 
 async function cancelAndReadTerminal(session: Session): Promise<string> {
-  await session.press("esc");
+  await session.press('esc');
   await new Promise((resolve) => setTimeout(resolve, 250));
   return readTerminal(session);
 }
 
-function closeSessionSafely(session: Session | undefined): Promise<void> {
+async function closeSessionSafely(session: Session | undefined): Promise<void> {
   if (!session) {
-    return Promise.resolve();
+    return;
   }
 
   try {
@@ -104,20 +104,20 @@ function closeSessionSafely(session: Session | undefined): Promise<void> {
     // Ignore cleanup failures so test errors stay focused on the terminal state.
   }
 
-  return Promise.resolve();
+  return;
 }
 
-describe.sequential("prw e2e", () => {
-  test("shows the script picker for simple workspace package selection", async () => {
+describe.sequential('prw e2e', () => {
+  test('shows the script picker for simple workspace package selection', async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
-      args: ["web"],
-      cwd: resolve(repoRoot, "example/simple"),
+      args: ['web'],
+      cwd: resolve(repoRoot, 'example/simple'),
       homeDir: fixture.path,
     });
 
     try {
-      await session.waitForText("Select script");
+      await session.waitForText('Select script');
 
       await expect(readTerminal(session)).resolves.toMatchSnapshot();
     } finally {
@@ -125,18 +125,18 @@ describe.sequential("prw e2e", () => {
     }
   });
 
-  test.each(["build", "dev", "test", "type-check", "zzz"])(
+  test.each(['build', 'dev', 'test', 'type-check', 'zzz'])(
     'shows the simple workspace script picker while searching for "%s"',
     async (query) => {
       await using fixture = await createFixture();
       const session = await launchPrwSession({
-        args: ["web"],
-        cwd: resolve(repoRoot, "example/simple"),
+        args: ['web'],
+        cwd: resolve(repoRoot, 'example/simple'),
         homeDir: fixture.path,
       });
 
       try {
-        await session.waitForText("Select script");
+        await session.waitForText('Select script');
         await expect(
           getScriptSearchTerminalText(session, query)
         ).resolves.toMatchSnapshot();
@@ -146,34 +146,34 @@ describe.sequential("prw e2e", () => {
     }
   );
 
-  test("runs a script directly in the simple workspace", async () => {
+  test('runs a script directly in the simple workspace', async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
-      args: ["web", "dev"],
-      cwd: resolve(repoRoot, "example/simple"),
+      args: ['web', 'dev'],
+      cwd: resolve(repoRoot, 'example/simple'),
       homeDir: fixture.path,
     });
 
     try {
-      await session.waitForText("🚀 @simple/web dev starting...");
+      await session.waitForText('🚀 @simple/web dev starting...');
 
       await expect(readTerminal(session)).resolves.toContain(
-        "🚀 @simple/web dev starting..."
+        '🚀 @simple/web dev starting...'
       );
     } finally {
       await closeSessionSafely(session);
     }
   });
 
-  test("shows the package picker for the large workspace", async () => {
+  test('shows the package picker for the large workspace', async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
-      cwd: resolve(repoRoot, "example/large"),
+      cwd: resolve(repoRoot, 'example/large'),
       homeDir: fixture.path,
     });
 
     try {
-      await session.waitForText("Select package");
+      await session.waitForText('Select package');
 
       await expect(readTerminal(session)).resolves.toMatchSnapshot();
     } finally {
@@ -181,17 +181,17 @@ describe.sequential("prw e2e", () => {
     }
   });
 
-  test.each(["web", "zzz"])(
+  test.each(['web', 'zzz'])(
     'shows the package picker while searching for "%s"',
     async (query) => {
       await using fixture = await createFixture();
       const session = await launchPrwSession({
-        cwd: resolve(repoRoot, "example/large"),
+        cwd: resolve(repoRoot, 'example/large'),
         homeDir: fixture.path,
       });
 
       try {
-        await session.waitForText("Select package");
+        await session.waitForText('Select package');
         await expect(
           getPackageSearchTerminalText(session, query)
         ).resolves.toMatchSnapshot();
@@ -204,13 +204,13 @@ describe.sequential("prw e2e", () => {
   test('shows the filtered package picker for the query "a"', async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
-      args: ["a"],
-      cwd: resolve(repoRoot, "example/large"),
+      args: ['a'],
+      cwd: resolve(repoRoot, 'example/large'),
       homeDir: fixture.path,
     });
 
     try {
-      await session.waitForText("Select package");
+      await session.waitForText('Select package');
 
       await expect(readTerminal(session)).resolves.toMatchSnapshot();
     } finally {
@@ -218,15 +218,15 @@ describe.sequential("prw e2e", () => {
     }
   });
 
-  test("shows the package picker cancellation state", async () => {
+  test('shows the package picker cancellation state', async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
-      cwd: resolve(repoRoot, "example/large"),
+      cwd: resolve(repoRoot, 'example/large'),
       homeDir: fixture.path,
     });
 
     try {
-      await session.waitForText("Select package");
+      await session.waitForText('Select package');
 
       await expect(cancelAndReadTerminal(session)).resolves.toMatchSnapshot();
     } finally {
@@ -234,35 +234,35 @@ describe.sequential("prw e2e", () => {
     }
   });
 
-  test("runs a script directly in the large workspace", async () => {
+  test('runs a script directly in the large workspace', async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
-      args: ["api", "build"],
-      cwd: resolve(repoRoot, "example/large"),
+      args: ['api', 'build'],
+      cwd: resolve(repoRoot, 'example/large'),
       homeDir: fixture.path,
     });
 
     try {
-      await session.waitForText("📦 @large/api building...");
+      await session.waitForText('📦 @large/api building...');
 
       await expect(readTerminal(session)).resolves.toContain(
-        "📦 @large/api building..."
+        '📦 @large/api building...'
       );
     } finally {
       await closeSessionSafely(session);
     }
   });
 
-  test("shows the minimal script picker in edge-cases workspace", async () => {
+  test('shows the minimal script picker in edge-cases workspace', async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
-      args: ["minimal"],
-      cwd: resolve(repoRoot, "example/edge-cases"),
+      args: ['minimal'],
+      cwd: resolve(repoRoot, 'example/edge-cases'),
       homeDir: fixture.path,
     });
 
     try {
-      await session.waitForText("Select script");
+      await session.waitForText('Select script');
 
       await expect(readTerminal(session)).resolves.toMatchSnapshot();
     } finally {
@@ -270,18 +270,18 @@ describe.sequential("prw e2e", () => {
     }
   });
 
-  test.each(["build", "zzz"])(
+  test.each(['build', 'zzz'])(
     'shows the minimal script picker while searching for "%s"',
     async (query) => {
       await using fixture = await createFixture();
       const session = await launchPrwSession({
-        args: ["minimal"],
-        cwd: resolve(repoRoot, "example/edge-cases"),
+        args: ['minimal'],
+        cwd: resolve(repoRoot, 'example/edge-cases'),
         homeDir: fixture.path,
       });
 
       try {
-        await session.waitForText("Select script");
+        await session.waitForText('Select script');
         await expect(
           getScriptSearchTerminalText(session, query)
         ).resolves.toMatchSnapshot();
@@ -291,16 +291,16 @@ describe.sequential("prw e2e", () => {
     }
   );
 
-  test("shows the root script picker", async () => {
+  test('shows the root script picker', async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
-      args: ["root"],
-      cwd: resolve(repoRoot, "example/simple"),
+      args: ['root'],
+      cwd: resolve(repoRoot, 'example/simple'),
       homeDir: fixture.path,
     });
 
     try {
-      await session.waitForText("Select script");
+      await session.waitForText('Select script');
 
       await expect(readTerminal(session)).resolves.toMatchSnapshot();
     } finally {
@@ -308,16 +308,16 @@ describe.sequential("prw e2e", () => {
     }
   });
 
-  test("shows the script picker cancellation state", async () => {
+  test('shows the script picker cancellation state', async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
-      args: ["web"],
-      cwd: resolve(repoRoot, "example/simple"),
+      args: ['web'],
+      cwd: resolve(repoRoot, 'example/simple'),
       homeDir: fixture.path,
     });
 
     try {
-      await session.waitForText("Select script");
+      await session.waitForText('Select script');
 
       await expect(cancelAndReadTerminal(session)).resolves.toMatchSnapshot();
     } finally {
@@ -325,55 +325,55 @@ describe.sequential("prw e2e", () => {
     }
   });
 
-  test("reports a missing script list for unnamed packages", async () => {
+  test('reports a missing script list for unnamed packages', async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
-      args: ["unnamed"],
-      cwd: resolve(repoRoot, "example/edge-cases"),
+      args: ['unnamed'],
+      cwd: resolve(repoRoot, 'example/edge-cases'),
       homeDir: fixture.path,
     });
 
     try {
-      await session.waitForText("No scripts in apps/unnamed");
+      await session.waitForText('No scripts in apps/unnamed');
 
       await expect(readTerminal(session)).resolves.toMatchSnapshot();
       await expect(readTerminal(session)).resolves.toContain(
-        "No scripts in apps/unnamed"
+        'No scripts in apps/unnamed'
       );
     } finally {
       await closeSessionSafely(session);
     }
   });
 
-  test("reports a missing script list for named packages with no scripts", async () => {
+  test('reports a missing script list for named packages with no scripts', async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
-      args: ["no-scripts"],
-      cwd: resolve(repoRoot, "example/edge-cases"),
+      args: ['no-scripts'],
+      cwd: resolve(repoRoot, 'example/edge-cases'),
       homeDir: fixture.path,
     });
 
     try {
-      await session.waitForText("No scripts in @edge/no-scripts");
+      await session.waitForText('No scripts in @edge/no-scripts');
 
       await expect(readTerminal(session)).resolves.toMatchSnapshot();
       await expect(readTerminal(session)).resolves.toContain(
-        "No scripts in @edge/no-scripts"
+        'No scripts in @edge/no-scripts'
       );
     } finally {
       await closeSessionSafely(session);
     }
   });
 
-  test("shows the package picker when launched from inside a workspace subdirectory", async () => {
+  test('shows the package picker when launched from inside a workspace subdirectory', async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
-      cwd: resolve(repoRoot, "example/simple/apps/web"),
+      cwd: resolve(repoRoot, 'example/simple/apps/web'),
       homeDir: fixture.path,
     });
 
     try {
-      await session.waitForText("Select package");
+      await session.waitForText('Select package');
 
       await expect(readTerminal(session)).resolves.toMatchSnapshot();
     } finally {
@@ -381,28 +381,28 @@ describe.sequential("prw e2e", () => {
     }
   });
 
-  test("runs root workspace scripts when launched from inside a workspace subdirectory", async () => {
+  test('runs root workspace scripts when launched from inside a workspace subdirectory', async () => {
     await using fixture = await createFixture();
     const session = await launchPrwSession({
-      args: ["root", "build"],
-      cwd: resolve(repoRoot, "example/simple/apps/web"),
+      args: ['root', 'build'],
+      cwd: resolve(repoRoot, 'example/simple/apps/web'),
       homeDir: fixture.path,
     });
 
     try {
-      await session.waitForText("@simple/web building");
+      await session.waitForText('@simple/web building');
 
       const output = await readTerminal(session);
 
-      expect(output).toContain("simple-workspace@1.0.0 build");
-      expect(output).toContain("/example/simple");
-      expect(output).toContain("@simple/web building");
+      expect(output).toContain('simple-workspace@1.0.0 build');
+      expect(output).toContain('/example/simple');
+      expect(output).toContain('@simple/web building');
     } finally {
       await closeSessionSafely(session);
     }
   });
 
-  test.each(["--help", "-h"])(
+  test.each(['--help', '-h'])(
     'shows help when "%s" is passed',
     async (flag) => {
       await using fixture = await createFixture();
@@ -413,10 +413,10 @@ describe.sequential("prw e2e", () => {
       });
 
       try {
-        await session.waitForText("USAGE");
+        await session.waitForText('USAGE');
 
         expect(
-          (await readTerminal(session)).replace(pkg.version, "0.0.0-test")
+          (await readTerminal(session)).replace(pkg.version, '0.0.0-test')
         ).toMatchSnapshot();
       } finally {
         await closeSessionSafely(session);
@@ -424,7 +424,7 @@ describe.sequential("prw e2e", () => {
     }
   );
 
-  test.each(["--version", "-v"])(
+  test.each(['--version', '-v'])(
     'shows version when "%s" is passed',
     async (flag) => {
       await using fixture = await createFixture();
@@ -445,7 +445,7 @@ describe.sequential("prw e2e", () => {
     }
   );
 
-  test("reports an error when launched completely outside a workspace", async () => {
+  test('reports an error when launched completely outside a workspace', async () => {
     await using fixture = await createFixture();
     await using homeFixture = await createFixture();
     const session = await launchPrwSession({
@@ -454,7 +454,7 @@ describe.sequential("prw e2e", () => {
     });
 
     try {
-      await session.waitForText("Run prw inside a pnpm workspace.");
+      await session.waitForText('Run prw inside a pnpm workspace.');
 
       await expect(readTerminal(session)).resolves.toMatchSnapshot();
     } finally {

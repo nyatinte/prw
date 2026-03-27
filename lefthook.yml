@@ -2,12 +2,12 @@ pre-commit:
   jobs:
     - run: pnpm fix -- {staged_files}
       glob:
-        - "**/*.js"
-        - "**/*.jsx"
-        - "**/*.ts"
-        - "**/*.tsx"
-        - "**/*.json"
-        - "**/*.jsonc"
-        - "**/*.css"
+        - '**/*.js'
+        - '**/*.jsx'
+        - '**/*.ts'
+        - '**/*.tsx'
+        - '**/*.json'
+        - '**/*.jsonc'
+        - '**/*.css'
       stage_fixed: true
     - run: pnpm knip

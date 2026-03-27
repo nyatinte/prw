@@ -1,9 +1,9 @@
 ---
 name: Bug Report
 about: Report unexpected behavior or a regression
-title: ""
+title: ''
 labels: bug
-assignees: ""
+assignees: ''
 ---
 
 ## AS IS

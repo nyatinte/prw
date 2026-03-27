@@ -2,22 +2,15 @@
 
 ## SYNOPSIS
 
-`prw` [-h|--help] [-v|--version]<br>
-`prw` [PACKAGE [SCRIPT]]
+`prw` [-h|--help] [-v|--version]<br> `prw` [PACKAGE [SCRIPT]]
 
 ## DESCRIPTION
 
-**prw** is an interactive CLI for selecting and running scripts from packages
-in a pnpm monorepo.
+**prw** is an interactive CLI for selecting and running scripts from packages in a pnpm monorepo.
 
-When invoked without arguments, it presents an interactive package picker
-followed by a script picker. When a PACKAGE query is given, it substring-matches
-(case-insensitive) against workspace package names; if exactly one package matches,
-it is selected automatically. When both PACKAGE and SCRIPT are given, the script is
-executed directly without any interactive prompt.
+When invoked without arguments, it presents an interactive package picker followed by a script picker. When a PACKAGE query is given, it substring-matches (case-insensitive) against workspace package names; if exactly one package matches, it is selected automatically. When both PACKAGE and SCRIPT are given, the script is executed directly without any interactive prompt.
 
-Previously used package/script pairs are remembered and floated to the top
-of the picker lists.
+Previously used package/script pairs are remembered and floated to the top of the picker lists.
 
 ## ARGUMENTS
 
