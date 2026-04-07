@@ -50,7 +50,7 @@ export function findWorkspaceRoot(cwd: string): string {
 export async function getPackages(root: string): Promise<Package[]> {
   const workspaceConfig = await readFile(
     join(root, WORKSPACE_CONFIG_FILE),
-    "utf8"
+    "utf-8"
   );
   const config = (parse(workspaceConfig) ?? {}) as { packages?: string[] };
 
@@ -72,7 +72,7 @@ export async function getPackages(root: string): Promise<Package[]> {
       const dir = rawDir.replace(TRAILING_PATH_SEPARATOR_PATTERN, "");
       try {
         const pkgJson = JSON.parse(
-          await readFile(join(root, dir, "package.json"), "utf8")
+          await readFile(join(root, dir, "package.json"), "utf-8")
         );
         return { dir, name: pkgJson.name || dir } as Package;
       } catch {
@@ -93,7 +93,7 @@ export interface Script {
 export function getScripts(root: string, pkg: Package): Script[] {
   try {
     const pkgJson = JSON.parse(
-      readFileSync(join(root, pkg.dir, "package.json"), "utf8")
+      readFileSync(join(root, pkg.dir, "package.json"), "utf-8")
     );
     const { scripts } = pkgJson;
     if (!scripts || typeof scripts !== "object") {

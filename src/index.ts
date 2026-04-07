@@ -1,4 +1,4 @@
-import { defineCommand, runMain } from "citty";
+import { defineCommand, showUsage, runMain } from "citty";
 
 import pkg from "../package.json" with { type: "json" };
 import { resolveScript, selectPackageByArgs } from "./cli.js";
@@ -35,6 +35,11 @@ const command = defineCommand({
     description: "Interactive pnpm workspace package & script runner",
   },
   async run({ args }) {
+    if (args.help) {
+      await showUsage(command);
+      return;
+    }
+
     if (args.version) {
       console.log(pkg.version);
       return;
