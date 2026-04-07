@@ -1,6 +1,6 @@
 {
   "name": "@nyatinte/prw",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Interactive pnpm workspace package & script runner",
   "keywords": [
     "cli",
