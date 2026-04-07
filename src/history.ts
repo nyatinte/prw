@@ -20,7 +20,10 @@ export function resolveHistoryFile(workspaceRootPath: string): string {
 
 export function loadHistory(workspaceRootPath: string): HistoryEntry[] {
   try {
-    const content = readFileSync(resolveHistoryFile(workspaceRootPath), "utf8");
+    const content = readFileSync(
+      resolveHistoryFile(workspaceRootPath),
+      "utf-8"
+    );
     const parsed = JSON.parse(content);
     return Array.isArray(parsed) ? parsed : [];
   } catch {
