@@ -1,5 +1,11 @@
 # @nyatinte/prw
 
+## 0.4.2
+
+### Patch Changes
+
+- 37cc6d7: Update dependencies: @clack/prompts, citty, yaml, vitest, tsdown, typescript, knip, @types/node, and others
+
 ## 0.4.1
 
 ### Patch Changes
@@ -19,6 +25,7 @@
   History is now saved at `$XDG_STATE_HOME/prw/histories/<workspace-id>.json` (fallback: `~/.local/state/prw/histories/<workspace-id>.json`). `<workspace-id>` is a SHA-256 hash of the resolved workspace root path.
 
 - 28f0f2f: Fix signal-killed child process treated as success and unhandled rejection in bin.ts
+
   - `runner.ts`: exit with code 1 when `spawnSync` returns a non-null `signal` (e.g. SIGINT from Ctrl+C), instead of silently exiting 0
   - `bin.ts`: chain `.catch()` on `main()` so unexpected rejections are logged and cause a non-zero exit instead of an unhandled promise rejection
 
