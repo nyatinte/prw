@@ -4,6 +4,9 @@ export default defineConfig({
   entry: {
     bin: "src/bin.ts",
   },
+  // Without `targets`, exe: true builds only for the current platform using
+  // the current Node.js binary. Specifying targets here enables cross-platform
+  // builds: @tsdown/exe downloads the appropriate Node.js binary per target.
   exe: {
     outDir: "exe",
     fileName: "prw",

@@ -66,8 +66,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          # exe build requires Node.js >=25.7.0 (SEA support)
-          node-version: '25'
+          node-version-file: .node-versions
           cache: pnpm
 
       - name: Install dependencies
@@ -78,8 +77,10 @@ jobs:
 
       - name: Get release tag
         id: tag
+        env:
+          PUBLISHED_PACKAGES: ${{ needs.release.outputs.publishedPackages }}
         run: |
-          VERSION=$(echo '${{ needs.release.outputs.publishedPackages }}' | jq -r '.[0].version')
+          VERSION=$(echo "$PUBLISHED_PACKAGES" | jq -r '.[0].version')
           echo "tag=@nyatinte/prw@${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Upload executables to GitHub Release

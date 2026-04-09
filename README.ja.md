@@ -27,11 +27,37 @@
 
 ## インストール
 
+### npm（Node.js が必要）
+
 ```bash
 npm install -g @nyatinte/prw
 # or
 pnpm add -g @nyatinte/prw
 ```
+
+### スタンドアロンバイナリ（Node.js 不要）
+
+各 [GitHub Release](https://github.com/nyatinte/prw/releases) にプラットフォーム別の実行ファイルが添付されています。
+ダウンロードして実行権限を付与し、`$PATH` の通ったディレクトリに置くだけで使えます。
+
+| ファイル | プラットフォーム |
+|---|---|
+| `prw-linux-x64` | Linux x64 |
+| `prw-linux-arm64` | Linux ARM64 |
+| `prw-darwin-x64` | macOS Intel |
+| `prw-darwin-arm64` | macOS Apple Silicon |
+| `prw-win-x64.exe` | Windows x64 |
+
+**macOS / Linux**
+
+```bash
+# 例: macOS Apple Silicon
+curl -L https://github.com/nyatinte/prw/releases/latest/download/prw-darwin-arm64 -o prw
+chmod +x prw
+sudo mv prw /usr/local/bin/
+```
+
+**Windows** — `prw-win-x64.exe` をダウンロードして `prw.exe` にリネームし、`%PATH%` の通ったフォルダに配置してください。
 
 ## 使い方
 
