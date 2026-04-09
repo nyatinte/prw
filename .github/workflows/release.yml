@@ -19,6 +19,9 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    outputs:
+      published: ${{ steps.changesets.outputs.published }}
+      publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,5 +47,45 @@ jobs:
         with:
           version: pnpm version-packages
           publish: pnpm release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-exe:
+    name: Build Executables
+    needs: release
+    if: needs.release.outputs.published == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          # exe build requires Node.js >=25.7.0 (SEA support)
+          node-version: '25'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build cross-platform executables
+        run: pnpm build:exe
+
+      - name: Get release tag
+        id: tag
+        run: |
+          VERSION=$(echo '${{ needs.release.outputs.publishedPackages }}' | jq -r '.[0].version')
+          echo "tag=@nyatinte/prw@${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload executables to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          files: exe/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
