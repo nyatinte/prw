@@ -34,7 +34,9 @@
   },
   "scripts": {
     "build": "tsdown",
+    "build:exe": "tsdown --config tsdown.exe.config.ts",
     "clean:dist": "rm -rf dist",
+    "clean:exe": "rm -rf exe",
     "build:man": "marked-man man/prw.1.md -o man/prw.1",
     "changeset": "changeset",
     "check": "ultracite check",
@@ -59,6 +61,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "2.30.0",
+    "@tsdown/exe": "0.21.7",
     "@types/node": "24.12.2",
     "@typescript/native-preview": "7.0.0-dev.20260406.1",
     "@vitest/coverage-v8": "4.1.2",
