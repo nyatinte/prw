@@ -1,5 +1,4 @@
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 
 import { createFixture } from "fs-fixture";
 import { launchTerminal } from "tuistory";
@@ -7,7 +6,7 @@ import type { Session } from "tuistory";
 
 import pkg from "../package.json" with { type: "json" };
 
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const repoRoot = resolve(import.meta.dirname, "..");
 const binPath = resolve(repoRoot, "dist/bin.mjs");
 
 /*
