@@ -2,8 +2,8 @@ vi.mock<typeof import("./ui")>(import("./ui"), async (importOriginal) => {
   const actual = await importOriginal<typeof import("./ui")>();
   return {
     ...actual,
-    selectPackage: vi.fn(),
-    selectScript: vi.fn(),
+    selectPackage: vi.fn<typeof import("./ui").selectPackage>(),
+    selectScript: vi.fn<typeof import("./ui").selectScript>(),
   };
 });
 vi.mock<typeof import("./workspace")>(
@@ -12,7 +12,7 @@ vi.mock<typeof import("./workspace")>(
     const actual = await importOriginal<typeof import("./workspace")>();
     return {
       ...actual,
-      getScripts: vi.fn(),
+      getScripts: vi.fn<typeof import("./workspace").getScripts>(),
     };
   }
 );
