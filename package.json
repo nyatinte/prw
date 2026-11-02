@@ -48,7 +48,7 @@
     "test:coverage": "pnpm build && vitest run --coverage",
     "test:update": "pnpm build && vitest -u",
     "typecheck": "tsgo --noEmit -p tsconfig.json",
-    "version-packages": "changeset version"
+    "version-packages": "changeset version && oxfmt --write CHANGELOG.md"
   },
   "dependencies": {
     "@clack/prompts": "1.2.0",
