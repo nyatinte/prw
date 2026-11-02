@@ -6,7 +6,7 @@ import type { Package } from "./workspace.js";
 vi.mock<typeof import("node:child_process")>(
   import("node:child_process"),
   () => ({
-    spawnSync: vi.fn(),
+    spawnSync: vi.fn<typeof import("node:child_process").spawnSync>(),
   })
 );
 
